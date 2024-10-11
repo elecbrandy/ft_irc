@@ -107,28 +107,17 @@ void IrcServer::handleClientMessage(int client_fd) {
 	// 나중에 이 클라에서 보낸 데이터를 읽어올때 이걸 반복문으로 돌려야하나? 버퍼 이상 보낼수도있으니까?
 	
 	if (bytes_received < 0) {	 // 클라에서 에러 발생
-		handleReceiveError(client_fd);
+		if (errno != EWOULDBLOCK && errno != EAGAIN) {
+			handleError(ERR_ETC, UNEXIT);
+			removeClient(client_fd);
+		}
 	} else if (bytes_received == 0) { // 클라 정상 종료
 		removeClient(client_fd);	
 	} else { // 메ㅔ세지 정상 받음
-		processClientMessage(client_fd, buffer, bytes_received);
+		buffer[bytes_received] = '\0';  // 널 문자추가
+		std::cout << "클라이언트 " << client_fd << "로부터 메시지: " << buffer << std::endl;
+		broadcastMessage(client_fd, buffer);  // 다른 클라이언트들에게 메시지 쏴주기
 	}
-}
-
-// 클라이언트에서 에러를 받았을 경우
-void IrcServer::handleReceiveError(int client_fd) {
-	if (errno != EWOULDBLOCK && errno != EAGAIN) {
-		handleError(ERR_ETC, UNEXIT);
-		removeClient(client_fd);
-	}
-}
-
-
-void IrcServer::processClientMessage(int client_fd, char* buffer, int bytes_received) {
-	buffer[bytes_received] = '\0';  // 널 종단 문자 추가
-	std::cout << "클라이언트 " << client_fd << "로부터 메시지: " << buffer << std::endl;
-
-	broadcastMessage(client_fd, buffer);  // 다른 클라이언트들에게 메시지 쏴주기
 }
 
 // 깔끔하게 좀 수정하기 밑에

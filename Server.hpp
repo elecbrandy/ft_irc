@@ -54,8 +54,6 @@ public:
 	void	removeClient(int fd);
 	void	handleSocketEvent(int fd);
 	void	handleClientMessage(int fd);
-	void 	processClientMessage(int client_fd, char* buffer, int bytes_received);
-	void	handleReceiveError(int client_fd);
 	void	broadcastMessage(int sender_fd, const char* message);
 	void	handleError(ServerError code, int flag);
 	void	run();
