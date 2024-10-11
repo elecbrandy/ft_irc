@@ -111,18 +111,18 @@ void IrcServer::handleClientMessage(int client_fd) {
 			handleError(ERR_ETC, UNEXIT);
 			removeClient(client_fd);
 		}
-	} else if (bytes_received == 0) { // 클라 정상 종료
-		removeClient(client_fd);	
+	} else if (bytes_received == 0) { // 클라 정상 종료?
+		removeClient(client_fd);
 	} else { // 메ㅔ세지 정상 받음
 		buffer[bytes_received] = '\0';  // 널 문자추가
-		std::cout << "클라이언트 " << client_fd << "로부터 메시지: " << buffer << std::endl;
+		std::cout << "Message from client " << client_fd << ": " << buffer << std::endl;
 		broadcastMessage(client_fd, buffer);  // 다른 클라이언트들에게 메시지 쏴주기
 	}
 }
 
 // 깔끔하게 좀 수정하기 밑에
 void IrcServer::broadcastMessage(int sender_fd, const char* message) {
-	std::string full_message = "클라이언트 ";
+	std::string full_message = "Client ";
 	std::stringstream ss;
 	ss << sender_fd;
 	full_message += ss.str();
@@ -136,7 +136,7 @@ void IrcServer::broadcastMessage(int sender_fd, const char* message) {
 		if (client_fd != server_fd && client_fd != sender_fd) {
 			int bytes_sent = send(client_fd, full_message.c_str(), full_message.length(), 0);
 			if (bytes_sent < 0) {
-				std::cerr << "클라이언트 " << client_fd << "에게 메시지 전송 에러: " << strerror(errno) << std::endl;
+				std::cerr << "Error sending message to client " << client_fd << ": " << strerror(errno) << std::endl;
 				// 필요에 따라 클라이언트를 제거할 수 있음
 				// removeClient(client_fd);
 			}
