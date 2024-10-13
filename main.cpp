@@ -1,18 +1,21 @@
+#include "ArgParser.hpp"
 #include "Server.hpp"
 
 int main(int ac, char** av) {
-	if (ac != 3) {
-		std::cerr << "error" << std::endl;
+	try {
+		ArgParser arg(ac, av);
+		IrcServer server(arg.getPort(), arg.getPassword());
+		server.init();
+		server.run();
+	} catch (const ArgParser::ArgException& e) {
+		std::cerr << "Error: " << e.what() << std::endl;
+		return 1;
+	// } catch (const Server::ServerException& e) {
+	// 	std::cerr << "Error: " << e.what() << std::endl;
+	// 	return 1;
+	} catch (const std::exception& e) {
+		std::cerr << "Error: Unkown..." << e.what() << std::endl;
 		return 1;
 	}
-
-	int port = std::atoi(av[1]);
-	std::string password = av[2];
-
-	IrcServer server(port, password);
-	server.init();
-
-	server.run();
-
 	return 0;
 }

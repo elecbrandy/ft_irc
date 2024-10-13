@@ -146,7 +146,7 @@ void IrcServer::broadcastMessage(int sender_fd, const char* message) {
 
 
 // 나중에 영어로~
-void IrcServer::handleError(ServerError code, int flag) {
+void IrcServer::handleError(ErrorCode code, int flag) {
 	switch (code) {
 		case ERR_SOCKET_CREATION:
 			std::cerr << "소켓 생성 에러: " << strerror(errno) << std::endl;
