@@ -1,8 +1,12 @@
 #include "Client.hpp"
 
-Client::Client() {}
-
-Client::Client(const std::string& str) : name(str) {}
+Client::Client() : _nickname(""), 
+					_username(""), 
+					_hostname(""), 
+					_realname(""), 
+					_password(""), 
+					_ipAddress(""), 
+					_servername("") {}
 
 Client:: ~Client() {}
 

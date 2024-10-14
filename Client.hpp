@@ -32,7 +32,7 @@ public:
 	std::string	getRealname() const;
 	std::string	getPassword() const;
 	std::string	getIpAddress() const;
-	std::string	getServername() const; 
+	std::string	getServername() const;
 };
 
 #endif

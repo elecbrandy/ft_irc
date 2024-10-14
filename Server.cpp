@@ -99,9 +99,10 @@ void IrcServer::handleSocketEvent(int fd) {
 	}
 }
 
-void IrcServer::handleClientMessage(int client_fd) {
-	char buffer[BUFFER_SIZE];
+std::string IrcServer::handleClientMessage(int client_fd) {
+	char buffer[BUFFER_SIZE]; //rfc기준 512가 맥스임
 	std::memset(buffer, 0, BUFFER_SIZE); // 이거 써도 되나?
+	std::string receivecMsg;
 
 	int bytes_received = recv(client_fd, buffer, BUFFER_SIZE - 1, 0);
 	// 나중에 이 클라에서 보낸 데이터를 읽어올때 이걸 반복문으로 돌려야하나? 버퍼 이상 보낼수도있으니까?
@@ -118,6 +119,9 @@ void IrcServer::handleClientMessage(int client_fd) {
 		std::cout << "Message from client " << client_fd << ": " << buffer << std::endl;
 		broadcastMessage(client_fd, buffer);  // 다른 클라이언트들에게 메시지 쏴주기
 	}
+
+	receivecMsg = buffer;
+	return receivecMsg;
 }
 
 // 깔끔하게 좀 수정하기 밑에
@@ -185,4 +189,44 @@ void IrcServer::handleError(ErrorCode code, int flag) {
 	if (flag == EXIT) {
 		exit(EXIT_FAILURE);
 	}
+}
+
+
+void IrcServer::handleClient(int client_fd) {
+	std::string clientRequest = handleClientMessage(client_fd);
+
+	handleClientCommand(client_fd, clientRequest);
+}
+
+void handleClientCommand(int client_fd, std::string clientMsg) {
+	// clientRequest를 파싱해서 명령어를 추출
+	// 추출한 명령어를 실행
+	// 명령어 실행 결과를 클라이언트에게 전송
+
+	std::string cmd = getCommand(clientMsg);
+
+	if (cmd == "PASS")
+		cmdPass(client_fd, clientMsg);
+	else if (cmd == "NICK")
+		cmdNick(client_fd, clientMsg);
+	else if (cmd == "USER")
+		cmdUser(client_fd, clientMsg);
+	else if (cmd == "JOIN")
+		cmdJoin(client_fd, clientMsg);
+	else if (cmd == "PART")
+		cmdMode(client_fd, clientMsg);
+	else if (cmd == "PRIVMSG")
+		cmdPrivmsg(client_fd, clientMsg);
+	else if (cmd == "PING")
+		cmdPing(client_fd, clientMsg);
+	else if (cmd == "KICK")
+		cmdKick(client_fd, clientMsg);
+	else if (cmd == "INVITE")
+		cmdInvite(client_fd, clientMsg);
+	else if (cmd == "MODE")
+		cmdPart(client_fd, clientMsg);
+	else if (cmd == "TOPIC")
+		cmdTopic(client_fd, clientMsg);
+	else
+		sendMessage(client_fd, ERR_UNKNOWNCOMMAND);
 }
