@@ -175,6 +175,7 @@ private:
 	std::string					password;
 	std::vector<struct pollfd>	fds;
 	std::map<int, Client*>		clients;
+	std::stringstream			_msgBuf;
 
 public:
 	IrcServer();
@@ -185,12 +186,17 @@ public:
 	void	acceptClient();
 	void	removeClient(int fd);
 	void	handleSocketEvent(int fd);
-	std::string	handleClientMessage(int fd);
-	void	broadcastMessage(int sender_fd, const char* message);
+	void	handleClientMessage(int fd);
+	void	broadcastMessage(int sender_fd, char* message);
 	void	handleError(ErrorCode code, int flag);
 	void	run();
 
 	void 	handleClientRequest(int client_fd);
+	std::string extractCmd();
+	void 	handleClientCommand(int client_fd);
+	Client* getClient(int client_fd);
+	void cmdUser(std::stringstream &msg, int client_fd);
+	void sendMsg(int client_fd, const std::string& msg);
 };
 
 #endif

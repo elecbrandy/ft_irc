@@ -99,7 +99,7 @@ void IrcServer::handleSocketEvent(int fd) {
 	}
 }
 
-std::string IrcServer::handleClientMessage(int client_fd) {
+void IrcServer::handleClientMessage(int client_fd) {
 	char buffer[BUFFER_SIZE]; //rfc기준 512가 맥스임
 	std::memset(buffer, 0, BUFFER_SIZE); // 이거 써도 되나?
 	std::string receivecMsg;
@@ -117,15 +117,16 @@ std::string IrcServer::handleClientMessage(int client_fd) {
 	} else { // 메ㅔ세지 정상 받음
 		buffer[bytes_received] = '\0';  // 널 문자추가
 		std::cout << "Message from client " << client_fd << ": " << buffer << std::endl;
+		receivecMsg = buffer;
+		this->_msgBuf << receivecMsg;
+		handleClientCommand(client_fd);  // 클라이언트 요청 처리
 		broadcastMessage(client_fd, buffer);  // 다른 클라이언트들에게 메시지 쏴주기
 	}
 
-	receivecMsg = buffer;
-	return receivecMsg;
 }
 
 // 깔끔하게 좀 수정하기 밑에
-void IrcServer::broadcastMessage(int sender_fd, const char* message) {
+void IrcServer::broadcastMessage(int sender_fd, char* message) {
 	std::string full_message = "Client ";
 	std::stringstream ss;
 	ss << sender_fd;
@@ -191,42 +192,65 @@ void IrcServer::handleError(ErrorCode code, int flag) {
 	}
 }
 
+std::string IrcServer::extractCmd() {
+	if (_msgBuf.str().empty())
+		throw std::runtime_error("Empty message");
+	
+	std::string cmd;
+	
+	_msgBuf >> cmd;
+	_msgBuf.str(_msgBuf.str().substr(cmd.length() + 1));
 
-void IrcServer::handleClient(int client_fd) {
-	std::string clientRequest = handleClientMessage(client_fd);
-
-	handleClientCommand(client_fd, clientRequest);
+	return cmd;
 }
 
-void handleClientCommand(int client_fd, std::string clientMsg) {
+void IrcServer::handleClientCommand(int client_fd) {
 	// clientRequest를 파싱해서 명령어를 추출
 	// 추출한 명령어를 실행
 	// 명령어 실행 결과를 클라이언트에게 전송
 
-	std::string cmd = getCommand(clientMsg);
+	std::string cmd = extractCmd();
+	std::cout << "Command : " << cmd << std::endl;
+	if (cmd == "USER")
+		cmdUser(_msgBuf, client_fd);
+	// else if (cmd == "PASS")
+	// 	cmdPass(client_fd, clientMsg);
+	// else if (cmd == "NICK")
+	// 	cmdNick(client_fd, clientMsg);
+	// else if (cmd == "JOIN")
+	// 	cmdJoin(client_fd, clientMsg);
+	// else if (cmd == "PART")
+	// 	cmdMode(client_fd, clientMsg);
+	// else if (cmd == "PRIVMSG")
+	// 	cmdPrivmsg(client_fd, clientMsg);
+	// else if (cmd == "PING")
+	// 	cmdPing(client_fd, clientMsg);
+	// else if (cmd == "KICK")
+	// 	cmdKick(client_fd, clientMsg);
+	// else if (cmd == "INVITE")
+	// 	cmdInvite(client_fd, clientMsg);
+	// else if (cmd == "MODE")
+	// 	cmdPart(client_fd, clientMsg);
+	// else if (cmd == "TOPIC")
+	// 	cmdTopic(client_fd, clientMsg);
+	// else
+	// 	sendMessage(client_fd, ERR_UNKNOWNCOMMAND);
+}
 
-	if (cmd == "PASS")
-		cmdPass(client_fd, clientMsg);
-	else if (cmd == "NICK")
-		cmdNick(client_fd, clientMsg);
-	else if (cmd == "USER")
-		cmdUser(client_fd, clientMsg);
-	else if (cmd == "JOIN")
-		cmdJoin(client_fd, clientMsg);
-	else if (cmd == "PART")
-		cmdMode(client_fd, clientMsg);
-	else if (cmd == "PRIVMSG")
-		cmdPrivmsg(client_fd, clientMsg);
-	else if (cmd == "PING")
-		cmdPing(client_fd, clientMsg);
-	else if (cmd == "KICK")
-		cmdKick(client_fd, clientMsg);
-	else if (cmd == "INVITE")
-		cmdInvite(client_fd, clientMsg);
-	else if (cmd == "MODE")
-		cmdPart(client_fd, clientMsg);
-	else if (cmd == "TOPIC")
-		cmdTopic(client_fd, clientMsg);
-	else
-		sendMessage(client_fd, ERR_UNKNOWNCOMMAND);
+Client* IrcServer::getClient(int client_fd) {
+	if (clients.find(client_fd) == clients.end()) {
+    // 해당하는 client_fd가 존재하지 않음
+    throw std::runtime_error("Client not found.");
+	}
+
+	if (clients[client_fd] == nullptr) {
+		// 포인터가 null인 경우
+		throw std::runtime_error("Client pointer is null.");
+	}
+
+	return clients[client_fd];
+}
+
+void IrcServer::sendMsg(int client_fd, const std::string& msg) {
+	send(client_fd, msg.c_str(), msg.length(), 0);
 }
