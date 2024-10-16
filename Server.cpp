@@ -129,7 +129,7 @@ void IrcServer::handleClientMessage(int client_fd) {
 
 }
 
-void IrcServer::broadcastMessage(int client_fd, char* message) {
+void IrcServer::broadcastMessage(int client_fd, const char* message) {
     // 메시지 길이를 계산
     size_t msgLen = std::strlen(message);
 	std::cout << "client_fd in broadcastMessage : " << client_fd << std::endl;
@@ -209,17 +209,16 @@ std::string IrcServer::extractCmd() {
 
 void IrcServer::handleClientCommand(int client_fd) {
 	// clientRequest를 파싱해서 명령어를 추출
-	// 추출한 명령어를 실행
-	// 명령어 실행 결과를 클라이언트에게 전송
+	// 추출한 명령어 실행 후 실행 결과를 클라이언트에게 전송
 
-	std::string cmd = extractCmd();
+	std::string cmd = extractCmd(); // 클라이언트가 보낸 메세지에서 명령어 추출
 	std::cout << "Command : " << cmd << std::endl;
 	if (cmd == "USER")
 		cmdUser(_msgBuf, client_fd);
+	else if (cmd == "NICK")
+		cmdNick(client_fd, clientMsg);
 	// else if (cmd == "PASS")
 	// 	cmdPass(client_fd, clientMsg);
-	// else if (cmd == "NICK")
-	// 	cmdNick(client_fd, clientMsg);
 	// else if (cmd == "JOIN")
 	// 	cmdJoin(client_fd, clientMsg);
 	// else if (cmd == "PART")

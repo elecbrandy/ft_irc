@@ -28,19 +28,15 @@ void IrcServer::cmdUser(std::stringstream &msg, int client_fd) {
 	std::cout << "client->getServername() : " << client->getServername() << std::endl;
 	std::cout << "client->getRealname() : " << client->getRealname() << std::endl;
 
-
-
-	// 클라이언트에게 환영 메시지 전송
+	// 클라이언트에게 웰컴 메시지 전송
     std::string welcomeMsg = RPL_WELCOME(client->getUsername());
-    char tmpMsg[welcomeMsg.length() + 1];
-    std::strcpy(tmpMsg, welcomeMsg.c_str());
-	std::cout << "tmpMsg : " << tmpMsg << std::endl;
-	std::cout << "client_fd : " << client_fd << std::endl;
-    broadcastMessage(client_fd, tmpMsg);
+    broadcastMessage(client_fd, makeMsgFromServer(welcomeMsg));
 }
 
-// const char* IrcServer::makeCompleted(const std::string& str) {
-// 	std::string addCRLF = str + "\r\n";
-// 	const char* result = addCRLF.c_str();
-
-// }
+void IrcServer::cmdNick(std::stringstream &msg, int client_fd) {
+	std::string nickname;
+	msg >> nickname;
+	Client* client = getClient(client_fd);
+	client->setNickname(nickname);
+	std::cout << "client->getNickname() : " << client->getNickname() << std::endl;
+}

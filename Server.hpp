@@ -23,6 +23,7 @@
 #define EXIT 1
 #define UNEXIT 0
 
+#define CRLF "\r\n"
 // 001: 서버에 연결됨
 #define RPL_WELCOME(user) 						"001 " + user + " :Welcome to the motherfucking Internet Relay Network, " + user + "!"
 
@@ -187,7 +188,7 @@ public:
 	void	removeClient(int fd);
 	void	handleSocketEvent(int fd);
 	void	handleClientMessage(int fd);
-	void	broadcastMessage(int client_fd, char* message);
+	void	broadcastMessage(int client_fd, const char* message);
 	void	handleError(ErrorCode code, int flag);
 	void	run();
 
@@ -196,6 +197,8 @@ public:
 	void 	handleClientCommand(int client_fd);
 	Client* getClient(int client_fd);
 	void cmdUser(std::stringstream &msg, int client_fd);
+	void cmdNick(std::stringstream &msg, int client_fd);
+	const char* makeMsgFromServer(std::string msg);
 };
 
 #endif
