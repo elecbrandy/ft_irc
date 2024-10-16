@@ -24,7 +24,7 @@
 #define UNEXIT 0
 
 // 001: 서버에 연결됨
-#define RPL_WELCOME(user) 						"001 " + user + " :Welcome to the Internet Relay Network, " + user + "!"
+#define RPL_WELCOME(user) 						"001 " + user + " :Welcome to the motherfucking Internet Relay Network, " + user + "!"
 
 // 401: 대상 닉네임을 가진 사용자가 존재하지 않음
 #define ERR_NOSUCHNICK							"401 " + user + " "
@@ -187,7 +187,7 @@ public:
 	void	removeClient(int fd);
 	void	handleSocketEvent(int fd);
 	void	handleClientMessage(int fd);
-	void	broadcastMessage(int sender_fd, char* message);
+	void	broadcastMessage(int client_fd, char* message);
 	void	handleError(ErrorCode code, int flag);
 	void	run();
 
@@ -196,7 +196,6 @@ public:
 	void 	handleClientCommand(int client_fd);
 	Client* getClient(int client_fd);
 	void cmdUser(std::stringstream &msg, int client_fd);
-	void sendMsg(int client_fd, const std::string& msg);
 };
 
 #endif

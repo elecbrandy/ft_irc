@@ -1,4 +1,5 @@
 #include "Server.hpp"
+#include "Client.hpp"
 
 IrcServer::IrcServer() {}
 
@@ -62,7 +63,10 @@ void IrcServer::acceptClient() {
 	client_poll_fd.events = POLLIN;
 	fds.push_back(client_poll_fd);
 
-	std::cout << "New Client connected : " << client_fd << std::endl;
+	Client newClient;
+	clients[client_fd] = &newClient;
+
+	std::cout << "New Client connected, client_fd is " << client_fd << std::endl;
 }
 
 void IrcServer::removeClient(int client_fd) {
@@ -125,29 +129,28 @@ void IrcServer::handleClientMessage(int client_fd) {
 
 }
 
-// 깔끔하게 좀 수정하기 밑에
-void IrcServer::broadcastMessage(int sender_fd, char* message) {
-	std::string full_message = "Client ";
-	std::stringstream ss;
-	ss << sender_fd;
-	full_message += ss.str();
-	full_message += ": ";
-	full_message += message;
+void IrcServer::broadcastMessage(int client_fd, char* message) {
+    // 메시지 길이를 계산
+    size_t msgLen = std::strlen(message);
+	std::cout << "client_fd in broadcastMessage : " << client_fd << std::endl;
+    // send()를 통해 메시지 전송
+    ssize_t bytesSent = send(client_fd, message, msgLen, 0);
+    
+    if (bytesSent == -1) {
+        // 전송 중 오류가 발생하면 예외 처리
+        std::cerr << "Error: Failed to send message to client fd " << client_fd << std::endl;
+        throw std::runtime_error("Failed to send message");
+    }
 
-	for (size_t i = 0; i < fds.size(); ++i) {
-		int client_fd = fds[i].fd;
+    // 전송된 바이트 수가 전체 메시지 길이보다 적을 때 처리
+    // if (bytesSent < msgLen) {
+    //     std::cerr << "Warning: Only partial message sent to client fd " << client_fd << std::endl;
+    //     // 필요한 경우 여기서 추가 처리를 할 수 있음
+    // }
 
-		// 서버 소켓과 메시지 보낸 클라이언트는 제외
-		if (client_fd != server_fd && client_fd != sender_fd) {
-			int bytes_sent = send(client_fd, full_message.c_str(), full_message.length(), 0);
-			if (bytes_sent < 0) {
-				std::cerr << "Error sending message to client " << client_fd << ": " << strerror(errno) << std::endl;
-				// 필요에 따라 클라이언트를 제거할 수 있음
-				// removeClient(client_fd);
-			}
-		}
-	}
+    //std::cout << "Message sent to client fd " << client_fd << ": " << message << std::endl;
 }
+
 
 
 // 나중에 영어로~
@@ -249,8 +252,4 @@ Client* IrcServer::getClient(int client_fd) {
 	}
 
 	return clients[client_fd];
-}
-
-void IrcServer::sendMsg(int client_fd, const std::string& msg) {
-	send(client_fd, msg.c_str(), msg.length(), 0);
 }

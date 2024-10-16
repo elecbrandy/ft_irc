@@ -4,8 +4,7 @@ Client::Client() : _nickname(""),
 					_username(""), 
 					_hostname(""), 
 					_realname(""), 
-					_password(""), 
-					_ipAddress(""), 
+					_password(""),
 					_servername("") {}
 
 Client:: ~Client() {}
@@ -21,8 +20,6 @@ void Client::setRealname(const std::string& str) {this->_realname = str;}
 
 void Client::setPassword(const std::string& str) {this->_password = str;}
 
-void Client::setIpAddress(const std::string& str) {this->_ipAddress = str;}
-
 void Client::setServername(const std::string& str) {this->_servername = str;}
 
 /* getter */
@@ -35,7 +32,5 @@ std::string	Client::getHostname() const {return this->_hostname;}
 std::string	Client::getRealname() const {return this->_realname;}
 
 std::string	Client::getPassword() const {return this->_password;}
-
-std::string	Client::getIpAddress() const {return this->_ipAddress;}
 
 std::string	Client::getServername() const {return this->_servername;}

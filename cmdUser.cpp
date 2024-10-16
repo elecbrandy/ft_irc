@@ -2,12 +2,10 @@
 #include "Client.hpp"
 
 void IrcServer::cmdUser(std::stringstream &msg, int client_fd) {
-	std::cout << "here" << std::endl;
-	std::string names[4];
-	std::string tmp;
 	int cnt = 0;
-	std::cout << "here1" << std::endl;
-	Client* client = getClient(client_fd); //클라이언트 fd가 저장이 안된 상태에서 가져와서 실행이 안된다!!!!!
+	std::string tmp;
+	std::string names[4];
+	Client* client = getClient(client_fd);
 
 	while (cnt < 4) {
 		if (!(msg >> tmp)) {
@@ -15,12 +13,34 @@ void IrcServer::cmdUser(std::stringstream &msg, int client_fd) {
 			char tmpMsg[needmoreparams.length() + 1];
 			broadcastMessage(client_fd, tmpMsg);
 		}
-	std::cout << "here2" << std::endl;
 		names[cnt] = tmp;
 		cnt++;
 	}
-	std::cout << "here3" << std::endl;
-	std::string welcomeMsg = RPL_WELCOME(client->getNickname());
-	char tmpMsg[welcomeMsg.length() + 1];
-	broadcastMessage(client_fd, tmpMsg);
+
+	// 정상적으로 4개의 필드가 들어왔을 때 클라이언트 정보를 설정
+    client->setUsername(names[0]);
+    client->setHostname(names[1]);
+    client->setServername(names[2]);
+    client->setRealname(names[3]); 
+
+	std::cout << "client->getUsername() : " << client->getUsername() << std::endl;
+	std::cout << "client->getHostname() : " << client->getHostname() << std::endl;
+	std::cout << "client->getServername() : " << client->getServername() << std::endl;
+	std::cout << "client->getRealname() : " << client->getRealname() << std::endl;
+
+
+
+	// 클라이언트에게 환영 메시지 전송
+    std::string welcomeMsg = RPL_WELCOME(client->getUsername());
+    char tmpMsg[welcomeMsg.length() + 1];
+    std::strcpy(tmpMsg, welcomeMsg.c_str());
+	std::cout << "tmpMsg : " << tmpMsg << std::endl;
+	std::cout << "client_fd : " << client_fd << std::endl;
+    broadcastMessage(client_fd, tmpMsg);
 }
+
+// const char* IrcServer::makeCompleted(const std::string& str) {
+// 	std::string addCRLF = str + "\r\n";
+// 	const char* result = addCRLF.c_str();
+
+// }
