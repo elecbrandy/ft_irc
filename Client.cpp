@@ -1,4 +1,5 @@
 #include "Client.hpp"
+#include "Server.hpp"
 
 Client::Client() : _nickname(""), 
 					_username(""), 
@@ -18,7 +19,7 @@ void Client::setHostname(const std::string& str) {this->_hostname = str;}
 
 void Client::setRealname(const std::string& str) {this->_realname = str;}
 
-void Client::setPassword(const std::string& str) {this->_password = str;}
+void Client::setPassword(const std::string str) {this->_password = str;  std::cout << "FUCKKKK setPassword() : " << this->_password << std::endl;}
 
 void Client::setServername(const std::string& str) {this->_servername = str;}
 

@@ -64,7 +64,8 @@ void IrcServer::acceptClient() {
 	fds.push_back(client_poll_fd);
 
 	Client newClient;
-	clients[client_fd] = &newClient;
+	clients[client_fd] = &newClient; //map구조체에 key=client_fd, value=Client구조체 저장
+	std::cout << "New Client connected, name is |" << newClient.getNickname() << "|" << std::endl;
 
 	std::cout << "New Client connected, client_fd is " << client_fd << std::endl;
 }
@@ -110,7 +111,7 @@ void IrcServer::handleClientMessage(int client_fd) {
 
 	int bytes_received = recv(client_fd, buffer, BUFFER_SIZE - 1, 0);
 	// 나중에 이 클라에서 보낸 데이터를 읽어올때 이걸 반복문으로 돌려야하나? 버퍼 이상 보낼수도있으니까?
-	
+
 	if (bytes_received < 0) {	 // 클라에서 에러 발생
 		if (errno != EWOULDBLOCK && errno != EAGAIN) {
 			handleError(ERR_ETC, UNEXIT);
@@ -118,21 +119,20 @@ void IrcServer::handleClientMessage(int client_fd) {
 		}
 	} else if (bytes_received == 0) { // 클라 정상 종료?
 		removeClient(client_fd);
-	} else { // 메ㅔ세지 정상 받음
+	} else { // 메세지 정상 받음
 		buffer[bytes_received] = '\0';  // 널 문자추가
-		std::cout << "Message from client " << client_fd << ": " << buffer << std::endl;
+		std::cout << "Message from client " << client_fd << ": " << buffer << "|" << std::endl;
 		receivecMsg = buffer;
 		this->_msgBuf << receivecMsg;
 		handleClientCommand(client_fd);  // 클라이언트 요청 처리
-		broadcastMessage(client_fd, buffer);  // 다른 클라이언트들에게 메시지 쏴주기
+		// castMsg(client_fd, buffer);  // 다른 클라이언트들에게 메시지 쏴주기
 	}
 
 }
 
-void IrcServer::broadcastMessage(int client_fd, const char* message) {
+void IrcServer::castMsg(int client_fd, const char* message) {
     // 메시지 길이를 계산
     size_t msgLen = std::strlen(message);
-	std::cout << "client_fd in broadcastMessage : " << client_fd << std::endl;
     // send()를 통해 메시지 전송
     ssize_t bytesSent = send(client_fd, message, msgLen, 0);
     
@@ -196,15 +196,32 @@ void IrcServer::handleError(ErrorCode code, int flag) {
 }
 
 std::string IrcServer::extractCmd() {
-	if (_msgBuf.str().empty())
-		throw std::runtime_error("Empty message");
-	
-	std::string cmd;
-	
-	_msgBuf >> cmd;
-	_msgBuf.str(_msgBuf.str().substr(cmd.length() + 1));
+	 // _msgBuf의 내용을 출력하여 디버깅
+    std::cout << "_msgBuf content: " << _msgBuf.str() << std::endl;
 
-	return cmd;
+    // 공백을 기준으로 문자열을 나누어 처리
+    std::istringstream iss(_msgBuf.str());
+    std::string cmd;
+    iss >> cmd;  // 첫 번째 단어 추출
+
+    // 남은 부분을 다시 저장
+    std::string remainingMsg;
+    std::getline(iss, remainingMsg);  // 나머지 부분 가져오기
+    _msgBuf.str(remainingMsg);
+
+    return cmd;
+	
+	// if (_msgBuf.str().empty())
+	// 	throw std::runtime_error("Empty message");
+	
+	// std::string cmd;
+	
+	// std::cout << "ExtractCmd() : " << _msgBuf.str() << std::endl;
+	// _msgBuf >> cmd;
+	// std::cout << "ExtractCmd()cmd : " << cmd << std::endl;
+	// _msgBuf.str(_msgBuf.str().substr(cmd.length() + 1));
+
+	// return cmd;
 }
 
 void IrcServer::handleClientCommand(int client_fd) {
@@ -212,13 +229,15 @@ void IrcServer::handleClientCommand(int client_fd) {
 	// 추출한 명령어 실행 후 실행 결과를 클라이언트에게 전송
 
 	std::string cmd = extractCmd(); // 클라이언트가 보낸 메세지에서 명령어 추출
-	std::cout << "Command : " << cmd << std::endl;
-	if (cmd == "USER")
+	std::cout << "Command : " << "|" << cmd << "|" << std::endl;
+	// if (cmd == "PASS")
+	// 	cmdPass("1111", client_fd);
+	if (cmd == "NICK")
+		cmdNick(_msgBuf, client_fd);
+	else if (cmd == "USER")
 		cmdUser(_msgBuf, client_fd);
-	else if (cmd == "NICK")
-		cmdNick(client_fd, clientMsg);
-	// else if (cmd == "PASS")
-	// 	cmdPass(client_fd, clientMsg);
+	else if (cmd == "CAP")
+		cmdCap(_msgBuf, client_fd);
 	// else if (cmd == "JOIN")
 	// 	cmdJoin(client_fd, clientMsg);
 	// else if (cmd == "PART")
@@ -240,15 +259,8 @@ void IrcServer::handleClientCommand(int client_fd) {
 }
 
 Client* IrcServer::getClient(int client_fd) {
-	if (clients.find(client_fd) == clients.end()) {
-    // 해당하는 client_fd가 존재하지 않음
-    throw std::runtime_error("Client not found.");
-	}
+	if (clients.find(client_fd) == clients.end())
+		return nullptr;
 
-	if (clients[client_fd] == nullptr) {
-		// 포인터가 null인 경우
-		throw std::runtime_error("Client pointer is null.");
-	}
-
-	return clients[client_fd];
+	return (clients[client_fd]);
 }

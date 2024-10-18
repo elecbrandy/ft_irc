@@ -188,7 +188,7 @@ public:
 	void	removeClient(int fd);
 	void	handleSocketEvent(int fd);
 	void	handleClientMessage(int fd);
-	void	broadcastMessage(int client_fd, const char* message);
+	void	castMsg(int client_fd, const char* message); //프라이빗 메세지 등 다양한 모드로 메세지를 전송할 수 있기 때문에 castMsg라는 이름으로 변경
 	void	handleError(ErrorCode code, int flag);
 	void	run();
 
@@ -198,7 +198,10 @@ public:
 	Client* getClient(int client_fd);
 	void cmdUser(std::stringstream &msg, int client_fd);
 	void cmdNick(std::stringstream &msg, int client_fd);
-	const char* makeMsgFromServer(std::string msg);
+	void cmdPass(std::string msg, int client_fd);
+	std::string makeMsg(std::string msg);
+
+	void cmdCap(std::stringstream &msg, int client_fd);
 };
 
 #endif

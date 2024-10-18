@@ -1,9 +1,9 @@
-#include "server.hpp"
-#include "client.hpp"
+#include "Server.hpp"
+#include "Client.hpp"
 
-const char* IrcServer::makeMsgFromServer(std::string msg) {
-	std::string prefix = ":localhost ";
+std::string IrcServer::makeMsg(std::string msg) {
+	std::string prefix = ":localhost "; //prefix는 선택사항!
 	std::string completeMsg = prefix + " " + msg + " " + CRLF;
 
-	return completeMsg.c_str();
+	return completeMsg;
 }
