@@ -43,7 +43,6 @@ void IrcServer::cmdPass(std::string msg, int client_fd) {
     password = msg;
     std::cout << "password : " << password << std::endl;
     client->setPassword("1111");
-    // std::cout << "client->getPassword() : " << client->getPassword() << std::endl;
 }
 
 
