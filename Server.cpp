@@ -67,6 +67,7 @@ void IrcServer::acceptClient() {
     _clients[client_fd] = newClient; //map구조체에 key=client_fd, value=Client구조체 저장
 
 	std::cout << "New Client connected, client_fd is " << client_fd << std::endl;
+	
 }
 
 void IrcServer::removeClient(int client_fd) {
@@ -93,7 +94,7 @@ void IrcServer::run() {
 	while (true) {
 		time_t now = time(NULL);
 
-		if (now - lastCheckTime >= 60) {
+		if (now - lastCheckTime >= PING_INTERVAL) {
 			checkConnections();
 			lastCheckTime = now;
 		}
@@ -113,7 +114,7 @@ void IrcServer::run() {
 
 void IrcServer::handleSocketEvent(int fd) {
 	if (fd == server_fd) {	// 이벤트가 서버 소켓에서 감지되었을 경우에는->?
-		acceptClient();		// 클라이언트 추가
+		acceptClient();	// 클라이언트 추가
 	} else {
 		handleClientMessage(fd); // 아마 그게 아니면 클라이언트 메세지일거임!s
 	}

@@ -24,6 +24,8 @@
 #define UNEXIT 0
 
 #define CRLF "\r\n"
+#define PING_INTERVAL 120
+
 // 001: 서버에 연결됨
 #define RPL_WELCOME(user) 						"001 " + user + " :Welcome to the Internet Relay Network, " + user + "!"
 
