@@ -201,7 +201,7 @@ public:
 	void cmdUser(std::stringstream &msg, int client_fd);
 	void cmdNick(std::stringstream &msg, int client_fd);
 	void cmdPass(std::stringstream &msg, int client_fd);
-	void cmdPong(int client_fd);
+	void cmdPong(std::stringstream &msg, int client_fd);
 	std::string makeMsg(std::string msg);
 	void checkConnections();
 

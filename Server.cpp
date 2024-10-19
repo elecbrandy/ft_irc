@@ -4,7 +4,7 @@
 IrcServer::IrcServer() {}
 
 IrcServer::IrcServer(int port, const std::string& password)
-: port(port), password(password) { }
+: port(port), password(password) {}
 
 IrcServer::~IrcServer() {}
 
@@ -182,7 +182,7 @@ void IrcServer::handleError(ErrorCode code, int flag) {
 		case ERR_SOCKET_BIND:
 			std::cerr << "소켓 바인딩 에러: " << strerror(errno) << std::endl;
 			break;
-		case ERR_SOCKET_LISTEN:
+		case ERR_SOCKET_LISTEN:  
 			std::cerr << "소켓 리슨 에러: " << strerror(errno) << std::endl;
 			break;
 		case ERR_SET_NONBLOCKING:
@@ -270,7 +270,8 @@ void IrcServer::checkConnections() {
 	std::map<int, Client*>::iterator it = _clients.begin();
     
     while (it != _clients.end()) {
-        if (it->second->isConnectionTimedOut(70)) {
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																													
+        if (it->second->isConnectionTimedOut(180)) {
             std::cout << "Client " << it->first << " connection timed out." << std::endl;
             int clientId = it->first;  // 현재 클라이언트 ID 저장
             it = _clients.erase(it);   // 안전하게 현재 요소 제거하고 다음 반복자 받기

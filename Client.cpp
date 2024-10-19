@@ -39,11 +39,13 @@ std::string	Client::getPassword() const {return this->_password;}
 
 std::string	Client::getServername() const {return this->_servername;}
 
-time_t		Client::getLastPongTime() const {return this->_lastPongTime;}
+time_t	Client::getLastPongTime() const {return this->_lastPongTime;}
 
+/* other */
 bool Client::isConnectionTimedOut(time_t timeout) {
 	time_t now = time(NULL);
 	if (now - this->_lastPongTime > timeout)
 		return true;
 	return false;
 }
+
