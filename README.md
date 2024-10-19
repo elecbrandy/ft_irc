@@ -1,5 +1,6 @@
 # ft_irc
 
+
 ### Server 기본 구현
 - [x] client - server 기본적 연결
 - [x] 닉네임 밑 사용자명 설정 가능
@@ -32,3 +33,6 @@
 ### Bonus 구현
 - [ ] Handle file transfer
 - [ ] A bot
+
+### 변경 사항
+- 굿
