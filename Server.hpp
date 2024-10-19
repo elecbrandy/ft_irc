@@ -25,7 +25,7 @@
 
 #define CRLF "\r\n"
 // 001: 서버에 연결됨
-#define RPL_WELCOME(user) 						"001 " + user + " :Welcome to the motherfucking Internet Relay Network, " + user + "!"
+#define RPL_WELCOME(user) 						"001 " + user + " :Welcome to the Internet Relay Network, " + user + "!"
 
 // 401: 대상 닉네임을 가진 사용자가 존재하지 않음
 #define ERR_NOSUCHNICK							"401 " + user + " "
@@ -175,7 +175,7 @@ private:
 	int							port;
 	std::string					password;
 	std::vector<struct pollfd>	fds;
-	std::map<int, Client*>		clients;
+	std::map<int, Client*>		_clients;
 	std::stringstream			_msgBuf;
 
 public:
@@ -194,14 +194,15 @@ public:
 
 	void 	handleClientRequest(int client_fd);
 	std::string extractCmd();
-	void 	handleClientCommand(int client_fd);
+	void 	handleClientCmd(int client_fd);
 	Client* getClient(int client_fd);
 	void cmdUser(std::stringstream &msg, int client_fd);
 	void cmdNick(std::stringstream &msg, int client_fd);
-	void cmdPass(std::string msg, int client_fd);
+	void cmdPass(std::stringstream &msg, int client_fd);
+	void cmdPong(int client_fd);
 	std::string makeMsg(std::string msg);
+	void checkConnections();
 
-	void cmdCap(std::stringstream &msg, int client_fd);
 };
 
 #endif

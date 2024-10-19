@@ -10,7 +10,8 @@ class Client {
 		std::string	_hostname;
 		std::string	_realname;
 		std::string _password;
-		std::string _servername; 
+		std::string _servername;
+		time_t		_lastPongTime;
 	public:
 		Client();
 		Client(const std::string& str);
@@ -22,6 +23,7 @@ class Client {
 		void		setRealname(const std::string& str);
 		void		setPassword(const std::string str);
 		void		setServername(const std::string& str); //단일 서버라도 서버이름은 필요함
+		void 		setLastPongTime();
 
 		std::string	getNickname() const;
 		std::string	getUsername() const;
@@ -29,6 +31,9 @@ class Client {
 		std::string	getRealname() const;
 		std::string	getPassword() const;
 		std::string	getServername() const;
+		time_t		getLastPongTime() const;
+
+		bool isConnectionTimedOut(time_t timeout);
 };
 
 #endif

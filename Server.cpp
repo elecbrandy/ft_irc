@@ -63,34 +63,49 @@ void IrcServer::acceptClient() {
 	client_poll_fd.events = POLLIN;
 	fds.push_back(client_poll_fd);
 
-	Client newClient;
-	clients[client_fd] = &newClient; //map구조체에 key=client_fd, value=Client구조체 저장
-	std::cout << "New Client connected, name is |" << newClient.getNickname() << "|" << std::endl;
+	Client* newClient = new Client();
+    _clients[client_fd] = newClient; //map구조체에 key=client_fd, value=Client구조체 저장
 
 	std::cout << "New Client connected, client_fd is " << client_fd << std::endl;
 }
 
 void IrcServer::removeClient(int client_fd) {
+	// new로 클라이언트 할당한 것에 대해서 객체 메모리 해제 추가!
+    if (_clients.find(client_fd) != _clients.end()) {
+        delete _clients[client_fd];
+        _clients.erase(client_fd);
+    }
+
 	for (size_t i = 0; i < fds.size(); ++i) {
 		if (fds[i].fd == client_fd) {
 			fds.erase(fds.begin() + i);
 			break;
 		}
 	}
+
 	close(client_fd);
 	std::cout << "Client connection end : " << client_fd << std::endl;
 }
 
 void IrcServer::run() {
+	time_t lastCheckTime = time(NULL);
+
 	while (true) {
-		// poll 하는 중 ~
+		time_t now = time(NULL);
+
+		if (now - lastCheckTime >= 60) {
+			checkConnections();
+			lastCheckTime = now;
+		}
+
 		if (poll(&fds[0], fds.size(), -1) < 0) {
 			handleError(ERR_POLL, EXIT);
 		}
-		// 
+
 		for (int i = fds.size() - 1; i>= 0; --i) {
 			if (fds[i].revents & POLLIN) {	// 파일 디스크립터가 poll 상태인지 비트연산해서->revent(short)의 비트랑 비교해서 그 안에 Pollin 있는지 아마 최저 1비트s
 				handleSocketEvent(fds[i].fd);
+		
 			}
 		}
 	}
@@ -121,10 +136,11 @@ void IrcServer::handleClientMessage(int client_fd) {
 		removeClient(client_fd);
 	} else { // 메세지 정상 받음
 		buffer[bytes_received] = '\0';  // 널 문자추가
-		std::cout << "Message from client " << client_fd << ": " << buffer << "|" << std::endl;
+		std::cout << "\n\n--------------------------------" << std::endl;
+		std::cout << "Message from client " << client_fd << ": " << buffer << std::endl;
 		receivecMsg = buffer;
 		this->_msgBuf << receivecMsg;
-		handleClientCommand(client_fd);  // 클라이언트 요청 처리
+		handleClientCmd(client_fd);  // 클라이언트 요청 처리
 		// castMsg(client_fd, buffer);  // 다른 클라이언트들에게 메시지 쏴주기
 	}
 
@@ -196,56 +212,39 @@ void IrcServer::handleError(ErrorCode code, int flag) {
 }
 
 std::string IrcServer::extractCmd() {
-	 // _msgBuf의 내용을 출력하여 디버깅
-    std::cout << "_msgBuf content: " << _msgBuf.str() << std::endl;
-
-    // 공백을 기준으로 문자열을 나누어 처리
-    std::istringstream iss(_msgBuf.str());
     std::string cmd;
-    iss >> cmd;  // 첫 번째 단어 추출
+    std::string remainMsg;
+    std::stringstream ss(_msgBuf.str());
 
-    // 남은 부분을 다시 저장
-    std::string remainingMsg;
-    std::getline(iss, remainingMsg);  // 나머지 부분 가져오기
-    _msgBuf.str(remainingMsg);
+    ss >> cmd;  // 첫 번째 단어 추출
+
+    std::getline(ss, remainMsg);  // 명령어 추출 후 남은 나머지 부분 가져오기
+    _msgBuf.str(remainMsg);
 
     return cmd;
-	
-	// if (_msgBuf.str().empty())
-	// 	throw std::runtime_error("Empty message");
-	
-	// std::string cmd;
-	
-	// std::cout << "ExtractCmd() : " << _msgBuf.str() << std::endl;
-	// _msgBuf >> cmd;
-	// std::cout << "ExtractCmd()cmd : " << cmd << std::endl;
-	// _msgBuf.str(_msgBuf.str().substr(cmd.length() + 1));
-
-	// return cmd;
 }
 
-void IrcServer::handleClientCommand(int client_fd) {
-	// clientRequest를 파싱해서 명령어를 추출
+void IrcServer::handleClientCmd(int client_fd) {
+	// client에서 보낸 메세지를 파싱해서 명령어를 추출
 	// 추출한 명령어 실행 후 실행 결과를 클라이언트에게 전송
 
 	std::string cmd = extractCmd(); // 클라이언트가 보낸 메세지에서 명령어 추출
-	std::cout << "Command : " << "|" << cmd << "|" << std::endl;
-	// if (cmd == "PASS")
-	// 	cmdPass("1111", client_fd);
+	std::cout << "---------------------------------" << std::endl;
+	std::cout << "Command : " << cmd << std::endl;
+	if (cmd == "PASS")
+		cmdPass(_msgBuf, client_fd);
 	if (cmd == "NICK")
 		cmdNick(_msgBuf, client_fd);
 	else if (cmd == "USER")
 		cmdUser(_msgBuf, client_fd);
-	else if (cmd == "CAP")
-		cmdCap(_msgBuf, client_fd);
+	else if (cmd == "PONG")
+		cmdPong(client_fd);
 	// else if (cmd == "JOIN")
 	// 	cmdJoin(client_fd, clientMsg);
 	// else if (cmd == "PART")
 	// 	cmdMode(client_fd, clientMsg);
 	// else if (cmd == "PRIVMSG")
 	// 	cmdPrivmsg(client_fd, clientMsg);
-	// else if (cmd == "PING")
-	// 	cmdPing(client_fd, clientMsg);
 	// else if (cmd == "KICK")
 	// 	cmdKick(client_fd, clientMsg);
 	// else if (cmd == "INVITE")
@@ -259,8 +258,24 @@ void IrcServer::handleClientCommand(int client_fd) {
 }
 
 Client* IrcServer::getClient(int client_fd) {
-	if (clients.find(client_fd) == clients.end())
+	if (_clients.find(client_fd) == _clients.end())
 		return nullptr;
 
-	return (clients[client_fd]);
+	return (_clients[client_fd]);
+}
+
+void IrcServer::checkConnections() {
+	std::cout << "Checking connections..." << std::endl;
+	std::map<int, Client*>::iterator it = _clients.begin();
+    
+    while (it != _clients.end()) {
+        if (it->second->isConnectionTimedOut(70)) {
+            std::cout << "Client " << it->first << " connection timed out." << std::endl;
+            int clientId = it->first;  // 현재 클라이언트 ID 저장
+            it = _clients.erase(it);   // 안전하게 현재 요소 제거하고 다음 반복자 받기
+            removeClient(clientId);     // 추가적인 정리 작업 수행
+        } else {
+            ++it;  // 타임아웃이 아닌 경우에만 반복자 증가
+        }
+    }
 }

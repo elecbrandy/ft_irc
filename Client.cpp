@@ -6,7 +6,8 @@ Client::Client() : _nickname(""),
 					_hostname(""), 
 					_realname(""), 
 					_password(""),
-					_servername("") {}
+					_servername(""),
+					_lastPongTime(time(NULL)) {}
 
 Client:: ~Client() {}
 
@@ -19,9 +20,11 @@ void Client::setHostname(const std::string& str) {this->_hostname = str;}
 
 void Client::setRealname(const std::string& str) {this->_realname = str;}
 
-void Client::setPassword(const std::string str) {this->_password = str;  std::cout << "FUCKKKK setPassword() : " << this->_password << std::endl;}
+void Client::setPassword(const std::string str) {this->_password = str;}
 
 void Client::setServername(const std::string& str) {this->_servername = str;}
+
+void Client::setLastPongTime() {this->_lastPongTime = time(NULL);}
 
 /* getter */
 std::string	Client::getNickname() const {return this->_nickname;}
@@ -35,3 +38,12 @@ std::string	Client::getRealname() const {return this->_realname;}
 std::string	Client::getPassword() const {return this->_password;}
 
 std::string	Client::getServername() const {return this->_servername;}
+
+time_t		Client::getLastPongTime() const {return this->_lastPongTime;}
+
+bool Client::isConnectionTimedOut(time_t timeout) {
+	time_t now = time(NULL);
+	if (now - this->_lastPongTime > timeout)
+		return true;
+	return false;
+}
