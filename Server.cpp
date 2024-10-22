@@ -239,9 +239,9 @@ void IrcServer::handleClientCmd(int client_fd) {
 	else if (cmd == "USER")
 		cmdUser(_msgBuf, client_fd);
 	else if (cmd == "PONG")
-		cmdPong(client_fd);
-	// else if (cmd == "JOIN")
-	// 	cmdJoin(client_fd, clientMsg);
+		cmdPong(_msgBuf, client_fd);
+	else if (cmd == "JOIN")
+		cmdJoin(_msgBuf, client_fd);
 	// else if (cmd == "PART")
 	// 	cmdMode(client_fd, clientMsg);
 	// else if (cmd == "PRIVMSG")

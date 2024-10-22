@@ -202,6 +202,8 @@ public:
 	void cmdNick(std::stringstream &msg, int client_fd);
 	void cmdPass(std::stringstream &msg, int client_fd);
 	void cmdPong(std::stringstream &msg, int client_fd);
+	void cmdJoin(std::stringstream &msg, int client_fd);
+	std::vector<std::string> joinSplit(std::string &msg);
 	std::string makeMsg(std::string msg);
 	void checkConnections();
 
