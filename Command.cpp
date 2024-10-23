@@ -64,7 +64,9 @@ std::vector<std::string> IrcServer::joinSplit(std::string &msg) {
 				tmp.clear();
 			}
 		} else if (msg[i] == ' ') {
+			res.push_back(" ");
 			if (!tmp.empty()) {
+				std::cout << "tmp : |" << tmp << "|" << std::endl;
 				res.push_back(tmp);
 				tmp.clear();
 			}
@@ -88,18 +90,21 @@ void IrcServer::cmdJoin(std::stringstream &msg, int client_fd) {
 	std::vector<std::string> keys;
 	
 	for (size_t i = 0; i < joinTokens.size(); i++) {
-		if (joinTokens[i] == " ") {
-			for (size_t j = i + 1; j < joinTokens.size(); j++)
-				keys.push_back(joinTokens[j]);
-		}
-		else
-			channels.push_back(joinTokens[i]);
+		std::cout << "joinTokens[" << i << "] : " << joinTokens[i] << std::endl;
 	}
+	// for (size_t i = 0; i < joinTokens.size(); i++) {
+	// 	if (joinTokens[i] == " ") {
+	// 		for (size_t j = i + 1; j < joinTokens.size(); j++)
+	// 			keys.push_back(joinTokens[j]);
+	// 	}
+	// 	else
+	// 		channels.push_back(joinTokens[i]);
+	// }
 
-	for (size_t i = 0; i < channels.size(); i++) {
-		std::cout << "channelName [" << i << "] : " << channels[i] << std::endl;
-	}
-	for (size_t i = 0; i < keys.size(); i++) {
-		std::cout << "keys [" << i << "] : " << keys[i] << std::endl;
-	}
+	// for (size_t i = 0; i < channels.size(); i++) {
+	// 	std::cout << "channelName [" << i << "] : " << channels[i] << std::endl;
+	// }
+	// for (size_t i = 0; i < keys.size(); i++) {
+	// 	std::cout << "keys [" << i << "] : " << keys[i] << std::endl;
+	// }
 }
