@@ -1,5 +1,6 @@
 #include "Server.hpp"
 #include "Client.hpp"
+#include "Channel.hpp"
 
 void IrcServer::cmdUser(std::stringstream &msg, int client_fd) {
 	int cnt = 0;
@@ -55,56 +56,61 @@ void IrcServer::cmdPong(std::stringstream &msg, int client_fd) {
 
 std::vector<std::string> IrcServer::joinSplit(std::string &msg) {
 	std::vector<std::string> res;
-	std::string tmp;
+    std::string tmp;
 
-	for (size_t i = 0; i < msg.size(); i++) {
-		if (msg[i] == ',') {
-			if (!tmp.empty()) {
-				res.push_back(tmp);
-				tmp.clear();
-			}
-		} else if (msg[i] == ' ') {
-			res.push_back(" ");
-			if (!tmp.empty()) {
-				std::cout << "tmp : |" << tmp << "|" << std::endl;
-				res.push_back(tmp);
-				tmp.clear();
-			}
+    for (size_t i = 0; i < msg.size(); i++) {
+        char c = msg[i];
+        if (c == ',' || c == ' ') {
+            if (!tmp.empty()) {
+                res.push_back(tmp);
+                tmp.clear();
+            }
 		} else
-			tmp += msg[i];
-	}
-	if (!tmp.empty())
-		res.push_back(tmp);
-		
-	return res;
+            tmp += c;
+    }	
+
+    if (!tmp.empty())
+        res.push_back(tmp);
+
+    return res;
 }
 
 void IrcServer::cmdJoin(std::stringstream &msg, int client_fd) {
 	//Client* client = getClient(client_fd);
 	(void)client_fd;
 	std::string channelName;
+	std::string channelKey;
+
 	
 	std::string msgStr = msg.str();
 	std::vector<std::string> joinTokens = joinSplit(msgStr);
-	std::vector<std::string> channels;
-	std::vector<std::string> keys;
+	std::vector<std::string> channel;
+	std::vector<std::string> key;
 	
 	for (size_t i = 0; i < joinTokens.size(); i++) {
-		std::cout << "joinTokens[" << i << "] : " << joinTokens[i] << std::endl;
+		if (joinTokens[i][0] == '#')
+			channel.push_back(joinTokens[i]);
+		else
+			key.push_back(joinTokens[i]);
 	}
-	// for (size_t i = 0; i < joinTokens.size(); i++) {
-	// 	if (joinTokens[i] == " ") {
-	// 		for (size_t j = i + 1; j < joinTokens.size(); j++)
-	// 			keys.push_back(joinTokens[j]);
-	// 	}
-	// 	else
-	// 		channels.push_back(joinTokens[i]);
-	// }
 
-	// for (size_t i = 0; i < channels.size(); i++) {
-	// 	std::cout << "channelName [" << i << "] : " << channels[i] << std::endl;
-	// }
-	// for (size_t i = 0; i < keys.size(); i++) {
-	// 	std::cout << "keys [" << i << "] : " << keys[i] << std::endl;
-	// }
+	for (size_t i = 0; i < channel.size(); i++) {
+		channelName = channel[i];	
+		bool isNew = false;
+
+		if (i < key.size())
+			channelKey = key[i];
+
+		if (_channels.find(channel[i]) == _channels.end()) {
+			isNew = true;
+			_channels[channelName] = new Channel(channelName);
+			if (!channelKey.empty()) {
+				_channels[channelName]->setMode(KEY_MODE);
+				_channels[channelName]->setKey(channelKey);
+			}
+		}
+	}
+
+
+
 }

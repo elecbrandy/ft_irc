@@ -16,3 +16,33 @@
 // 5. removeInvite로 alice의 초대 정보 삭제
 // 6. alice가 나갔다가 다시 들어오려면 새로운 초대 필요
 
+#include "Channel.hpp"
+
+Channel::Channel(std::string name) : _name(name) {
+	_key = "";
+	_topic = "";
+	_mode = std::set<char>();
+	_participant = std::vector<Client*>();
+}
+
+Channel::~Channel() {}
+
+/* setter */
+void Channel::setKey(std::string key) {_key = key;}
+
+void Channel::setTopic(std::string topic) {_topic = topic;}
+
+void Channel::setMode(char mode) {_mode.insert(mode);}
+
+void Channel::setParticipant(Client* client) {_participant.push_back(client);}
+
+/* getter */
+std::string Channel::getName() {return this->_name;}
+
+std::string Channel::getKey() {return this->_key;}
+
+std::string Channel::getTopic() {return this->_topic;}
+
+std::set<char> Channel::getMode() {return this->_mode;}
+
+std::vector<Client*> Channel::getParticipant() {return this->_participant;}
