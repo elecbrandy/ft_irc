@@ -35,8 +35,8 @@ private:
 	std::string					password;
 	std::vector<struct pollfd>	fds;
 	std::map<int, Client*>		_clients;
-	std::stringstream			_msgBuf;
-	std::map<std::string, Channel*> _channels;
+	std::string					_msgBuf;
+	std::map<std::string, Channel *> _channels;
 
 public:
 	IrcServer();
@@ -54,13 +54,14 @@ public:
 
 	void 	handleClientRequest(int client_fd);
 	std::string extractCmd();
+	std::string extractCmdParams(size_t cmdSize);
 	void 	handleClientCmd(int client_fd);
 	Client* getClient(int client_fd);
-	void cmdUser(std::stringstream &msg, int client_fd);
-	void cmdNick(std::stringstream &msg, int client_fd);
-	void cmdPass(std::stringstream &msg, int client_fd);
-	void cmdPong(std::stringstream &msg, int client_fd);
-	void cmdJoin(std::stringstream &msg, int client_fd);
+	void cmdUser(std::string &cmdParams, int client_fd);
+	void cmdNick(std::string &cmdParams, int client_fd);
+	void cmdPass(std::string &cmdParams, int client_fd);
+	void cmdPing(std::string &cmdParams, int client_fd);
+	void cmdJoin(std::string &cmdParams, int client_fd);
 	std::vector<std::string> joinSplit(std::string &msg);
 	std::string makeMsg(std::string msg);
 	void checkConnections();

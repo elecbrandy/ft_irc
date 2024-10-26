@@ -22,7 +22,7 @@ Channel::Channel(std::string name) : _name(name) {
 	_key = "";
 	_topic = "";
 	_mode = std::set<char>();
-	_participant = std::vector<Client*>();
+	_participant = std::set<Client*>();
 }
 
 Channel::~Channel() {}
@@ -34,7 +34,7 @@ void Channel::setTopic(std::string topic) {_topic = topic;}
 
 void Channel::setMode(char mode) {_mode.insert(mode);}
 
-void Channel::setParticipant(Client* client) {_participant.push_back(client);}
+void Channel::setParticipant(Client* client) {_participant.insert(client);}
 
 /* getter */
 std::string Channel::getName() {return this->_name;}
@@ -45,4 +45,4 @@ std::string Channel::getTopic() {return this->_topic;}
 
 std::set<char> Channel::getMode() {return this->_mode;}
 
-std::vector<Client*> Channel::getParticipant() {return this->_participant;}
+std::set<Client*> Channel::getParticipant() {return this->_participant;}

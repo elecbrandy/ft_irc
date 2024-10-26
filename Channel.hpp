@@ -2,7 +2,8 @@
 # define CHANNEL_HPP
 
 #include <set>
-#include "Server.hpp"
+#include <vector>
+// #include "Server.hpp"
 #include "Client.hpp"
 
 #define OPERATOR_MODE 'o'
@@ -23,7 +24,8 @@ class Channel {
 		std::string				_key; //채널 비밀번호
 		std::string				_topic; //채널 주제
 		std::set<char>			_mode; //채널 모드
-		std::vector<Client*> 	_participant; //채널 참여자
+		std::set<Client*> 		_participant; //채널 참여자
+		std::set<Client*>		_operator; //채널 운영자  //set으로 하면 중복 안되고 자동 정렬이 유용함
 	public:
 		Channel(std::string name);
 		~Channel();
@@ -37,7 +39,7 @@ class Channel {
 		std::string getKey();
 		std::string getTopic();
 		std::set<char> getMode();
-		std::vector<Client*> getParticipant();
+		std::set<Client*> getParticipant();
 };
 	
 #endif

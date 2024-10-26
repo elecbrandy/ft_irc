@@ -18,7 +18,11 @@ void Client::setUsername(const std::string& str) {this->_username = str;}
 
 void Client::setHostname(const std::string& str) {this->_hostname = str;}
 
-void Client::setRealname(const std::string& str) {this->_realname = str;}
+void Client::setRealname(const std::string& str) {
+	size_t pos = str.find(":");
+	if (pos != std::string::npos)
+		this->_realname = str.substr(pos + 1);
+}
 
 void Client::setPassword(const std::string str) {this->_password = str;}
 

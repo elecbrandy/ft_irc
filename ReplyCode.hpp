@@ -38,7 +38,7 @@
 // #define ERR_WILDTOPLEVEL 						"414 " + user + " "
 
 // 421: 알 수 없는 명령을 보냄
-#define ERR_UNKNOWNCOMMAND 						"421 " + user + " "
+#define ERR_UNKNOWNCOMMAND(user)  				"421 " + user + " "
 
 // 422: 서버에 MOTD(메시지)가 설정되지 않음
 #define ERR_NOMOTD 								"422 " + user + " "

@@ -123,7 +123,6 @@ void IrcServer::handleSocketEvent(int fd) {
 void IrcServer::handleClientMessage(int client_fd) {
 	char buffer[BUFFER_SIZE]; //rfc기준 512가 맥스임
 	std::memset(buffer, 0, BUFFER_SIZE); // 이거 써도 되나?
-	std::string receivecMsg;
 
 	int bytes_received = recv(client_fd, buffer, BUFFER_SIZE - 1, 0);
 	// 나중에 이 클라에서 보낸 데이터를 읽어올때 이걸 반복문으로 돌려야하나? 버퍼 이상 보낼수도있으니까?
@@ -139,10 +138,14 @@ void IrcServer::handleClientMessage(int client_fd) {
 		buffer[bytes_received] = '\0';  // 널 문자추가
 		std::cout << "\n\n--------------------------------" << std::endl;
 		std::cout << "Message from client " << client_fd << ": " << buffer << std::endl;
-		receivecMsg = buffer;
-		this->_msgBuf << receivecMsg;
-		handleClientCmd(client_fd);  // 클라이언트 요청 처리
-		// castMsg(client_fd, buffer);  // 다른 클라이언트들에게 메시지 쏴주기
+		
+		this->_msgBuf += buffer;
+
+		size_t pos;
+		while ((pos = _msgBuf.find("\r\n")) != std::string::npos) { 
+			handleClientCmd(client_fd);  // 클라이언트 요청 처리
+			_msgBuf.erase(0, pos + 2);  // 처리한 명령어 삭제
+		}
 	}
 
 }
@@ -214,34 +217,42 @@ void IrcServer::handleError(ErrorCode code, int flag) {
 
 std::string IrcServer::extractCmd() {
     std::string cmd;
-    std::string remainMsg;
-    std::stringstream ss(_msgBuf.str());
+    std::stringstream ss(_msgBuf);
 
     ss >> cmd;  // 첫 번째 단어 추출
 
-    std::getline(ss, remainMsg);  // 명령어 추출 후 남은 나머지 부분 가져오기
-    _msgBuf.str(remainMsg);
-
     return cmd;
+}
+
+std::string IrcServer::extractCmdParams(size_t cmdSize) {
+	std::string cmdParams;
+	size_t pos = this->_msgBuf.find(CRLF);
+
+	if (pos != std::string::npos)
+		cmdParams = this->_msgBuf.substr(cmdSize + 1, pos - (cmdSize + 1));
+	
+	return cmdParams;
 }
 
 void IrcServer::handleClientCmd(int client_fd) {
 	// client에서 보낸 메세지를 파싱해서 명령어를 추출
 	// 추출한 명령어 실행 후 실행 결과를 클라이언트에게 전송
-
+	Client* client = getClient(client_fd);
 	std::string cmd = extractCmd(); // 클라이언트가 보낸 메세지에서 명령어 추출
+	std::string cmdParams = extractCmdParams(cmd.size()); // 클라이언트가 보낸 메세지에서 명령어 파라미터 추출
 	std::cout << "---------------------------------" << std::endl;
 	std::cout << "Command : " << cmd << std::endl;
+	std::cout << "Command Params : " << cmdParams << std::endl;
 	if (cmd == "PASS")
-		cmdPass(_msgBuf, client_fd);
+		cmdPass(cmdParams, client_fd);
 	if (cmd == "NICK")
-		cmdNick(_msgBuf, client_fd);
+		cmdNick(cmdParams, client_fd);
 	else if (cmd == "USER")
-		cmdUser(_msgBuf, client_fd);
-	else if (cmd == "PONG")
-		cmdPong(_msgBuf, client_fd);
+		cmdUser(cmdParams, client_fd);
+	else if (cmd == "PING")
+		cmdPing(cmdParams, client_fd);
 	else if (cmd == "JOIN")
-		cmdJoin(_msgBuf, client_fd);
+		cmdJoin(cmdParams, client_fd);
 	// else if (cmd == "PART")
 	// 	cmdMode(client_fd, clientMsg);
 	// else if (cmd == "PRIVMSG")
@@ -254,8 +265,8 @@ void IrcServer::handleClientCmd(int client_fd) {
 	// 	cmdPart(client_fd, clientMsg);
 	// else if (cmd == "TOPIC")
 	// 	cmdTopic(client_fd, clientMsg);
-	// else
-	// 	sendMessage(client_fd, ERR_UNKNOWNCOMMAND);
+	else
+		castMsg(client_fd, makeMsg(ERR_UNKNOWNCOMMAND(client->getNickname())).c_str());
 }
 
 Client* IrcServer::getClient(int client_fd) {
