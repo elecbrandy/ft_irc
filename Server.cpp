@@ -164,50 +164,6 @@ void IrcServer::castMsg(int client_fd, const char* message) {
 	//std::cout << "Message sent to client fd " << client_fd << ": " << message << std::endl;
 }
 
-
-
-// 나중에 영어로~
-void IrcServer::handleError(ErrorCode code, int flag) {
-	switch (code) {
-		case ERR_SOCKET_CREATION:
-			std::cerr << "소켓 생성 에러: " << strerror(errno) << std::endl;
-			break;
-		case ERR_SOCKET_OPTIONS:
-			std::cerr << "소켓 옵션 설정 에러: " << strerror(errno) << std::endl;
-			break;
-		case ERR_SOCKET_BIND:
-			std::cerr << "소켓 바인딩 에러: " << strerror(errno) << std::endl;
-			break;
-		case ERR_SOCKET_LISTEN:  
-			std::cerr << "소켓 리슨 에러: " << strerror(errno) << std::endl;
-			break;
-		case ERR_SET_NONBLOCKING:
-			std::cerr << "논블로킹 모드 설정 에러: " << strerror(errno) << std::endl;
-			break;
-		case ERR_ACCEPT_CLIENT:
-			std::cerr << "클라이언트 수락 에러: " << strerror(errno) << std::endl;
-			break;
-		case ERR_CLIENT_NONBLOCKING:
-			std::cerr << "클라이언트 소켓 논블로킹 설정 에러: " << strerror(errno) << std::endl;
-			break;
-		case ERR_DATA_RECEIVE:
-			std::cerr << "데이터 수신 에러: " << strerror(errno) << std::endl;
-			break;
-		case ERR_MESSAGE_SEND:
-			std::cerr << "메시지 전송 에러: " << strerror(errno) << std::endl;
-			break;
-		case ERR_POLL:
-			std::cerr << "poll() 호출 에러: " << strerror(errno) << std::endl;
-			break;
-		default:
-			std::cerr << "알 수 없는 에러가 발생했습니다." << std::endl;
-			break;
-	}
-	if (flag == EXIT) {
-		exit(EXIT_FAILURE);
-	}
-}
-
 std::string IrcServer::extractCmd() {
 	std::string cmd;
 	std::stringstream ss(_msgBuf);
@@ -283,5 +239,49 @@ void IrcServer::checkConnections() {
 		} else {
 			++it;  // 타임아웃이 아닌 경우에만 반복자 증가
 		}
+	}
+}
+
+
+
+// 나중에 영어로~
+void IrcServer::handleError(ErrorCode code, int flag) {
+	switch (code) {
+		case ERR_SOCKET_CREATION:
+			std::cerr << "소켓 생성 에러: " << strerror(errno) << std::endl;
+			break;
+		case ERR_SOCKET_OPTIONS:
+			std::cerr << "소켓 옵션 설정 에러: " << strerror(errno) << std::endl;
+			break;
+		case ERR_SOCKET_BIND:
+			std::cerr << "소켓 바인딩 에러: " << strerror(errno) << std::endl;
+			break;
+		case ERR_SOCKET_LISTEN:  
+			std::cerr << "소켓 리슨 에러: " << strerror(errno) << std::endl;
+			break;
+		case ERR_SET_NONBLOCKING:
+			std::cerr << "논블로킹 모드 설정 에러: " << strerror(errno) << std::endl;
+			break;
+		case ERR_ACCEPT_CLIENT:
+			std::cerr << "클라이언트 수락 에러: " << strerror(errno) << std::endl;
+			break;
+		case ERR_CLIENT_NONBLOCKING:
+			std::cerr << "클라이언트 소켓 논블로킹 설정 에러: " << strerror(errno) << std::endl;
+			break;
+		case ERR_DATA_RECEIVE:
+			std::cerr << "데이터 수신 에러: " << strerror(errno) << std::endl;
+			break;
+		case ERR_MESSAGE_SEND:
+			std::cerr << "메시지 전송 에러: " << strerror(errno) << std::endl;
+			break;
+		case ERR_POLL:
+			std::cerr << "poll() 호출 에러: " << strerror(errno) << std::endl;
+			break;
+		default:
+			std::cerr << "알 수 없는 에러가 발생했습니다." << std::endl;
+			break;
+	}
+	if (flag == EXIT) {
+		exit(EXIT_FAILURE);
 	}
 }
