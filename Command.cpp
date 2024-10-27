@@ -121,8 +121,4 @@ void IrcServer::cmdJoin(std::string &cmdParams, int client_fd) {
 			participantName = "@" + participant->getNickname();
 	}
 
-
-
-
-
 }
