@@ -50,7 +50,7 @@
 #define ERR_FILEERROR 							"424 " + user + " "
 
 // 431: 닉네임이 주어지지 않음
-#define ERR_NONICKNAMEGIVEN(user) 				"431 " + user + " :No nickname given"
+#define ERR_NONICKNAMEGIVEN(user) (std::string("431 ") + user + " :No nickname given")
 
 // 432: 잘못된 형식의 닉네임 사용
 #define ERR_ERRONEUSNICKNAME 					"432 " + user + " "
