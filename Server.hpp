@@ -18,7 +18,7 @@
 #include "Channel.hpp"
 #include "ErrorCode.hpp"
 #include "ReplyCode.hpp"
-#include "Cmd.hpp"
+#include "Cmd/Cmd.hpp"
 
 #define MAX_CLIENTS 42
 #define BUFFER_SIZE 42
@@ -71,7 +71,7 @@ public:
 	// void cmdPing(std::string &cmdParams, int client_fd);
 	// void cmdJoin(std::string &cmdParams, int client_fd);
 	// std::vector<std::string> joinSplit(std::string &msg);
-	// std::string makeMsg(std::string msg);
+	std::string makeMsg(std::string msg);
 	void checkConnections();
 
 };

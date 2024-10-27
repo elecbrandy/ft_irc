@@ -1,18 +1,21 @@
 #ifndef CMD_HPP
 # define CMD_HPP
 
-#include "Server.hpp"
+#include "../Server.hpp"
+#include "../Color.hpp"
 
-#define NICK_MAX_LEN 9
+#define NICK_MAX_LEN 15
+
+class IrcServer;
 
 class Cmd {
 private:
 	IrcServer&	server;
+	int			client_fd;
 	Client*		client;
 	std::string	msg;
 	std::string cmd;
 	std::string cmdParams;
-	int			client_fd;
 
 public:
 	/* Constructor & Destructor */
@@ -26,27 +29,26 @@ public:
 	void		handleClientCmd();
 
 	/* Commands */
+	void		cmdCap();
 	void		cmdUser(std::string &cmdParams, int client_fd);
-	void		cmdNick(std::string &cmdParams, int client_fd);
-	void		cmdPass(std::string &cmdParams, int client_fd);
-	void		cmdPing(std::string &cmdParams, int client_fd);
-	void		cmdJoin(std::string &cmdParams, int client_fd);
+	void		cmdNick();
+	void		cmdPass();
+	void		cmdPing();
+	// void		cmdJoin(std::string &cmdParams, int client_fd);
 
 	/* Utils */
 	void checkNick(const std::string& str);
 	void checkPassword(const std::string& str);
-	std::vector<std::string> joinSplit(std::string &msg);
-	std::string makeMsg(std::string msg);
-	void checkConnections();
+	// std::vector<std::string> joinSplit(std::string &msg);
 
 	/* Exception */
-	// :irc.example.com 461 guest NICK :Not enough parameters
 	class CmdException : public std::exception {
 	private:
 		std::string msg;
 	public:
 		explicit CmdException(const std::string& str) : msg(str) {}
-		const char* what() const noexcept override {
+		virtual ~CmdException() throw() {}
+		const char* what() const throw() {
 			return msg.c_str();
 		}
 	};

@@ -1,7 +1,7 @@
 #include "Cmd.hpp"
 
 Cmd::Cmd(IrcServer &s, std::string &msg, int client_fd)
-: server(s), msg(msg), client_fd(client_fd), client(server.getClient(client_fd)) {}
+: server(s), client_fd(client_fd), client(server.getClient(client_fd)), msg(msg) {}
 
 Cmd::~Cmd() {}
 
@@ -30,16 +30,21 @@ void Cmd::handleClientCmd() {
 		this->cmd = extractCmd();
 		this->cmdParams = extractCmdParams();
 
+		if (this->cmd == "CAP") {
+			cmdCap();
+		}
 		if (this->cmd == "PASS") {
-			cmdPass(cmdParams, client_fd);
-		} else if (this->cmd == "NICK") {
-			cmdNick(cmdParams, client_fd);
+			cmdPass();
+		}
+
+		if (this->cmd == "NICK") {
+			cmdNick();
 		} else if (this->cmd == "USER") {
 			cmdUser(cmdParams, client_fd);
 		} else if (this->cmd == "PING") {
-			cmdPing(cmdParams, client_fd);
+			cmdPing();
 		} else if (this->cmd == "JOIN") {
-			cmdJoin(cmdParams, client_fd);
+			// cmdJoin(cmdParams, client_fd);
 		} else if (cmd == "PART") {
 			// cmdMode(client_fd, clientMsg);
 		} else if (cmd == "PRIVMSG") {
@@ -53,7 +58,7 @@ void Cmd::handleClientCmd() {
 		} else if (cmd == "TOPIC") {
 			// cmdTopic(client_fd, clientMsg);
 		} else {
-			// castMsg(client_fd, makeMsg(ERR_UNKNOWNCOMMAND(client->getNickname())).c_str());
+			server.castMsg(client_fd, server.makeMsg(ERR_UNKNOWNCOMMAND(client->getNickname())).c_str());
 		}
 	}
 	catch (const CmdException& e) {

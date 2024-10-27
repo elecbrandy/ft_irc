@@ -32,8 +32,8 @@ void Cmd::checkPassword(const std::string& str) {
 	}
 }
 
-void Cmd::cmdPass(std::string &cmdParams, int client_fd) {
-	checkPassword(cmdParams);
-	client->setPassword(cmdParams);
+void Cmd::cmdPass() {
+	checkPassword(this->cmdParams);
+	client->setPassword(this->cmdParams);
 	// std::cout << "client->getPassword() : " << client->getPassword() << std::endl;
 }

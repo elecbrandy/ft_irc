@@ -17,7 +17,7 @@ void Cmd::cmdUser(std::string &cmdParams, int client_fd) {
 
 	for (int i = 0; i < 4; i++) {
 		if (cmdParams.empty())
-			server.castMsg(client_fd, makeMsg(ERR_NEEDMOREPARAMS(client->getNickname(), "USER")).c_str());
+			server.castMsg(client_fd, server.makeMsg(ERR_NEEDMOREPARAMS(client->getNickname(), "USER")).c_str());
 		ss >> names[i];
 		if (i == 3 && !ss.eof()) {
 			while (!ss.eof()) {
@@ -40,7 +40,7 @@ void Cmd::cmdUser(std::string &cmdParams, int client_fd) {
 	// std::cout << "client->getRealname() : " << client->getRealname() << std::endl;
 
 	// 클라이언트에게 웰컴 메시지 전송
-	server.castMsg(client_fd, makeMsg(RPL_WELCOME(client->getUsername())).c_str());
+	server.castMsg(client_fd, server.makeMsg(RPL_WELCOME(client->getUsername())).c_str());
 }
 
 

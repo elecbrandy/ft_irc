@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <cctype>
 #include <stdexcept>
+#include "Server.hpp"
 #include "ErrorCode.hpp"
 
 class ArgParser {
