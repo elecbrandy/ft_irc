@@ -64,18 +64,17 @@ void IrcServer::acceptClient() {
 	fds.push_back(client_poll_fd);
 
 	Client* newClient = new Client();
-    _clients[client_fd] = newClient; //map구조체에 key=client_fd, value=Client구조체 저장
+	_clients[client_fd] = newClient;
 
 	std::cout << "New Client connected, client_fd is " << client_fd << std::endl;
-	
 }
 
 void IrcServer::removeClient(int client_fd) {
 	// new로 클라이언트 할당한 것에 대해서 객체 메모리 해제 추가!
-    if (_clients.find(client_fd) != _clients.end()) {
-        delete _clients[client_fd];
-        _clients.erase(client_fd);
-    }
+	if (_clients.find(client_fd) != _clients.end()) {
+		delete _clients[client_fd];
+		_clients.erase(client_fd);
+	}
 
 	for (size_t i = 0; i < fds.size(); ++i) {
 		if (fds[i].fd == client_fd) {
@@ -104,71 +103,65 @@ void IrcServer::run() {
 		}
 
 		for (int i = fds.size() - 1; i>= 0; --i) {
-			if (fds[i].revents & POLLIN) {	// 파일 디스크립터가 poll 상태인지 비트연산해서->revent(short)의 비트랑 비교해서 그 안에 Pollin 있는지 아마 최저 1비트s
+			if (fds[i].revents & POLLIN) {	
 				handleSocketEvent(fds[i].fd);
-		
 			}
 		}
 	}
 }
 
 void IrcServer::handleSocketEvent(int fd) {
-	if (fd == server_fd) {	// 이벤트가 서버 소켓에서 감지되었을 경우에는->?
-		acceptClient();	// 클라이언트 추가
+	if (fd == server_fd) {
+		acceptClient();
 	} else {
-		handleClientMessage(fd); // 아마 그게 아니면 클라이언트 메세지일거임!s
+		handleClientMessage(fd);
 	}
 }
 
 void IrcServer::handleClientMessage(int client_fd) {
-	char buffer[BUFFER_SIZE]; //rfc기준 512가 맥스임
-	std::memset(buffer, 0, BUFFER_SIZE); // 이거 써도 되나?
+	char buffer[BUFFER_SIZE];
+	std::memset(buffer, 0, BUFFER_SIZE);
 
 	int bytes_received = recv(client_fd, buffer, BUFFER_SIZE - 1, 0);
-	// 나중에 이 클라에서 보낸 데이터를 읽어올때 이걸 반복문으로 돌려야하나? 버퍼 이상 보낼수도있으니까?
 
-	if (bytes_received < 0) {	 // 클라에서 에러 발생
+	if (bytes_received < 0) {							// Client에서 에러 발생 시
 		if (errno != EWOULDBLOCK && errno != EAGAIN) {
 			handleError(ERR_ETC, UNEXIT);
 			removeClient(client_fd);
 		}
-	} else if (bytes_received == 0) { // 클라 정상 종료?
+	} else if (bytes_received == 0) {					// 종료된 Client일 경우
 		removeClient(client_fd);
-	} else { // 메세지 정상 받음
-		buffer[bytes_received] = '\0';  // 널 문자추가
+	} else {											// 메세지 정상 받음
+		buffer[bytes_received] = '\0';
 		std::cout << "\n\n--------------------------------" << std::endl;
 		std::cout << "Message from client " << client_fd << ": " << buffer << std::endl;
-		
+
 		this->_msgBuf += buffer;
 
 		size_t pos;
 		while ((pos = _msgBuf.find("\r\n")) != std::string::npos) { 
-			handleClientCmd(client_fd);  // 클라이언트 요청 처리
-			_msgBuf.erase(0, pos + 2);  // 처리한 명령어 삭제
+			handleClientCmd(client_fd);					// 클라이언트 요청 처리
+			_msgBuf.erase(0, pos + 2);					// 처리한 명령어 삭제
 		}
 	}
-
 }
 
 void IrcServer::castMsg(int client_fd, const char* message) {
-    // 메시지 길이를 계산
-    size_t msgLen = std::strlen(message);
-    // send()를 통해 메시지 전송
-    ssize_t bytesSent = send(client_fd, message, msgLen, 0);
-    
-    if (bytesSent == -1) {
-        // 전송 중 오류가 발생하면 예외 처리
-        std::cerr << "Error: Failed to send message to client fd " << client_fd << std::endl;
-        throw std::runtime_error("Failed to send message");
-    }
+	size_t msgLen = std::strlen(message);				// 메시지 길이를 계산
+	ssize_t bytesSent = send(client_fd, message, msgLen, 0);
 
-    // 전송된 바이트 수가 전체 메시지 길이보다 적을 때 처리
-    // if (bytesSent < msgLen) {
-    //     std::cerr << "Warning: Only partial message sent to client fd " << client_fd << std::endl;
-    //     // 필요한 경우 여기서 추가 처리를 할 수 있음
-    // }
+	if (bytesSent == -1) {								// 전송 중 오류 예외 처리
+		std::cerr << "Error: Failed to send message to client fd " << client_fd << std::endl;
+		throw std::runtime_error("Failed to send message");
+	}
 
-    //std::cout << "Message sent to client fd " << client_fd << ": " << message << std::endl;
+	// 전송된 바이트 수가 전체 메시지 길이보다 적을 때 처리
+	// if (bytesSent < msgLen) {
+	//     std::cerr << "Warning: Only partial message sent to client fd " << client_fd << std::endl;
+	//     // 필요한 경우 여기서 추가 처리를 할 수 있음
+	// }
+
+	//std::cout << "Message sent to client fd " << client_fd << ": " << message << std::endl;
 }
 
 
@@ -216,12 +209,12 @@ void IrcServer::handleError(ErrorCode code, int flag) {
 }
 
 std::string IrcServer::extractCmd() {
-    std::string cmd;
-    std::stringstream ss(_msgBuf);
+	std::string cmd;
+	std::stringstream ss(_msgBuf);
 
-    ss >> cmd;  // 첫 번째 단어 추출
+	ss >> cmd;  // 첫 번째 단어 추출
 
-    return cmd;
+	return cmd;
 }
 
 std::string IrcServer::extractCmdParams(size_t cmdSize) {
@@ -279,16 +272,16 @@ Client* IrcServer::getClient(int client_fd) {
 void IrcServer::checkConnections() {
 	std::cout << "Checking connections..." << std::endl;
 	std::map<int, Client*>::iterator it = _clients.begin();
-    
-    while (it != _clients.end()) {
+	
+	while (it != _clients.end()) {
 																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																													
-        if (it->second->isConnectionTimedOut(180)) {
-            std::cout << "Client " << it->first << " connection timed out." << std::endl;
-            int clientId = it->first;  // 현재 클라이언트 ID 저장
-            it = _clients.erase(it);   // 안전하게 현재 요소 제거하고 다음 반복자 받기
-            removeClient(clientId);     // 추가적인 정리 작업 수행
-        } else {
-            ++it;  // 타임아웃이 아닌 경우에만 반복자 증가
-        }
-    }
+		if (it->second->isConnectionTimedOut(180)) {
+			std::cout << "Client " << it->first << " connection timed out." << std::endl;
+			int clientId = it->first;  // 현재 클라이언트 ID 저장
+			it = _clients.erase(it);   // 안전하게 현재 요소 제거하고 다음 반복자 받기
+			removeClient(clientId);     // 추가적인 정리 작업 수행
+		} else {
+			++it;  // 타임아웃이 아닌 경우에만 반복자 증가
+		}
+	}
 }

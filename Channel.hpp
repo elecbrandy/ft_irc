@@ -20,12 +20,12 @@
 
 class Channel {
 	private:
-		std::string				_name; //채널명
-		std::string				_key; //채널 비밀번호
-		std::string				_topic; //채널 주제
-		std::set<char>			_mode; //채널 모드
-		std::set<Client*> 		_participant; //채널 참여자
-		std::set<Client*>		_operator; //채널 운영자  //set으로 하면 중복 안되고 자동 정렬이 유용함
+		std::string				_name;			// 채널명
+		std::string				_key;			// 채널 비밀번호
+		std::string				_topic;			// 채널 주제
+		std::set<char>			_mode;			// 채널 모드
+		std::set<Client*> 		_participant;	// 채널 참여자
+		std::set<Client*>		_operator;		// 채널 운영자 (set:중복방지/자동정렬)
 	public:
 		Channel(std::string name);
 		~Channel();

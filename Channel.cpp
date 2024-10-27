@@ -8,7 +8,6 @@
 // 4. 채널에 입장하기
 // 5. 채널 참여 완료 관련 처리 e.g)메세지 출력 등
 
-
 // 1. #secret 채널이 invite-only (+i) 모드
 // 2. 운영자가 alice를 초대 (/INVITE alice #secret)
 // 3. alice가 초대 목록에 추가됨
