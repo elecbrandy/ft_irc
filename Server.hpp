@@ -30,13 +30,13 @@
 
 class IrcServer {
 private:
-	int							server_fd;
-	int							port;
-	std::string					password;
-	std::vector<struct pollfd>	fds;
-	std::map<int, Client*>		_clients;
-	std::string					_msgBuf;
-	std::map<std::string, Channel *> _channels;
+	int									server_fd;
+	int									port;
+	std::string							password;
+	std::vector<struct pollfd>			fds;
+	std::map<int, Client*>				_clients;
+	std::string							_msgBuf;
+	std::map<std::string, Channel *>	_channels;
 
 public:
 	IrcServer();

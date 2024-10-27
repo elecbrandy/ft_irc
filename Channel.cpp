@@ -15,14 +15,27 @@
 // 5. removeInvite로 alice의 초대 정보 삭제
 // 6. alice가 나갔다가 다시 들어오려면 새로운 초대 필요
 
+/* dongwook
+
+	< 채널 >
+	1. 최소한 하나 이상의 클라이언트로 구성되있고, 마지막 클라이언트가 떠나면 채널 종료
+	2. 채널 이름은 문자열 (& or # 으로 시작)이고, 최대 200자 까지 가능. 공백과 제어G 포함X
+	3. MODE 변경 가능. MODE에 따라 참가 승인 여부 다름
+	4. 사용자가 가입 가능한 채널은 최대 10개 까지
+	5. 
+
+	< op >
+	1. 채널 운영자 = chop or chanop
+	2. 채널 옆에 있는 @으로 식별
+	3. KICK, MODE, INVITE, TOPIC 명령어 사용 가능
+
+
+*/
+
 #include "Channel.hpp"
 
-Channel::Channel(std::string name) : _name(name) {
-	_key = "";
-	_topic = "";
-	_mode = std::set<char>();
-	_participant = std::set<Client*>();
-}
+Channel::Channel(std::string name) :
+_name(name), _key(""), _topic(""), _mode(std::set<char>()) , _participant(std::set<Client*>()) {}
 
 Channel::~Channel() {}
 

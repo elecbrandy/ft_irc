@@ -87,7 +87,7 @@ void IrcServer::cmdJoin(std::string &cmdParams, int client_fd) {
 	std::vector<std::string> joinTokens = joinSplit(cmdParams);
 	std::vector<std::string> channel;
 	std::vector<std::string> key;
-	
+
 	for (size_t i = 0; i < joinTokens.size(); i++) {
 		if (joinTokens[i][0] == '#')
 			channel.push_back(joinTokens[i]);
