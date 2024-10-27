@@ -17,32 +17,39 @@
 */
 
 void Cmd::checkNick(const std::string& str) {
+	/* CLIENT NICK check */	
+	std::string tmp = this->client->getNickname();
+	if (tmp.empty() == 1) {
+		tmp = "guest";
+	}
+
 	/* EMPTY check */
 	if (str.empty() == 1) {
-		if (server.getClient(client_fd)->getNickname().empty() == 1) {
-			throw CmdException(ERR_NONICKNAMEGIVEN("guest"));
-		} else {
-			throw CmdException(ERR_NONICKNAMEGIVEN(""));
+		if (this->client->getNickname().empty() == 1) {
+			throw CmdException(ERR_NONICKNAMEGIVEN(tmp));	// empty nick
 		}
-		
 	}
 
 	/* SIZE check */
 	if (str.size() > NICK_MAX_LEN) {
-		throw CmdException(ERR_ERRONEUSNICKNAME);
+		throw CmdException(ERR_ERRONEUSNICKNAME(tmp));
 	}
 	
 	/* ALNUM check */
 	for (std::string::const_iterator it = str.begin(); it != str.end(); ++it) {
 		if (!std::isalpha(static_cast<unsigned char>(*it))) {
-			throw CmdException(ERR_ERRONEUSNICKNAME);
+			throw CmdException(ERR_ERRONEUSNICKNAME(tmp));
 		}
+	}
+
+	/* INUSE check */
+	if (server.getClient(str) == nullptr) {
+		throw CmdException(ERR_ERRONEUSNICKNAME(tmp));
 	}
 }
 
 void Cmd::cmdNick(std::string &cmdParams, int client_fd) {
 	checkNick(cmdParams);
-	Client* client = server.getClient(client_fd);
 	client->setNickname(cmdParams);
 	// std::cout << "client->getNickname() : " << client->getNickname() << std::endl;
 }

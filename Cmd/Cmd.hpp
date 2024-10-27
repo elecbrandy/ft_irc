@@ -8,6 +8,7 @@
 class Cmd {
 private:
 	IrcServer&	server;
+	Client*		client;
 	std::string	msg;
 	std::string cmd;
 	std::string cmdParams;

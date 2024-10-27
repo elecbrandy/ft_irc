@@ -1,10 +1,7 @@
 #include "Cmd.hpp"
 
-Cmd::Cmd(IrcServer &s)
-: server(s) {}
-
 Cmd::Cmd(IrcServer &s, std::string &msg, int client_fd)
-: server(s), msg(msg), client_fd(client_fd) {}
+: server(s), msg(msg), client_fd(client_fd), client(server.getClient(client_fd)) {}
 
 Cmd::~Cmd() {}
 

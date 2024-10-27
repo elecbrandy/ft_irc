@@ -139,8 +139,9 @@ void IrcServer::handleClientMessage(int client_fd) {
 		this->_msgBuf += buffer;
 
 		size_t pos;
-		while ((pos = _msgBuf.find("\r\n")) != std::string::npos) { 
-			handleClientCmd(client_fd);					// 클라이언트 요청 처리
+		while ((pos = _msgBuf.find("\r\n")) != std::string::npos) {
+			Cmd cmdHandler(*this, _msgBuf, client_fd);
+			cmdHandler.handleClientCmd();
 			_msgBuf.erase(0, pos + 2);					// 처리한 명령어 삭제
 		}
 	}
@@ -163,8 +164,6 @@ void IrcServer::castMsg(int client_fd, const char* message) {
 
 	//std::cout << "Message sent to client fd " << client_fd << ": " << message << std::endl;
 }
-
-
 
 // 나중에 영어로~
 void IrcServer::handleError(ErrorCode code, int flag) {
@@ -208,65 +207,74 @@ void IrcServer::handleError(ErrorCode code, int flag) {
 	}
 }
 
-std::string IrcServer::extractCmd() {
-	std::string cmd;
-	std::stringstream ss(_msgBuf);
+// std::string IrcServer::extractCmd() {
+// 	std::string cmd;
+// 	std::stringstream ss(_msgBuf);
 
-	ss >> cmd;  // 첫 번째 단어 추출
+// 	ss >> cmd;  // 첫 번째 단어 추출
 
-	return cmd;
-}
+// 	return cmd;
+// }
 
-std::string IrcServer::extractCmdParams(size_t cmdSize) {
-	std::string cmdParams;
-	size_t pos = this->_msgBuf.find(CRLF);
+// std::string IrcServer::extractCmdParams(size_t cmdSize) {
+// 	std::string cmdParams;
+// 	size_t pos = this->_msgBuf.find(CRLF);
 
-	if (pos != std::string::npos)
-		cmdParams = this->_msgBuf.substr(cmdSize + 1, pos - (cmdSize + 1));
+// 	if (pos != std::string::npos)
+// 		cmdParams = this->_msgBuf.substr(cmdSize + 1, pos - (cmdSize + 1));
 	
-	return cmdParams;
-}
+// 	return cmdParams;
+// }
 
-void IrcServer::handleClientCmd(int client_fd) {
-	// client에서 보낸 메세지를 파싱해서 명령어를 추출
-	// 추출한 명령어 실행 후 실행 결과를 클라이언트에게 전송
-	Client* client = getClient(client_fd);
-	std::string cmd = extractCmd(); // 클라이언트가 보낸 메세지에서 명령어 추출
-	std::string cmdParams = extractCmdParams(cmd.size()); // 클라이언트가 보낸 메세지에서 명령어 파라미터 추출
-	std::cout << "---------------------------------" << std::endl;
-	std::cout << "Command : " << cmd << std::endl;
-	std::cout << "Command Params : " << cmdParams << std::endl;
-	if (cmd == "PASS")
-		cmdPass(cmdParams, client_fd);
-	if (cmd == "NICK")
-		cmdNick(cmdParams, client_fd);
-	else if (cmd == "USER")
-		cmdUser(cmdParams, client_fd);
-	else if (cmd == "PING")
-		cmdPing(cmdParams, client_fd);
-	else if (cmd == "JOIN")
-		cmdJoin(cmdParams, client_fd);
-	// else if (cmd == "PART")
-	// 	cmdMode(client_fd, clientMsg);
-	// else if (cmd == "PRIVMSG")
-	// 	cmdPrivmsg(client_fd, clientMsg);
-	// else if (cmd == "KICK")
-	// 	cmdKick(client_fd, clientMsg);
-	// else if (cmd == "INVITE")
-	// 	cmdInvite(client_fd, clientMsg);
-	// else if (cmd == "MODE")
-	// 	cmdPart(client_fd, clientMsg);
-	// else if (cmd == "TOPIC")
-	// 	cmdTopic(client_fd, clientMsg);
-	else
-		castMsg(client_fd, makeMsg(ERR_UNKNOWNCOMMAND(client->getNickname())).c_str());
-}
+// void IrcServer::handleClientCmd(int client_fd) {
+// 	// client에서 보낸 메세지를 파싱해서 명령어를 추출
+// 	// 추출한 명령어 실행 후 실행 결과를 클라이언트에게 전송
+// 	Client* client = getClient(client_fd);
+// 	std::string cmd = extractCmd(); // 클라이언트가 보낸 메세지에서 명령어 추출
+// 	std::string cmdParams = extractCmdParams(cmd.size()); // 클라이언트가 보낸 메세지에서 명령어 파라미터 추출
+// 	std::cout << "---------------------------------" << std::endl;
+// 	std::cout << "Command : " << cmd << std::endl;
+// 	std::cout << "Command Params : " << cmdParams << std::endl;
+// 	if (cmd == "PASS")
+// 		cmdPass(cmdParams, client_fd);
+// 	if (cmd == "NICK")
+// 		cmdNick(cmdParams, client_fd);
+// 	else if (cmd == "USER")
+// 		cmdUser(cmdParams, client_fd);
+// 	else if (cmd == "PING")
+// 		cmdPing(cmdParams, client_fd);
+// 	else if (cmd == "JOIN")
+// 		cmdJoin(cmdParams, client_fd);
+// 	// else if (cmd == "PART")
+// 	// 	cmdMode(client_fd, clientMsg);
+// 	// else if (cmd == "PRIVMSG")
+// 	// 	cmdPrivmsg(client_fd, clientMsg);
+// 	// else if (cmd == "KICK")
+// 	// 	cmdKick(client_fd, clientMsg);
+// 	// else if (cmd == "INVITE")
+// 	// 	cmdInvite(client_fd, clientMsg);
+// 	// else if (cmd == "MODE")
+// 	// 	cmdPart(client_fd, clientMsg);
+// 	// else if (cmd == "TOPIC")
+// 	// 	cmdTopic(client_fd, clientMsg);
+// 	else
+// 		castMsg(client_fd, makeMsg(ERR_UNKNOWNCOMMAND(client->getNickname())).c_str());
+// }
 
 Client* IrcServer::getClient(int client_fd) {
 	if (_clients.find(client_fd) == _clients.end())
 		return nullptr;
 
 	return (_clients[client_fd]);
+}
+
+Client* IrcServer::getClient(const std::string& nickname) {
+	for (std::map<int, Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it) {
+		if (it->second->getNickname() == nickname) {
+			return it->second;
+		}
+	}
+	return nullptr;
 }
 
 void IrcServer::checkConnections() {

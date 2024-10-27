@@ -16,7 +16,7 @@
 void Cmd::checkPassword(const std::string& str) {
 	/* EMPTY check */
 	if (str.empty() == 0) {
-		throw CmdException(ERR_NEEDMOREPARAMS);
+		throw CmdException(ERR_NEEDMOREPARAMS(client->getNickname(), "PASS"));
 	}
 
 	/* SIZE check */
@@ -33,7 +33,6 @@ void Cmd::checkPassword(const std::string& str) {
 }
 
 void Cmd::cmdPass(std::string &cmdParams, int client_fd) {
-	Client* client = server.getClient(client_fd);
 	checkPassword(cmdParams);
 	client->setPassword(cmdParams);
 	// std::cout << "client->getPassword() : " << client->getPassword() << std::endl;

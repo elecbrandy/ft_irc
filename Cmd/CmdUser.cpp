@@ -4,8 +4,6 @@
 	USER
 	- 명령어 : USER
 	- 매개변수 : <user> <mode> <unused> <realname>
-	
-	~?
 
 	Numeric 응답 코드
 	- ERR_NEEDMOREPARAMS: 필요한 매개변수가 부족한 경우 반환

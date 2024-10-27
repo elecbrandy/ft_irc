@@ -50,13 +50,13 @@
 #define ERR_FILEERROR 							"424 " + user + " "
 
 // 431: 닉네임이 주어지지 않음
-#define ERR_NONICKNAMEGIVEN(user) (std::string("431 ") + user + " :No nickname given")
+#define ERR_NONICKNAMEGIVEN(user)				(std::string("431 ") + user + " :No nickname given")
 
 // 432: 잘못된 형식의 닉네임 사용
-#define ERR_ERRONEUSNICKNAME 					"432 " + user + " "
+#define ERR_ERRONEUSNICKNAME(user)				(std::string("432 ") + user + " :Erroneous nickname")
 
 // 433: 닉네임이 이미 사용 중임
-#define ERR_NICKNAMEINUSE 						"433 " + user + " "
+#define ERR_NICKNAMEINUSE(user)					(std::string("433 ") + user + " :Nickname is already in use")
 
 // 436: 동일한 닉네임으로 다른 서버에서 충돌 발생
 #define ERR_NICKCOLLISION 						"436 " + user + " "

@@ -18,6 +18,7 @@
 #include "Channel.hpp"
 #include "ErrorCode.hpp"
 #include "ReplyCode.hpp"
+#include "Cmd.hpp"
 
 #define MAX_CLIENTS 42
 #define BUFFER_SIZE 42
@@ -57,18 +58,20 @@ public:
 	void	handleError(ErrorCode code, int flag);
 	void	run();
 
-	void 	handleClientRequest(int client_fd);
-	std::string extractCmd();
-	std::string extractCmdParams(size_t cmdSize);
-	void 	handleClientCmd(int client_fd);
+	// void 	handleClientRequest(int client_fd);
+	// std::string extractCmd();
+	// std::string extractCmdParams(size_t cmdSize);
+	// void 	handleClientCmd(int client_fd);
+	
+	Client* getClient(const std::string& nickname);
 	Client* getClient(int client_fd);
-	void cmdUser(std::string &cmdParams, int client_fd);
-	void cmdNick(std::string &cmdParams, int client_fd);
-	void cmdPass(std::string &cmdParams, int client_fd);
-	void cmdPing(std::string &cmdParams, int client_fd);
-	void cmdJoin(std::string &cmdParams, int client_fd);
-	std::vector<std::string> joinSplit(std::string &msg);
-	std::string makeMsg(std::string msg);
+	// void cmdUser(std::string &cmdParams, int client_fd);
+	// void cmdNick(std::string &cmdParams, int client_fd);
+	// void cmdPass(std::string &cmdParams, int client_fd);
+	// void cmdPing(std::string &cmdParams, int client_fd);
+	// void cmdJoin(std::string &cmdParams, int client_fd);
+	// std::vector<std::string> joinSplit(std::string &msg);
+	// std::string makeMsg(std::string msg);
 	void checkConnections();
 
 };
