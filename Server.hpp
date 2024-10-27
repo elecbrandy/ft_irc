@@ -22,6 +22,11 @@
 #define MAX_CLIENTS 42
 #define BUFFER_SIZE 42
 
+#define PORT_MAX 65535
+#define PORT_MIN 0
+#define PORT_MAX_LEN 5
+#define PASSWORD_MAX_LEN 10
+
 #define EXIT 1
 #define UNEXIT 0
 
