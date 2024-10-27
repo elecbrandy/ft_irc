@@ -70,7 +70,7 @@ std::vector<std::string> IrcServer::joinSplit(std::string &cmdParams) {
             }
 		} else
             tmp += c;
-    }	
+    }
 
     if (!tmp.empty())
         res.push_back(tmp);

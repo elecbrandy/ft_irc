@@ -8,11 +8,6 @@
 #include <stdexcept>
 #include "ErrorCode.hpp"
 
-#define PORT_MAX 65535
-#define PORT_MIN 0
-#define PORT_MAX_LEN 5
-#define PASSWORD_MAX_LEN 10
-
 class ArgParser {
 private:
 	int			port;
