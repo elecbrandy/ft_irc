@@ -3,7 +3,9 @@ NAME = ircserv
 CPP = c++
 CPPFLAGS = -Wall -Wextra -Werror -std=c++98
 
-SRCS = $(wildcard *.cpp)
+SRCS_CMD = $(wildcard Cmd/*.cpp)
+SRCS_MAIN = $(wildcard *.cpp)
+SRCS = $(SRCS_MAIN) $(SRCS_CMD)
 HDRS = $(wildcard *.hpp)
 OBJS = $(SRCS:.cpp=.o)
 
