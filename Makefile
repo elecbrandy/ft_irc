@@ -1,32 +1,28 @@
-CC = c++
-CFLAGS = -Wall -Wextra -Werror
-# CFLAGS = -Wall -Wextra -Werror -MMD -MP
-# CFLAGS = -std=c++98 -Wall -Wextra -Werror -MMD -MP
+NAME = ircserv
 
-NAME = server
-INCS = .
+CPP = c++
+CPPFLAGS = -Wall -Wextra -Werror -std=c++98
 
 SRCS = $(wildcard *.cpp)
-
+HDRS = $(wildcard *.hpp)
 OBJS = $(SRCS:.cpp=.o)
-DEPS = $(OBJS:.o=.d)
 
-all: $(NAME)
+all : $(NAME)
 
-$(NAME): $(OBJS)
-	$(CC) $(CFLAGS) -o $@ $^ -I$(INCS)
+$(NAME) : $(OBJS)
+	$(CPP) $(CPPFLAGS) $(OBJS) -o $(NAME)
 
--include $(DEPS)
+%.o : %.cpp $(HDRS)
+	$(CPP) $(CPPFLAGS) -c $< -o $@
+ 
+clean :
+	rm -f $(OBJS)
 
-%.o: %.cpp
-	$(CC) $(CFLAGS) -c $< -o $@ -I$(INCS)
-
-clean:
-	rm -f $(OBJS) $(DEPS)
-
-fclean: clean
+fclean : clean
 	rm -f $(NAME)
 
-re: fclean all
+re :
+	$(MAKE) fclean
+	$(MAKE) all
 
-.PHONY: all clean fclean re
+.PHONY : all clean fclean re

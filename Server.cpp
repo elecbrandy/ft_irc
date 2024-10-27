@@ -1,9 +1,10 @@
 #include "Server.hpp"
+#include "Client.hpp"
 
 IrcServer::IrcServer() {}
 
 IrcServer::IrcServer(int port, const std::string& password)
-: port(port), password(password) { }
+: port(port), password(password) {}
 
 IrcServer::~IrcServer() {}
 
@@ -62,30 +63,50 @@ void IrcServer::acceptClient() {
 	client_poll_fd.events = POLLIN;
 	fds.push_back(client_poll_fd);
 
-	std::cout << "New Client connected : " << client_fd << std::endl;
+	Client* newClient = new Client();
+    _clients[client_fd] = newClient; //map구조체에 key=client_fd, value=Client구조체 저장
+
+	std::cout << "New Client connected, client_fd is " << client_fd << std::endl;
+	
 }
 
 void IrcServer::removeClient(int client_fd) {
+	// new로 클라이언트 할당한 것에 대해서 객체 메모리 해제 추가!
+    if (_clients.find(client_fd) != _clients.end()) {
+        delete _clients[client_fd];
+        _clients.erase(client_fd);
+    }
+
 	for (size_t i = 0; i < fds.size(); ++i) {
 		if (fds[i].fd == client_fd) {
 			fds.erase(fds.begin() + i);
 			break;
 		}
 	}
+
 	close(client_fd);
 	std::cout << "Client connection end : " << client_fd << std::endl;
 }
 
 void IrcServer::run() {
+	time_t lastCheckTime = time(NULL);
+
 	while (true) {
-		// poll 하는 중 ~
+		time_t now = time(NULL);
+
+		if (now - lastCheckTime >= PING_INTERVAL) {
+			checkConnections();
+			lastCheckTime = now;
+		}
+
 		if (poll(&fds[0], fds.size(), -1) < 0) {
 			handleError(ERR_POLL, EXIT);
 		}
-		// 
+
 		for (int i = fds.size() - 1; i>= 0; --i) {
 			if (fds[i].revents & POLLIN) {	// 파일 디스크립터가 poll 상태인지 비트연산해서->revent(short)의 비트랑 비교해서 그 안에 Pollin 있는지 아마 최저 1비트s
 				handleSocketEvent(fds[i].fd);
+		
 			}
 		}
 	}
@@ -93,19 +114,19 @@ void IrcServer::run() {
 
 void IrcServer::handleSocketEvent(int fd) {
 	if (fd == server_fd) {	// 이벤트가 서버 소켓에서 감지되었을 경우에는->?
-		acceptClient();		// 클라이언트 추가
+		acceptClient();	// 클라이언트 추가
 	} else {
 		handleClientMessage(fd); // 아마 그게 아니면 클라이언트 메세지일거임!s
 	}
 }
 
 void IrcServer::handleClientMessage(int client_fd) {
-	char buffer[BUFFER_SIZE];
+	char buffer[BUFFER_SIZE]; //rfc기준 512가 맥스임
 	std::memset(buffer, 0, BUFFER_SIZE); // 이거 써도 되나?
 
 	int bytes_received = recv(client_fd, buffer, BUFFER_SIZE - 1, 0);
 	// 나중에 이 클라에서 보낸 데이터를 읽어올때 이걸 반복문으로 돌려야하나? 버퍼 이상 보낼수도있으니까?
-	
+
 	if (bytes_received < 0) {	 // 클라에서 에러 발생
 		if (errno != EWOULDBLOCK && errno != EAGAIN) {
 			handleError(ERR_ETC, UNEXIT);
@@ -113,36 +134,43 @@ void IrcServer::handleClientMessage(int client_fd) {
 		}
 	} else if (bytes_received == 0) { // 클라 정상 종료?
 		removeClient(client_fd);
-	} else { // 메ㅔ세지 정상 받음
+	} else { // 메세지 정상 받음
 		buffer[bytes_received] = '\0';  // 널 문자추가
+		std::cout << "\n\n--------------------------------" << std::endl;
 		std::cout << "Message from client " << client_fd << ": " << buffer << std::endl;
-		broadcastMessage(client_fd, buffer);  // 다른 클라이언트들에게 메시지 쏴주기
-	}
-}
+		
+		this->_msgBuf += buffer;
 
-// 깔끔하게 좀 수정하기 밑에
-void IrcServer::broadcastMessage(int sender_fd, const char* message) {
-	std::string full_message = "Client ";
-	std::stringstream ss;
-	ss << sender_fd;
-	full_message += ss.str();
-	full_message += ": ";
-	full_message += message;
-
-	for (size_t i = 0; i < fds.size(); ++i) {
-		int client_fd = fds[i].fd;
-
-		// 서버 소켓과 메시지 보낸 클라이언트는 제외
-		if (client_fd != server_fd && client_fd != sender_fd) {
-			int bytes_sent = send(client_fd, full_message.c_str(), full_message.length(), 0);
-			if (bytes_sent < 0) {
-				std::cerr << "Error sending message to client " << client_fd << ": " << strerror(errno) << std::endl;
-				// 필요에 따라 클라이언트를 제거할 수 있음
-				// removeClient(client_fd);
-			}
+		size_t pos;
+		while ((pos = _msgBuf.find("\r\n")) != std::string::npos) { 
+			handleClientCmd(client_fd);  // 클라이언트 요청 처리
+			_msgBuf.erase(0, pos + 2);  // 처리한 명령어 삭제
 		}
 	}
+
 }
+
+void IrcServer::castMsg(int client_fd, const char* message) {
+    // 메시지 길이를 계산
+    size_t msgLen = std::strlen(message);
+    // send()를 통해 메시지 전송
+    ssize_t bytesSent = send(client_fd, message, msgLen, 0);
+    
+    if (bytesSent == -1) {
+        // 전송 중 오류가 발생하면 예외 처리
+        std::cerr << "Error: Failed to send message to client fd " << client_fd << std::endl;
+        throw std::runtime_error("Failed to send message");
+    }
+
+    // 전송된 바이트 수가 전체 메시지 길이보다 적을 때 처리
+    // if (bytesSent < msgLen) {
+    //     std::cerr << "Warning: Only partial message sent to client fd " << client_fd << std::endl;
+    //     // 필요한 경우 여기서 추가 처리를 할 수 있음
+    // }
+
+    //std::cout << "Message sent to client fd " << client_fd << ": " << message << std::endl;
+}
+
 
 
 // 나중에 영어로~
@@ -157,7 +185,7 @@ void IrcServer::handleError(ErrorCode code, int flag) {
 		case ERR_SOCKET_BIND:
 			std::cerr << "소켓 바인딩 에러: " << strerror(errno) << std::endl;
 			break;
-		case ERR_SOCKET_LISTEN:
+		case ERR_SOCKET_LISTEN:  
 			std::cerr << "소켓 리슨 에러: " << strerror(errno) << std::endl;
 			break;
 		case ERR_SET_NONBLOCKING:
@@ -185,4 +213,82 @@ void IrcServer::handleError(ErrorCode code, int flag) {
 	if (flag == EXIT) {
 		exit(EXIT_FAILURE);
 	}
+}
+
+std::string IrcServer::extractCmd() {
+    std::string cmd;
+    std::stringstream ss(_msgBuf);
+
+    ss >> cmd;  // 첫 번째 단어 추출
+
+    return cmd;
+}
+
+std::string IrcServer::extractCmdParams(size_t cmdSize) {
+	std::string cmdParams;
+	size_t pos = this->_msgBuf.find(CRLF);
+
+	if (pos != std::string::npos)
+		cmdParams = this->_msgBuf.substr(cmdSize + 1, pos - (cmdSize + 1));
+	
+	return cmdParams;
+}
+
+void IrcServer::handleClientCmd(int client_fd) {
+	// client에서 보낸 메세지를 파싱해서 명령어를 추출
+	// 추출한 명령어 실행 후 실행 결과를 클라이언트에게 전송
+	Client* client = getClient(client_fd);
+	std::string cmd = extractCmd(); // 클라이언트가 보낸 메세지에서 명령어 추출
+	std::string cmdParams = extractCmdParams(cmd.size()); // 클라이언트가 보낸 메세지에서 명령어 파라미터 추출
+	std::cout << "---------------------------------" << std::endl;
+	std::cout << "Command : " << cmd << std::endl;
+	std::cout << "Command Params : " << cmdParams << std::endl;
+	if (cmd == "PASS")
+		cmdPass(cmdParams, client_fd);
+	if (cmd == "NICK")
+		cmdNick(cmdParams, client_fd);
+	else if (cmd == "USER")
+		cmdUser(cmdParams, client_fd);
+	else if (cmd == "PING")
+		cmdPing(cmdParams, client_fd);
+	else if (cmd == "JOIN")
+		cmdJoin(cmdParams, client_fd);
+	// else if (cmd == "PART")
+	// 	cmdMode(client_fd, clientMsg);
+	// else if (cmd == "PRIVMSG")
+	// 	cmdPrivmsg(client_fd, clientMsg);
+	// else if (cmd == "KICK")
+	// 	cmdKick(client_fd, clientMsg);
+	// else if (cmd == "INVITE")
+	// 	cmdInvite(client_fd, clientMsg);
+	// else if (cmd == "MODE")
+	// 	cmdPart(client_fd, clientMsg);
+	// else if (cmd == "TOPIC")
+	// 	cmdTopic(client_fd, clientMsg);
+	else
+		castMsg(client_fd, makeMsg(ERR_UNKNOWNCOMMAND(client->getNickname())).c_str());
+}
+
+Client* IrcServer::getClient(int client_fd) {
+	if (_clients.find(client_fd) == _clients.end())
+		return nullptr;
+
+	return (_clients[client_fd]);
+}
+
+void IrcServer::checkConnections() {
+	std::cout << "Checking connections..." << std::endl;
+	std::map<int, Client*>::iterator it = _clients.begin();
+    
+    while (it != _clients.end()) {
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																													
+        if (it->second->isConnectionTimedOut(180)) {
+            std::cout << "Client " << it->first << " connection timed out." << std::endl;
+            int clientId = it->first;  // 현재 클라이언트 ID 저장
+            it = _clients.erase(it);   // 안전하게 현재 요소 제거하고 다음 반복자 받기
+            removeClient(clientId);     // 추가적인 정리 작업 수행
+        } else {
+            ++it;  // 타임아웃이 아닌 경우에만 반복자 증가
+        }
+    }
 }
