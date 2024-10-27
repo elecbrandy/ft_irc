@@ -50,7 +50,7 @@
 #define ERR_FILEERROR 							"424 " + user + " "
 
 // 431: 닉네임이 주어지지 않음
-#define ERR_NONICKNAMEGIVEN 					"431 " + user + " "
+#define ERR_NONICKNAMEGIVEN(user) 				"431 " + user + " :No nickname given"
 
 // 432: 잘못된 형식의 닉네임 사용
 #define ERR_ERRONEUSNICKNAME 					"432 " + user + " "
@@ -141,3 +141,8 @@
 
 // 502: 사용자가 자신이 아닌 다른 사람의 모드를 변경하려 함
 #define ERR_USERSDONTMATCH 						"502 " + user + " "
+
+/* Custom */
+
+// PASS 시 Password 오류
+#define ERR_PASS_PASSWORD                       "Error: incorrected PassWord"
