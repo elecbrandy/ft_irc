@@ -48,6 +48,8 @@ void Channel::setMode(char mode) {_mode.insert(mode);}
 
 void Channel::setParticipant(Client* client) {_participant.insert(client);}
 
+void Channel::addParticipantname(std::string participantName) {_participantName = participantName + " ";}
+
 /* getter */
 std::string Channel::getName() {return this->_name;}
 
@@ -58,3 +60,5 @@ std::string Channel::getTopic() {return this->_topic;}
 std::set<char> Channel::getMode() {return this->_mode;}
 
 std::set<Client*> Channel::getParticipant() {return this->_participant;}
+
+std::string Channel::getParticipantName() {return this->_participantName;}

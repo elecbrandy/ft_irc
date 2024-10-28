@@ -26,6 +26,7 @@ class Channel {
 		std::set<char>			_mode;			// 채널 모드
 		std::set<Client*> 		_participant;	// 채널 참여자
 		std::set<Client*>		_operator;		// 채널 운영자 (set:중복방지/자동정렬)
+		std::string				_participantName; //참여자 이름
 	public:
 		Channel(std::string name);
 		~Channel();
@@ -34,12 +35,14 @@ class Channel {
 		void setTopic(std::string topic);
 		void setMode(char mode);
 		void setParticipant(Client* client);
+		void addParticipantname(std::string participantName);
 
 		std::string getName();
 		std::string getKey();
 		std::string getTopic();
 		std::set<char> getMode();
 		std::set<Client*> getParticipant();
+		std::string getParticipantName();
 };
 	
 #endif

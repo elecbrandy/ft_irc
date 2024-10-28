@@ -34,12 +34,14 @@ public:
 	void		cmdNick();
 	void		cmdPass();
 	void		cmdPing();
+	void		cmdJoin(std::string &cmdParams, int client_fd);
 	// void		cmdJoin(std::string &cmdParams, int client_fd);
 
 	/* Utils */
 	void checkNick(const std::string& str);
 	void checkPassword(const std::string& str);
 	// std::vector<std::string> joinSplit(std::string &msg);
+	std::vector<std::string> joinSplit(std::string &cmdParams);
 
 	/* Exception */
 	class CmdException : public std::exception {
