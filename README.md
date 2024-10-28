@@ -41,3 +41,20 @@ dongwook 작업일지
 
 ### 변경 사항
 - 굿
+
+____
+
+## homebrew 설치
+
+``` bash
+git clone https://github.com/Homebrew/brew ~/homebrew
+
+echo 'export PATH="$HOME/homebrew/bin:$PATH"' >> ~/.zshrc
+source ~/.zshrc
+
+brew help
+
+brew install irssi
+```
+
+
