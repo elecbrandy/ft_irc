@@ -6,11 +6,10 @@
 2. `main` 브런치에 넣어둔 **setDocker.sh** 실행 (`./setDocker.sh`)
 
 3. 터미널 창을 두개 띄우고, 각각의 창에 irc 서버, 클라이언트 열기
-	- 첫번째 터미널에 서버를 : `docker exec -it irc_container inspircd --runasroot --nofork --debug`
- 	- 두번째 터미널에 클라를
-  		- `docker exec -it irc_container /bin/bash` 로 접속해서 직접 `irssi` 켜기 또는
-    		- `docker exec -it irc_container irssi -c 127.0.0.1 -p 6667 -w 1234 -n nickname` 으로 한번에 접속
-      		- 전자가 편한듯? 
+- 첫번째 터미널에 서버를 : `docker exec -it irc_container inspircd --runasroot --nofork --debug`
+- 두번째 터미널에 클라를 :
+	- `docker exec -it irc_container /bin/bash` 로 접속해서 직접 `irssi` 켜기 또는  
+	- `docker exec -it irc_container irssi -c 127.0.0.1 -p 6667 -w 1234 -n nickname` 으로 한번에 접속 - 전자가 편한듯? 
 4. kill, rm 알아서
 
 __________
