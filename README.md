@@ -1,13 +1,21 @@
 # ft_irc
+## docker set
 
-dongwook 작업일지
-- Cmd 디렉토리 만들어서, Cmd 클래스 관련 파일 정리
-- Cmd 클래스가 명령어 추출, 명령어 핸들, 명령어 실행 함수 모두 관리함
-- 실제 irssi 와 연결 시 순서
-	- 처음 접속 시 클라가 `CAP LS 302` 보내면 서버에서 `CAP * LS :` 답장해야 함
-	- 이후 `NICK`, `USER` 호출
-	- 이때 `NICK`, `USER` 호출 이전에 `PASS` 강제 되도록 해야할듯. 우린 비번 있으니까
+1. **docker desktop** 키기
 
+2. `main` 브런치에 넣어둔 **setDocker.sh** 실행 (`./setDocker.sh`)
+
+3. 터미널 창을 두개 띄우고, 각각의 창에 irc 서버, 클라이언트 열기
+	- 첫번째 터미널에 서버를 : `docker exec -it irc_container inspircd --runasroot --nofork --debug`
+ 	- 두번째 터미널에 클라를
+  		- `docker exec -it irc_container /bin/bash` 로 접속해서 직접 `irssi` 켜기 또는
+    		- `docker exec -it irc_container irssi -c 127.0.0.1 -p 6667 -w 1234 -n nickname` 으로 한번에 접속
+      		- 전자가 편한듯? 
+4. kill, rm 알아서
+
+__________
+
+## checklist
 ### Server 기본 구현
 - [x] client - server 기본적 연결
 - [x] 닉네임 밑 사용자명 설정 가능
@@ -38,23 +46,4 @@ dongwook 작업일지
 ### Bonus 구현
 - [ ] Handle file transfer
 - [ ] A bot
-
-### 변경 사항
-- 굿
-
-____
-
-## homebrew 설치
-
-``` bash
-git clone https://github.com/Homebrew/brew ~/homebrew
-
-echo 'export PATH="$HOME/homebrew/bin:$PATH"' >> ~/.zshrc
-source ~/.zshrc
-
-brew help
-
-brew install irssi
-```
-
 
