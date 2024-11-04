@@ -1,9 +1,9 @@
 #include "Server.hpp"
 #include "Client.hpp"
 
-std::string IrcServer::makeMsg(std::string msg) {
-	std::string prefix = ":localhost "; //prefix는 선택사항!
-	std::string completeMsg = prefix + " " + msg + " " + CRLF;
+std::string IrcServer::makeMsg(const std::string& msg) {
+	//prefix는 선택사항!
+	std::string completeMsg = msg + " " + CRLF;
 
 	return completeMsg;
 }

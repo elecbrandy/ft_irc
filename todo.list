@@ -1,0 +1,8 @@
+- option
+client nickname 
+option +l 0명 막기  v
+옵션 부여 중 예외 발생 시 초기화 필요
+
+/mode #ch -o user -k -l -> /mode #ch -ok user -l 로 들어옴
+
+channel 인원 예외 처리

@@ -11,6 +11,7 @@
 	- `docker exec -it irc_container /bin/bash` 로 접속해서 직접 `irssi` 켜기 또는  
 	- `docker exec -it irc_container irssi -c 127.0.0.1 -p 6667 -w 1234 -n nickname` 으로 한번에 접속 - 전자가 편한듯? 
 4. kill, rm 알아서
+5. 도커에서 클라를 열고 로컬 서버에 접속할때는 ip주소 `host.docker.internal`
 
 __________
 
@@ -21,7 +22,7 @@ __________
 - [ ] 수신받은 패킷 이어 붙이기 (`com^Dman^Dd`)
 
 ### Cmd
-- [ ] PASS : 첫 접속 때 비번 강제하게 해야할듯? 클라클래스에 bool 타입으로 인증했는지 확인하는거 만들어서
+- [x] PASS
 - [x] USER
 - [ ] PING : 클라에서 임의로 `/ping a` 입력 시 `PRIVMSG a :PING 1730057358 334518` 이런 식으로 입력됨. 이때 PRIVMSG 등 처리 해야할듯
 - [x] NICK : 완성하긴했는데, MAX_LEN 어떻게 할지 정해야 함. 제대로 바뀌었는지 확인 하는 방법을 넣어야 하나? 중복 등 아직 테스트 안해봄

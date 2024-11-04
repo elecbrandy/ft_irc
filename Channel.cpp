@@ -35,7 +35,7 @@
 #include "Channel.hpp"
 
 Channel::Channel(std::string name) :
-_name(name), _key(""), _topic(""), _mode(std::set<char>()) , _participant(std::set<Client*>()) {}
+_name(name), _key(""), _topic(""), _mode() , _participant(), b_topic_mode(false), b_invite_mode(false) {}
 
 Channel::~Channel() {}
 
@@ -46,9 +46,41 @@ void Channel::setTopic(std::string topic) {_topic = topic;}
 
 void Channel::setMode(char mode) {_mode.insert(mode);}
 
-void Channel::setParticipant(Client* client) {_participant.insert(client);}
+void Channel::setParticipant(std::string participantName, Client* client) {
+    _participant.insert(std::make_pair(participantName, client));
+    _participantName += participantName + " ";
+}
 
-void Channel::addParticipantname(std::string participantName) {_participantName = participantName + " ";}
+// void Channel::setOperator(std::string nick, Client* client) {_operator.insert(std::make_pair(nick, client));}
+
+void Channel::setLimit(unsigned int limit) {_limit = limit;}
+
+void Channel::setInvited(std::string nickname) {_invited.push_back(nickname);}
+
+void Channel::addOperator(std::string nick, Client* client)
+{
+	this->_operator[nick] = client;
+}
+
+void Channel::removeOperator(Client* client)
+{
+	this->_operator.erase(client->getNickname());
+}
+
+void Channel::removeKey()
+{
+	this->_key = "";
+}
+
+void Channel::set_b_topic_mode(bool value)
+{
+	this->b_topic_mode = value;
+}
+
+void Channel::set_b_invite_mode(bool value)
+{
+	this->b_invite_mode = value;
+}
 
 /* getter */
 std::string Channel::getName() {return this->_name;}
@@ -59,6 +91,32 @@ std::string Channel::getTopic() {return this->_topic;}
 
 std::set<char> Channel::getMode() {return this->_mode;}
 
-std::set<Client*> Channel::getParticipant() {return this->_participant;}
+std::map<std::string, Client*>& Channel::getParticipant() {return this->_participant;}
 
 std::string Channel::getParticipantName() {return this->_participantName;}
+
+bool Channel::isOperator(Client* client) const
+{
+	if (this->_operator.find(client->getNickname()) == this->_operator.end())
+		return false;
+	else
+		return true;
+}
+
+bool Channel::get_b_topic_mode() const
+{
+	return (this->b_topic_mode);
+}
+
+bool Channel::get_b_invite_mode() const
+{
+	return (this->b_invite_mode);
+}
+std::map<std::string, Client*> Channel::getOperator() {return this->_operator;}
+
+unsigned int Channel::getLimit() const {return this->_limit;} 
+
+std::vector<std::string> Channel::getInvited() {return this->_invited;}
+
+std::vector<std::string> Channel::getBanned() {return this->_banned;}
+

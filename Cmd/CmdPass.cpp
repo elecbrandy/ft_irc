@@ -14,8 +14,9 @@
 */
 
 void Cmd::checkPassword(const std::string& str) {
+	std::cout << "INPUT PASSWORD : " << str << std::endl;
 	/* EMPTY check */
-	if (str.empty() == 0) {
+	if (str.empty()) {
 		throw CmdException(ERR_NEEDMOREPARAMS(client->getNickname(), "PASS"));
 	}
 
@@ -30,10 +31,16 @@ void Cmd::checkPassword(const std::string& str) {
 			throw CmdException(ERR_PASS_PASSWORD);
 		}
 	}
+
+	if (this->cmdParams == server.getPassword()) {
+		client->setPassStatus(true);
+	} else {
+		throw CmdException(ERR_PASS_PASSWORD);
+	}
 }
 
 void Cmd::cmdPass() {
+	std::cout << C_ERR << "cmdPASS" << C_RESET << std::endl;
 	checkPassword(this->cmdParams);
 	client->setPassword(this->cmdParams);
-	// std::cout << "client->getPassword() : " << client->getPassword() << std::endl;
 }

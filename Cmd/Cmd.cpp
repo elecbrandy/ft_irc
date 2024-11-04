@@ -15,76 +15,89 @@ std::string Cmd::extractCmd() {
 }
 
 std::string Cmd::extractCmdParams() {
-	size_t startPos = this->cmd.size() + 1;			// 시작 위치
-	size_t endPos = msg.find(CRLF, startPos);		// 끝 위치 (CRLF 위치)
+	size_t startPos = this->cmd.size();
 
-	if (endPos != std::string::npos) {     			// CRLF 존재O -> 파라미터 추출
-		return msg.substr(startPos, endPos - startPos);
+	// 명령어와 파라미터 사이에 공백이 있을 경우를 처리
+	if (msg.size() > startPos && std::isspace(static_cast<unsigned char>(msg[startPos]))) {
+		++startPos;
+	}
+
+	if (startPos < msg.size()) {
+		return msg.substr(startPos);
 	} else {
-		return "";									// CRLF 존재X -> 빈 문자열 반환
+		return ""; // 파라미터가 없는 경우 빈 문자열 반환
 	}
 }
 
-void Cmd::handleClientCmd() {
+void	Cmd::authorizeClient() {
+	if (this->cmd == "CAP") {
+		cmdCap();
+	} else if (this->cmd == "PASS") {
+		cmdPass();
+		client->setPassStatus(true);
+	} else if (this->cmd == "NICK") {
+		cmdNick();
+		client->setNickStatus(true);
+	} else if (this->cmd == "USER") {
+		cmdUser(cmdParams, client_fd);
+		client->setUserStatus(true);
+	}
+	if (client->getPassStatus() &&	\
+		client->getNickStatus() &&	\
+		client->getUserStatus()) {
+		client->setRegisteredStatus(true);
+		server.castMsg(client_fd, server.makeMsg(RPL_WELCOME(client->getUsername())).c_str());
+	}
+}
+
+bool Cmd::handleClientCmd() {
 	try {
 		this->cmd = extractCmd();
 		this->cmdParams = extractCmdParams();
-
-		if (this->cmd == "CAP") {
-			cmdCap();
-		}
-		if (this->cmd == "PASS") {
-			cmdPass();
-		}
-
-		if (this->cmd == "NICK") {
-			cmdNick();
-		} else if (this->cmd == "USER") {
-			cmdUser(cmdParams, client_fd);
-		} else if (this->cmd == "PING") {
-			cmdPing();
-		} else if (this->cmd == "JOIN") {
-			// cmdJoin(cmdParams, client_fd);
-		} else if (cmd == "PART") {
-			// cmdMode(client_fd, clientMsg);
-		} else if (cmd == "PRIVMSG") {
-			// cmdPrivmsg(client_fd, clientMsg);
-		} else if (cmd == "KICK") {
-			// cmdKick(client_fd, clientMsg);
-		} else if (cmd == "INVITE") {
-			// cmdInvite(client_fd, clientMsg);
-		} else if (cmd == "MODE") {
-			// cmdPart(client_fd, clientMsg);
-		} else if (cmd == "TOPIC") {
-			// cmdTopic(client_fd, clientMsg);
+		// std::cout << YELLOW << "cmd: " << this->cmd << C_RESET << std::endl;
+		// std::cout << YELLOW << "params: " << this->cmdParams << C_RESET << "\n" << std::endl;
+		if (!client->getRegisteredStatus()) {
+			authorizeClient();
 		} else {
-			server.castMsg(client_fd, server.makeMsg(ERR_UNKNOWNCOMMAND(client->getNickname())).c_str());
+			if (this->cmd == "NICK") {
+				cmdNick();
+			} else if (this->cmd == "USER") {
+				cmdUser(cmdParams, client_fd);
+			} else if (this->cmd == "PING") {
+				cmdPing();
+			} else if (this->cmd == "JOIN") {
+				// cmdJoin(cmdParams, client_fd);
+			} else if (cmd == "PART") {
+				// cmdMode(client_fd, clientMsg);
+			} else if (cmd == "PRIVMSG") {
+				// cmdPrivmsg(client_fd, clientMsg);
+			} else if (cmd == "KICK") {
+				// cmdKick(client_fd, clientMsg);
+			} else if (cmd == "INVITE") {
+				// cmdInvite(client_fd, clientMsg);
+			} else if (cmd == "MODE") {
+				// cmdPart(client_fd, clientMsg);
+			} else if (cmd == "TOPIC") {
+				// cmdTopic(client_fd, clientMsg);
+			} else {
+				server.castMsg(client_fd, server.makeMsg(ERR_UNKNOWNCOMMAND(client->getNickname())).c_str());
+			}
 		}
 	}
 	catch (const CmdException& e) {
+		if (!this->client->getPassStatus() || \
+			!this->client->getRegisteredStatus()) {
+			server.castMsg(client_fd, e.what());
+			server.removeClient(client_fd);
+			return false;
+		}
 		server.castMsg(client_fd, e.what());
 	}
+	return true;
 }
 
-// void Cmd::cmdPing(std::string &cmdParams, int client_fd) {
-//     Client* client = getClient(client_fd);
-//     client->setLastPongTime(); //마지막 pong 시간 갱신을 하는 이유 : 1.고스트커넥션 방지 2.서버가 살아있는지 확인 3.서버의 리소스 관리를 위해
-// 	std::string servername = client->getServername();
-// 	if (cmdParams == servername)
-// 		castMsg(client_fd, makeMsg("PONG" + ' ' + servername).c_str());
-// }
+const char* Cmd::CmdException::what() const throw() {
+	return msg.c_str();
+}
 
-
-/*
-	PASS
-	1. 닉네임을 설정하거나 기존의 닉네임을 변경하는 명령어
-	2. 이미 사용 중인 닉네임인 경우 에러 응답 ERR_NICKCOLLISION
-	3. 닉네임은 영문 문자나 특수문자로 시작하며 최대 9자로 구성됨.
-*/
-
-// void Cmd::cmdPass(std::string &cmdParams, int client_fd) {
-// 	Client* client = getClient(client_fd);
-//     std::string password = cmdParams;
-//     client->setPassword(password);
-//     // std::cout << "client->getPassword() : " << client->getPassword() << std::endl;
-// }
+std::string Cmd::getCmdParams() const {return this->cmdParams;}

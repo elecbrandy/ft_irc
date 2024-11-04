@@ -17,6 +17,12 @@
 */
 
 void Cmd::checkNick(const std::string& str) {
+	/* Register check */
+	std::cout << C_ERR << "cmdNick" << C_RESET << std::endl;
+	if (!this->client->getPassStatus()) {
+		throw CmdException(ERR_NEEDMOREPARAMS(client->getNickname(), "PASS"));
+	}
+
 	/* CLIENT NICK check */	
 	std::string tmp = this->client->getNickname();
 	if (tmp.empty()) {
@@ -51,5 +57,6 @@ void Cmd::checkNick(const std::string& str) {
 void Cmd::cmdNick() {
 	checkNick(this->cmdParams);
 	client->setNickname(this->cmdParams);
+	this->server.addClientByNickname(this->cmdParams, this->client);
 	// std::cout << "client->getNickname() : " << client->getNickname() << std::endl;
 }

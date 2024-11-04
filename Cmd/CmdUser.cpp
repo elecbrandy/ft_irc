@@ -11,6 +11,12 @@
 */
 
 void Cmd::cmdUser(std::string &cmdParams, int client_fd) {
+	/* Register check */
+	std::cout << C_ERR << "cmdUser" << C_RESET << std::endl;
+	if (!this->client->getPassStatus()) {
+		throw CmdException(ERR_NEEDMOREPARAMS(client->getNickname(), "PASS"));
+	}
+
 	std::stringstream ss(cmdParams);
 	std::string names[4];
 	Client* client = server.getClient(client_fd);
@@ -40,7 +46,5 @@ void Cmd::cmdUser(std::string &cmdParams, int client_fd) {
 	// std::cout << "client->getRealname() : " << client->getRealname() << std::endl;
 
 	// 클라이언트에게 웰컴 메시지 전송
-	server.castMsg(client_fd, server.makeMsg(RPL_WELCOME(client->getUsername())).c_str());
+	// server.castMsg(client_fd, server.makeMsg(RPL_WELCOME(client->getUsername())).c_str());
 }
-
-

@@ -3,8 +3,17 @@
 
 #include <string>
 
+typedef struct s_register {
+    bool pass;
+    bool nick;
+    bool user;
+    bool registered;
+} t_regitser;
+
 class Client {
 	private:
+		int			_fd;
+		std::string _msgBuf;
 		std::string	_nickname;
 		std::string	_username;
 		std::string	_hostname;
@@ -13,7 +22,8 @@ class Client {
 		std::string _servername;
 		time_t		_lastPingTime;
 		time_t		_lastPongTime;
-		bool		_isRegistered;
+		t_regitser	_registerStatus;
+
 
 	public:
 		Client();
@@ -28,7 +38,12 @@ class Client {
 		void		setServername(const std::string& str); //단일 서버라도 서버이름은 필요함
 		void 		setLastPongTime();
 		void		setIsRegistered(bool flag);
+		void		setPassStatus(bool status);
+		void 		setNickStatus(bool status);
+		void 		setUserStatus(bool status);
+		void 		setRegisteredStatus(bool status);
 
+		int			getFd() const;
 		std::string	getNickname() const;
 		std::string	getUsername() const;
 		std::string	getHostname() const;
@@ -36,9 +51,14 @@ class Client {
 		std::string	getPassword() const;
 		std::string	getServername() const;
 		time_t		getLastPongTime() const;
-		bool		getIsRegistered() const;
+		bool		getPassStatus() const;
+		bool		getNickStatus() const;
+		bool		getUserStatus() const;
+		bool		getRegisteredStatus() const;
 
-		bool isConnectionTimedOut(time_t timeout);
+		void		appendToBuffer(const std::string& str);
+		bool		extractMessage(std::string& message);
+		bool		isConnectionTimedOut(time_t timeout);
 };
 
 #endif

@@ -8,13 +8,10 @@ int main(int ac, char** av) {
 		server.init();
 		server.run();
 	} catch (const ArgParser::ArgException& e) {
-		std::cerr << "Error: " << e.what() << std::endl;
+		std::cerr << C_ERR << "Error: " << e.what() << C_RESET << std::endl;
 		return 1;
-	// } catch (const Server::ServerException& e) {
-	// 	std::cerr << "Error: " << e.what() << std::endl;
-	// 	return 1;
-	} catch (const std::exception& e) {
-		std::cerr << "Error: Unkown..." << e.what() << std::endl;
+	} catch (const IrcServer::ServerException &e) {
+		std::cerr << C_ERR << "Error: " << e.what() << C_RESET << std::endl;
 		return 1;
 	}
 	return 0;

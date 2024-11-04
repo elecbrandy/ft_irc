@@ -61,7 +61,7 @@ std::string ArgParser::checkPassword(char *s) {
 	if (s == NULL || *s == '\0') {
 		throw ArgException(ERR_PASSWORD_NULL);
 	}
-	
+
 	std::string password(s);
 	
 	/* SIZE check */
@@ -76,4 +76,8 @@ std::string ArgParser::checkPassword(char *s) {
 		}
 	}
 	return password;
+}
+
+const char* ArgParser::ArgException::what() const throw() {
+	return msg.c_str();
 }
