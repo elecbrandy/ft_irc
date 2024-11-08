@@ -6,7 +6,6 @@
 #define LOG_NEW_CONNECTED		"new client connected : fd "
 #define LOG_END_CONNECTED		"client connection closed : fd "
 #define LOG_CLINET_INPUT		"client input received : "
-#define LOG_CONNECTION_CHECK	"checking client connections..."
 #define LOG_CONNECTION_TIMEOUT	"client connection timed out"
 #define LOG_SERVER_SHUTDOWN		"server Closed"
 

@@ -95,7 +95,6 @@ void Cmd::cmdJoin() {
 	}
 
 	for (std::vector<std::string>::size_type i = 0; i < channel.size(); ++i) {
-		bool isOperator = false;
 		std::string chName = channel[i];
 		std::string chKey = (i < key.size()) ? key[i] : "";
 
@@ -103,8 +102,9 @@ void Cmd::cmdJoin() {
 
 		// 채널이 없을 때 생성 및 설정
 		if (channels.find(channel[i]) == channels.end()) {
-			isOperator = true;
 			server.setChannels(chName, chKey.empty() ? "" : chKey, chKey.empty() ? '\0' : KEY_MODE);
+			std::map<std::string, Channel*> channelss = server.getChannels();
+			channelss.find(chName)->second->addOperator(this->client->getNickname(), this->client);
 		}
 
 		std::map<std::string, Channel*> chs = server.getChannels();
@@ -138,23 +138,36 @@ void Cmd::cmdJoin() {
 
 		// 차단된 사용자 확인
 		std::vector<std::string> bannedList = ch->getBanned();
-		if (std::find(bannedList.begin(), bannedList.end(), client->getNickname()) != bannedList.end()) {
+		if (std::find(bannedList.begin(), bannedList.end(), client->getNickname()) != bannedList.end())
+		{
 			server.castMsg(client_fd, server.makeMsg(ERR_BANNEDFROMCHAN(client->getNickname(), chName)).c_str());
 			return;
 		}
 
 		// 참여자 추가
-		std::map<std::string, Client*> participant = ch->getParticipant();
-		std::string participantName = (participant.empty()) ? '@' + client->getNickname() : client->getNickname();
+		//  std::map<std::string, Client*> participant = ch->getParticipant();
+		//  std::string participantName = (participant.empty()) ? '@' + client->getNickname() : client->getNickname();
+		//  ch->setParticipant(participantName, client);
+		//  std::cout << "size :" << ch->getParticipant().size() << std::endl;
+		std::map<std::string, Client *> participant = ch->getParticipant();
+		std::string nickname = client->getNickname();
+		// 닉네임에서 공백 이후의 문자열 제거
+		size_t spacePos = nickname.find(' ');
+		if (spacePos != std::string::npos)
+		{
+			nickname = nickname.substr(0, spacePos);
+		}
+		// 참가자가 없으면 운영자로 설정
+		std::string participantName = (participant.empty()) ? '@' + nickname : nickname;
 		ch->setParticipant(participantName, client);
 
 		// 참여자 목록 전송
-		server.castMsg(client_fd, server.makeMsg(RPL_NAMREPLY(client->getNickname(), "=", ch->getName(), ch->getParticipantName())).c_str());
+		server.castMsg(client_fd, server.makeMsg(RPL_NAMREPLY(client->getNickname(), "=", ch->getName(), ch->getParticipantNameStr())).c_str());
 		server.castMsg(client_fd, server.makeMsg(RPL_ENDOFNAMES(client->getNickname(), ch->getName())).c_str());
 
 		// JOIN 알림
-		server.broadcastMsg(server.makeMsg(RPL_JOIN(client->getNickname(), client->getUsername(), client->getHostname(), chName)), ch);
-
+		server.broadcastMsg(server.makeMsg(RPL_JOIN(client->getServername(), chName)), ch);
+		
 		// 토픽 전송
 		if (ch->getTopic().empty())
 			server.castMsg(client_fd, server.makeMsg(RPL_NOTOPIC(client->getNickname(), ch->getName())).c_str());

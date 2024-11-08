@@ -17,12 +17,6 @@
 */
 
 void Cmd::checkNick(const std::string& str) {
-	/* Register check */
-	std::cout << C_ERR << "cmdNick" << C_RESET << std::endl;
-	if (!this->client->getPassStatus()) {
-		throw CmdException(ERR_NEEDMOREPARAMS(client->getNickname(), "PASS"));
-	}
-
 	/* CLIENT NICK check */	
 	std::string tmp = this->client->getNickname();
 	if (tmp.empty()) {
@@ -43,18 +37,23 @@ void Cmd::checkNick(const std::string& str) {
 	
 	/* ALNUM check */
 	for (std::string::const_iterator it = str.begin(); it != str.end(); ++it) {
-		if (!std::isalpha(static_cast<unsigned char>(*it))) {
+		if (!std::isalnum(static_cast<unsigned char>(*it))) {
 			throw CmdException(ERR_ERRONEUSNICKNAME(tmp));
 		}
 	}
 
 	/* INUSE check */
-	if (server.getClient(str) != nullptr) {
+	if (server.getClient(str) != NULL) {
 		throw CmdException(ERR_NICKNAMEINUSE(tmp));
 	}
 }
 
 void Cmd::cmdNick() {
+	/* Pass check */
+
+	if (!this->client->getPassStatus()) {
+		throw CmdException(ERR_NEEDMOREPARAMS(client->getNickname(), "PASS"));
+	}
 	checkNick(this->cmdParams);
 	client->setNickname(this->cmdParams);
 	this->server.addClientByNickname(this->cmdParams, this->client);

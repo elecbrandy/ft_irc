@@ -6,3 +6,5 @@ option +l 0명 막기  v
 /mode #ch -o user -k -l -> /mode #ch -ok user -l 로 들어옴
 
 channel 인원 예외 처리
+
+cmd + k  + f

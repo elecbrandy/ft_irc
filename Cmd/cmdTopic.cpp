@@ -64,29 +64,34 @@ void Cmd::cmdTopic() {
 	Channel *ch = channels[chName];
 
 	if (topic.empty()) { // 1: 토픽 파라미터가 없을 때
+
 		if (ch->getTopic().empty()) { // 1-1: 채널에 설정된 토픽이 없을 때
-			throw Cmd::CmdException(RPL_NOTOPIC(client->getNickname(), chName));
 			server.castMsg(this->client_fd, server.makeMsg(RPL_NOTOPIC(client->getNickname(), chName)));
+			throw Cmd::CmdException(RPL_NOTOPIC(client->getNickname(), chName));
 		}
+
 		if (ch->getParticipant().find(client->getNickname()) == ch->getParticipant().end()) { // 1-2: 채널에 참여한 클라이언트가 아닐 때
-			throw Cmd::CmdException(ERR_NOTONCHANNEL(client->getNickname(), chName));
 			server.castMsg(this->client_fd, server.makeMsg(ERR_NOTONCHANNEL(client->getNickname(), chName)));
+			throw Cmd::CmdException(ERR_NOTONCHANNEL(client->getNickname(), chName));
 		}
+
 		server.broadcastMsg(server.makeMsg(RPL_TOPIC(client->getNickname(), chName, ch->getTopic())), ch);
 	} else { // 2: 토픽 파라미터가 있을 때
 		if (ch->getParticipant().find(client->getNickname()) == ch->getParticipant().end()) { // 2-1: 채널에 참여한 클라이언트가 아닐 때
-			throw Cmd::CmdException(ERR_NOTONCHANNEL(client->getNickname(), chName));
 			server.castMsg(this->client_fd, server.makeMsg(ERR_NOTONCHANNEL(client->getNickname(), chName)));
+			throw Cmd::CmdException(ERR_NOTONCHANNEL(client->getNickname(), chName));
 		}
+
 		bool tFlag = false; // 토픽 모드인지 확인하기 위한 플래그
 		if (ch->getMode().find(TOPIC_MODE) != ch->getMode().end())
 			tFlag = true;
+
 		if (tFlag == true) { // 2-1: topic모드일 때
 			{
 				if (ch->getOperator().find(client->getNickname()) == ch->getOperator().end()) {
 					// 2-1-1: topic모드인데 채널에 참여한 클라이언트가 operator가 아닐 때
-					throw Cmd::CmdException(ERR_CHANOPRIVSNEEDED(client->getNickname(), chName));
 					server.castMsg(this->client_fd, server.makeMsg(ERR_CHANOPRIVSNEEDED(client->getNickname(), chName)));
+					throw Cmd::CmdException(ERR_CHANOPRIVSNEEDED(client->getNickname(), chName));
 				}
 				ch->setTopic(topic);
 				server.broadcastMsg(server.makeMsg(RPL_TOPIC(client->getNickname(), chName, ch->getTopic())), ch);
@@ -95,5 +100,6 @@ void Cmd::cmdTopic() {
 			ch->setTopic(topic);
 			server.broadcastMsg(server.makeMsg(RPL_TOPIC(client->getNickname(), chName, ch->getTopic())), ch);
 		}
+
 	}
 }

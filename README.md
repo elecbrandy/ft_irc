@@ -12,6 +12,7 @@
 	- `docker exec -it irc_container irssi -c 127.0.0.1 -p 6667 -w 1234 -n nickname` 으로 한번에 접속 - 전자가 편한듯? 
 4. kill, rm 알아서
 5. 도커에서 클라를 열고 로컬 서버에 접속할때는 ip주소 `host.docker.internal`
+	- `docker exec -it irc_container /bin/bash` -> `/connect host.docker.internal 6667 1234`
 
 __________
 

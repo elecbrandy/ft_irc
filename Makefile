@@ -1,7 +1,8 @@
 NAME = ircserv
 
 CPP = c++
-CPPFLAGS = -g -fsanitize=address -Wall -Wextra -Werror -std=c++98
+CPPFLAGS = -Wall -Wextra -Werror -std=c++98
+# CPPFLAGS = -g -fsanitize=address -Wall -Wextra -Werror -std=c++98
 
 INCS = .
 SRCS_CMD = $(wildcard Cmd/*.cpp)
@@ -17,7 +18,7 @@ $(NAME) : $(OBJS)
 
 %.o : %.cpp $(HDRS)
 	$(CPP) $(CPPFLAGS) -c $< -o $@
- 
+
 clean :
 	rm -f $(OBJS)
 

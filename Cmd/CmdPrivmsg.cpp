@@ -77,10 +77,10 @@ std::vector<std::string> Cmd::privmsgSplit() {
 bool Cmd::isDupReceiver(std::vector<std::string> &receivers) {
 	std::set<std::string> receiverSet;
     // Set에 삽입을 시도했을 때 이미 존재하는 경우 중복이라고 판단!
+	//insert 메서드는 삽입 결과로 std::pair를 반환. 이 pair의 첫 번째 요소는 삽입된 값이고,
+	//두 번째 요소는 삽입 성공 여부를 나타낸다. 삽입이 성공하면 true, 이미 존재하는 값이라면 false를 반환
     for (std::vector<std::string>::const_iterator it = receivers.begin(); it != receivers.end(); ++it) {
-		//insert 메서드는 삽입 결과로 std::pair를 반환합니다. 이 pair의 첫 번째 요소는 삽입된 값이고,
-		//두 번째 요소는 삽입 성공 여부를 나타낸다. 삽입이 성공하면 true, 이미 존재하는 값이라면 false를 반환
-        if (!receiverSet.insert(*it).second) // 
+        if (!receiverSet.insert(*it).second)
             return true; // 중복 발견
     }
     return false; // 중복 없음
@@ -108,8 +108,8 @@ void Cmd::cmdPrivmsg() {
 	
 	//케이스 1 : 수신자가 없는 경우
 	if (receivers.empty()) {
-		throw Cmd::CmdException(ERR_NORECIPIENT(client->getNickname(), "PRIVMSG")); // getcmd() 해서 객체에 저장해놓고 사용하기
 		server.castMsg(client_fd, server.makeMsg(ERR_NORECIPIENT(client->getNickname(), "PRIVMSG")).c_str());
+		throw Cmd::CmdException(ERR_NORECIPIENT(client->getNickname(), "PRIVMSG")); // getcmd() 해서 객체에 저장해놓고 사용하기
 	}
 	//케이스 2 : 수신자가 5명을 초과하거나, 수신자가 중복되는 경우
 	if (receivers.size() > 5 || isDupReceiver(receivers) == true) {
@@ -119,13 +119,13 @@ void Cmd::cmdPrivmsg() {
 			if (i == receivers.size() - 1)
 				receiverStr += receivers[i];
 		}
-		throw Cmd::CmdException(ERR_TOOMANYTARGETS(client->getNickname(), receiverStr));
 		server.castMsg(client_fd, server.makeMsg(ERR_TOOMANYTARGETS(client->getNickname(), receiverStr)).c_str());
+		throw Cmd::CmdException(ERR_TOOMANYTARGETS(client->getNickname(), receiverStr));
 	}
 	//케이스 3 : 메시지가 없거나 메세지의 형태가 잘못된 경우 -> 메세지 길이 재는 함수를 만들어야 하나...?
 	if (msg.empty() || msg[0] != ':') {
-		throw Cmd::CmdException(ERR_NOTEXTTOSEND(client->getNickname()));
 		server.castMsg(client_fd, server.makeMsg(ERR_NOTEXTTOSEND(client->getNickname())).c_str());
+		throw Cmd::CmdException(ERR_NOTEXTTOSEND(client->getNickname()));
 	}
 	//케이스 4 :
 	//	수신자 집단의 형태가 채널일 경우 -> 채널 존재 확인 -> 채널이 있으면, 채널에 참여하고 있는지 확인
@@ -136,19 +136,19 @@ void Cmd::cmdPrivmsg() {
 			std::map<std::string, Channel*>::iterator it = chs.find(receivers[i]);
 
 			if (it == server.getChannels().end()) {
-				throw Cmd::CmdException(ERR_NOSUCHNICK(client->getNickname(), receivers[i]));
 				server.castMsg(client_fd, server.makeMsg(ERR_NOSUCHNICK(client->getNickname(), receivers[i])).c_str());
+				throw Cmd::CmdException(ERR_NOSUCHNICK(client->getNickname(), receivers[i]));
 			} else {
 				if (it->second->getParticipant().find(client->getNickname()) == it->second->getParticipant().end()) {
-				throw Cmd::CmdException(ERR_CANNOTSENDTOCHAN(client->getNickname(), receivers[i]));
 				server.castMsg(client_fd, server.makeMsg(ERR_CANNOTSENDTOCHAN(client->getNickname(), receivers[i])).c_str());
+				throw Cmd::CmdException(ERR_CANNOTSENDTOCHAN(client->getNickname(), receivers[i]));
 				}
 			}
 		} else { // 수신자집단이 사용자인 경우
 			Client* receiver = server.getClient(receivers[i]);
 			if (receiver == NULL) {
-				throw Cmd::CmdException(ERR_NOSUCHNICK(client->getNickname(), receivers[i]));
 				server.castMsg(client_fd, server.makeMsg(ERR_NOSUCHNICK(client->getNickname(), receivers[i])).c_str());
+				throw Cmd::CmdException(ERR_NOSUCHNICK(client->getNickname(), receivers[i]));
 			}
 		}
 	}
