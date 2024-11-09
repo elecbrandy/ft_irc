@@ -202,6 +202,6 @@
 #define ERR_LINETOOLONG(nick)					"417 " + nick + " :Input Line too long"
 
 
-#define ERR_ERRUSERCMD "Error: "
+#define ERR_ERRUSERCMD "Error: in Usercmd"
 
 #define RPL_CAP "CAP * LS :"
