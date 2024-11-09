@@ -21,7 +21,6 @@
 #include "ServerCode.hpp"
 #include "ReplyCode.hpp"
 #include "Cmd/Cmd.hpp"
-#include "ScopedTimer.hpp"
 
 #define MAX_CLIENTS 42
 #define BUFFER_SIZE 512

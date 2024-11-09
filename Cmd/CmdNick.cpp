@@ -72,4 +72,5 @@ void Cmd::cmdNick() {
 	if (this->client->getRegisteredStatus()) {
 		server.castMsg(client_fd, server.makeMsg(client->getPrefix(), "NICK :" + getCmdParams()));
 	}
+	client->setPrefix();
 }

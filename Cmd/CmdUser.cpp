@@ -83,7 +83,6 @@ void Cmd::cmdUser() {
 	if (this->client->getRegisteredStatus()) {
 		throw CmdException(server.makeMsg(PREFIX_SERVER(server.getName()), ERR_ALREADYREGISTERED));
 	}
-	
 
 	/* Pass check */
 	if (!this->client->getPassStatus()) {

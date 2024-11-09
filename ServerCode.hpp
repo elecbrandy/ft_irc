@@ -6,8 +6,10 @@
 #define LOG_NEW_CONNECTED		" SERV_LOG: new client connected: fd:"
 #define LOG_END_CONNECTED		" SERV_LOG: client connection closed: fd:"
 #define LOG_CLINET_INPUT		" SERV_LOG: client input received:"
-#define LOG_CONNECTION_TIMEOUT	" SERV_LOG: client connection timed out fd:"
-#define LOG_SERVER_SHUTDOWN		" SERV_LOG: server Closed"
+#define LOG_CONNECTION_TIMEOUT	" SERV_LOG: client connection timed out: fd:"
+#define LOG_CHECK_CONNECTION_START    " SERV_LOG: checking client connection..."
+#define LOG_CHECK_CONNECTION_END    " SERV_LOG: checking client connection end!"
+#define LOG_SERVER_SHUTDOWN		" SERV_LOG: server closed"
 
 /* !ERROR! */
 #define	ERR_ARG_COUNT			"invalid argument count. (only 3)"

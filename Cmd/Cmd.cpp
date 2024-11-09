@@ -69,7 +69,7 @@ bool Cmd::handleClientCmd() {
 		} else {
 			if (this->cmd == "NICK") {
 				cmdNick();
-			} else if (this->cmd == "USER") {
+			} else if (this->cmd == "USER" || this->cmd == "userhost") {
 				cmdUser();
 			} else if (this->cmd == "PING") {
 				cmdPong();

@@ -1,5 +1,5 @@
 // 001: 서버에 연결됨
-#define RPL_WELCOME(nick, servername) 			":" + servername + " 001 " + nick + " :Welcome to the Internet Relay Network, " + nick + "!"
+#define RPL_WELCOME(nick, servername) 			"001 " + nick + " :Welcome to the Internet Relay Network, " + nick + "!"
 
 // 002: 서버의 호스트 정보와 버전을 알림
 #define RPL_YOURHOST(nick, servername)          "002 " + nick + " :Your host is " + servername

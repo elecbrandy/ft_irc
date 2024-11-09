@@ -125,7 +125,6 @@ void IrcServer::run() {
 			}
 
 			for (int i = fds.size() - 1; i>= 0; --i) {
-
 				// 해당 소켓에 읽기 플래그가 설정되어 있는 경우
 				if (fds[i].revents & POLLIN) {
 					handleSocketRead(fds[i].fd);
@@ -161,8 +160,8 @@ void IrcServer::handleSocketRead(int fd) {
 void IrcServer::handleClientMessage(int client_fd) {
 	// ScopedTimer("handleClientMessage");
 	Client * client = getClient(client_fd);
-
 	if (client) {
+		client->setlastActivityTime();
 		char buffer[BUFFER_SIZE];
 		int bytes_received = recv(client_fd, buffer, BUFFER_SIZE - 1, 0);
 
@@ -240,6 +239,7 @@ void IrcServer::modifyPollEvent(int fd, short events) {
 void IrcServer::handleSocketWrite(int client_fd) {
 	// ScopedTimer("handleScketWritable");
 	Client* client = getClient(client_fd);
+
 	if (client && client->hasDataToSend()) {
 		const std::string& buffer = client->getSendBuffer();
 		ssize_t bytesSent = send(client_fd, buffer.c_str(), buffer.size(), 0);
@@ -332,18 +332,19 @@ void IrcServer::setChannels(const std::string& channelName, const std::string& k
 																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																									
 void IrcServer::checkConnections() {
 	std::map<int, Client*>::iterator it = _clients.begin();
-	std::cout << GREEN << LOG_CHECK_CONNECTION << C_RESET << std::endl;
+	std::cout << GREEN << LOG_CHECK_CONNECTION_START << C_RESET << std::endl;
 	while (it != _clients.end()) {
 		if (it->second->isConnectionTimedOut(TIME_OUT)) {
-			std::cout << LOG_CONNECTION_LOST << C_LOG << it->first << C_RESET << std::endl;
-			int tmp = it->first;
-			it = _clients.erase(it);
-			removeClinetFromServer(it->second);
+			std::cout << LOG_CONNECTION_TIMEOUT << C_LOG << it->first << C_RESET << std::endl;
+			removeClinetFromServer(it->second); // Client 제거
+			it = _clients.erase(it);            // 지운 후 다음 iterator 반환
 		} else {
 			++it;
 		}
 	}
+	std::cout << LOG_CHECK_CONNECTION_END << C_LOG << it->first << C_RESET << std::endl;
 }
+
 
 void IrcServer::printGoat() {
 	std::ifstream goatFile(PATH_GOAT);
