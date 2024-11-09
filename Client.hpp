@@ -24,6 +24,7 @@ class Client {
 		std::string _servername;
 		time_t		_lastActivityTime;
 		t_regitser	_registerStatus;
+		std::string _prefix;
 
 	public:
 		Client(in_addr addr);
@@ -43,6 +44,7 @@ class Client {
 		void 		setNickStatus(bool status);
 		void 		setUserStatus(bool status);
 		void 		setRegisteredStatus(bool status);
+		void 		setPrefix();
 
 		int			getFd() const;
 		std::string	getNickname() const;
@@ -56,6 +58,7 @@ class Client {
 		bool		getNickStatus() const;
 		bool		getUserStatus() const;
 		bool		getRegisteredStatus() const;
+		std::string getPrefix() const;
 
 		void		appendToRecvBuffer(const std::string& str);
 		bool		extractMessage(std::string& message);

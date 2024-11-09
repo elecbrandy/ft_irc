@@ -74,6 +74,8 @@ bool Client::getUserStatus() const {return this->_registerStatus.user;}
 
 bool Client::getRegisteredStatus() const {return this->_registerStatus.registered;}
 
+std::string Client::getPrefix() const {return this->_prefix;}
+
 /* other */
 void Client::appendToRecvBuffer(const std::string& str) {
 	this->_recvBuffer += str;
@@ -113,6 +115,10 @@ bool Client::hasDataToSend() const {
 		return false;
 	}
 	return true;
+}
+
+void Client::setPrefix() {
+	this->_prefix = PREFIX_USER(this->getNickname(), this->getUsername(), this->getHostname());
 }
 
 void Client::printLog() {

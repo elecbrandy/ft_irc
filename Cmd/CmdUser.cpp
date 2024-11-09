@@ -139,6 +139,8 @@ void Cmd::cmdUser() {
 			}
 			break;
 		}
+
 		++count;
 	}
+	client->setPrefix();
 }

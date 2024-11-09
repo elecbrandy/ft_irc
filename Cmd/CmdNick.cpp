@@ -44,30 +44,30 @@ void Cmd::checkNick(const std::string& str) {
 
 	/* SIZE check */
 	if (str.size() > NICK_MAX_LEN) {
-		throw CmdException(server.makeMsg(SERVER_PREFIX(server.getName()), ERR_ERRONEUSNICKNAME(tmp)));
+		throw CmdException(server.makeMsg(PREFIX_SERVER(server.getName()), ERR_ERRONEUSNICKNAME(tmp)));
 	}
 
 	/* ALNUM check */
 	for (std::string::const_iterator it = str.begin(); it != str.end(); ++it) {
 		if (!std::isalnum(static_cast<unsigned char>(*it))) {
-			throw CmdException(server.makeMsg(SERVER_PREFIX(server.getName()), ERR_ERRONEUSNICKNAME(tmp)));
+			throw CmdException(server.makeMsg(PREFIX_SERVER(server.getName()), ERR_ERRONEUSNICKNAME(tmp)));
 		}
 	}
 
 	/* INUSE check */
 	if (server.getClient(str) != NULL) {
-		throw CmdException(server.makeMsg(SERVER_PREFIX(server.getName()), ERR_NICKNAMEINUSE(tmp)));
+		throw CmdException(server.makeMsg(PREFIX_SERVER(server.getName()), ERR_NICKNAMEINUSE(tmp)));
 	}
 }
 
 void Cmd::cmdNick() {
 	/* Pass check */
 	if (!this->client->getPassStatus()) {
-		throw CmdException(server.makeMsg(SERVER_PREFIX(server.getName()), ERR_NEEDMOREPARAMS(client->getNickname(), "PASS")));
+		throw CmdException(server.makeMsg(PREFIX_SERVER(server.getName()), ERR_NEEDMOREPARAMS(client->getNickname(), "PASS")));
 	}
 
 	checkNick(this->cmdParams);
 	client->setNickname(this->cmdParams);
 	this->server.addClientByNickname(this->cmdParams, this->client);
-	castMsg(server.makeMsg(USER_PREFIX(server.getName()), ERR_NEEDMOREPARAMS(client->getNickname(), "PASS")));
+	server.castMsg(client_fd, server.makeMsg(client->getPrefix(), ERR_NEEDMOREPARAMS(client->getNickname(), "PASS")).c_str());
 }
