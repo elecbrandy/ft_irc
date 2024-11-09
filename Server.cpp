@@ -342,9 +342,7 @@ void IrcServer::checkConnections() {
 			++it;
 		}
 	}
-	std::cout << LOG_CHECK_CONNECTION_END << C_LOG << it->first << C_RESET << std::endl;
 }
-
 
 void IrcServer::printGoat() {
 	std::ifstream goatFile(PATH_GOAT);
