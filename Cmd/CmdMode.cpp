@@ -336,4 +336,10 @@ void Cmd::cmdMode()
         handleMinusFlagOption(modeParse, channel, option_flag);
     else
         handlePlusFlagOption(modeParse, channel, option_flag);
+
+    std::string str = "MODE";
+    for(size_t i = 0; i < modeParse.size() - 1; i++)
+        str += " " + modeParse[i];
+    str += " :" + modeParse[modeParse.size() - 1];
+    server.broadcastMsg(server.makeMsg(USER_PREFIX(this->client->getNickname(), this->client->getUsername(), this->client->getHostname()), str), channel->second, this->client->getFd());
 }
