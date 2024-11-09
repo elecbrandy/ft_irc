@@ -46,7 +46,7 @@ void Cmd::authorizeClient() {
 		client->setRegisteredStatus(true);
 
 		/* RPL */
-		server.castMsg(client_fd, server.makeMsg(RPL_WELCOME(client->getNickname(), client->getServername())).c_str());
+		server.castMsg(client_fd, server.makeMsg(RPL_WELCOME(client->getNickname(), client->getServername())));
 		server.castMsg(client_fd, server.makeMsg(RPL_YOURHOST(client->getNickname(), client->getServername())).c_str());
 		server.castMsg(client_fd, server.makeMsg(RPL_CREATED(client->getNickname(), server.formatDateToString(server.getStartTime()))).c_str());
 		server.castMsg(client_fd, server.makeMsg(RPL_MYINFO(client->getNickname())).c_str());

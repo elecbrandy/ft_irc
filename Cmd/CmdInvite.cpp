@@ -29,37 +29,30 @@ void Cmd::cmdInvite() {
     // 파라미터 부족/과다
     if (params.size() != 2) {
         throw Cmd::CmdException(ERR_NEEDMOREPARAMS(client->getNickname(), cmd));
-        server.castMsg(this->client_fd, server.makeMsg(ERR_NEEDMOREPARAMS(client->getNickname(), cmd)));
+        server.castMsg(this->client_fd, server.makeMsg(PREFIX_SERVER(server.getServername()), ERR_NEEDMOREPARAMS(client->getNickname(), cmd)));
     }
     
     std::map<std::string, Channel*> chs = server.getChannels();
     Channel* ch = chs[params[1]];
 
     // 초대를 보내는 사용자가 해당 채널의 참여자가 아닌 경우
+    std::string servPrefix = PREFIX_SERVER(server.getServername());
     std::string nick = ch->isOperatorNickname(client->getNickname());
-    if (ch->getParticipant().find(nick) == ch->getParticipant().end()) {
-        throw Cmd::CmdException(ERR_NOTONCHANNEL(client->getNickname(), params[1]));
-        server.castMsg(this->client_fd, server.makeMsg(ERR_NOTONCHANNEL(client->getNickname(), params[1])));
-    }
+    if (ch->getParticipant().find(nick) == ch->getParticipant().end())
+        throw Cmd::CmdException(server.makeMsg(servPrefix, ERR_NOTONCHANNEL(client->getNickname(), params[1])));
 
     // 초대 당하는 사용자가 서버에 존재하지 않는 경우
-    if (server.getClient(params[0]) == NULL) {
-        throw Cmd::CmdException(ERR_NOSUCHNICK(client->getNickname(), params[0]));
-        server.castMsg(this->client_fd, server.makeMsg(ERR_NOSUCHNICK(client->getNickname(), params[0])));
-    }
+    if (server.getClient(params[0]) == NULL)
+        throw Cmd::CmdException(server.makeMsg(servPrefix, ERR_NOSUCHNICK(client->getNickname(), params[0])));
 
     // 초대 당하는 사용자가 이미 해당 채널의 참여자인 경우
-    if (ch->getParticipant().find(params[0]) != ch->getParticipant().end()) {
-        throw Cmd::CmdException(ERR_USERONCHANNEL(client->getNickname(), params[0]));
-        server.castMsg(this->client_fd, server.makeMsg(ERR_USERONCHANNEL(params[0], params[1])));
-    }
+    if (ch->getParticipant().find(params[0]) != ch->getParticipant().end())
+        throw Cmd::CmdException(server.makeMsg(servPrefix, ERR_USERONCHANNEL(params[0], params[1])));
 
     // 채널이 +i 일때, 초대를 보내는 사용자가 채널 오퍼레이터가 아닌 경우
     if (ch->getMode().count('i')) {
-        if (ch->getOperator().find(client->getNickname()) == ch->getOperator().end()) {
-            throw Cmd::CmdException(ERR_CHANOPRIVSNEEDED(client->getNickname(), params[1]));
-            server.castMsg(this->client_fd, server.makeMsg(ERR_CHANOPRIVSNEEDED(client->getNickname(), params[1])));
-        }
+        if (ch->getOperator().find(client->getNickname()) == ch->getOperator().end())
+            throw Cmd::CmdException(server.makeMsg(servPrefix, ERR_CHANOPRIVSNEEDED(client->getNickname(), params[1])));
     }
 
     // 채널의 초대 목록에 추가 (초대 목록에 없는 사용자만 추가)
@@ -67,10 +60,10 @@ void Cmd::cmdInvite() {
         ch->setInvited(params[0]);
 
     // 초대된 사용자에게 초대 메시지 전송
-    server.castMsg(server.getClient(params[0])->getFd(), server.makeMsg(RPL_INVITE(client->getNickname(), params[0], params[1]).c_str()));
+    server.castMsg(server.getClient(params[0])->getFd(), server.makeMsg(client->getPrefix(), RPL_INVITE(client->getNickname(), params[0], params[1])));
 
     // 초대한 사용자에게 초대 메시지 전송
-    server.castMsg(client_fd, server.makeMsg(RPL_INVITING(client->getNickname(), params[1], params[0]).c_str()));
+    server.castMsg(client_fd, server.makeMsg(servPrefix, RPL_INVITING(client->getNickname(), params[1], params[0])));
 }
 
 
