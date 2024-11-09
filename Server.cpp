@@ -107,17 +107,16 @@ void IrcServer::removeClient(int client_fd) {
 }
 
 void IrcServer::run() {
-	// time_t lastCheckTime = time(NULL);
+	time_t lastCheckTime = time(NULL);
 
 	while (true) {
-		// ScopedTimer("run");
 		bool exitFlag= false;
 		try {
-			// time_t currentTime = time(NULL);
-			// if (currentTime - lastCheckTime >= TIME_CHECK_INTERVAL) {
-			// 	checkConnections();
-			// 	lastCheckTime = currentTime;
-			// }
+			time_t currentTime = time(NULL);
+			if (currentTime - lastCheckTime >= TIME_CHECK_INTERVAL) {
+				checkConnections();
+				lastCheckTime = currentTime;
+			}
 
 			if (poll(&fds[0], fds.size(), -1) < 0) {
 				if (errno != EINTR) {
@@ -333,16 +332,14 @@ void IrcServer::setChannels(const std::string& channelName, const std::string& k
 }
 																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																									
 void IrcServer::checkConnections() {
-	// ScopedTimer("checkConnections");
 	std::map<int, Client*>::iterator it = _clients.begin();
-
+	std::cout << GREEN << LOG_CHECK_CONNECTION << C_RESET << std::endl;
 	while (it != _clients.end()) {
 		if (it->second->isConnectionTimedOut(TIME_OUT)) {
-			std::cout << "client[" << C_LOG << it->first << C_RESET << "] connection timed out." << std::endl;
+			std::cout << LOG_CONNECTION_LOST << C_LOG << it->first << C_RESET << std::endl;
 			int tmp = it->first;
 			it = _clients.erase(it);
-			removeClient(tmp);
-			// removeClinetFromServer(it->second);
+			removeClinetFromServer(it->second);
 		} else {
 			++it;
 		}

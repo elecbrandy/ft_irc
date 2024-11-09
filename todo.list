@@ -1,2 +1,0 @@
-// POLLOUT (소켓에 써야하는 플래그) 를 감지하도록 설정. 임시저장한 데이터를 언젠가 소켓 버퍼에 써야하므로
-modifyPollEvent(client, POLL) 

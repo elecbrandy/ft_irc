@@ -36,11 +36,11 @@ void Cmd::checkNick(const std::string& str) {
 	}
 
 	/* EMPTY check */
-	// if (str.empty()) {
-	// 	if (this->client->getNickname().empty() == 1) {
-	// 		throw CmdException(ERR_NONICKNAMEGIVEN(tmp));	// empty nick
-	// 	}
-	// }
+	if (str.empty()) {
+		if (this->client->getNickname().empty()) {
+			throw CmdException(ERR_NONICKNAMEGIVEN(tmp));	// empty nick
+		}
+	}
 
 	/* SIZE check */
 	if (str.size() > NICK_MAX_LEN) {
@@ -69,5 +69,7 @@ void Cmd::cmdNick() {
 	checkNick(this->cmdParams);
 	client->setNickname(this->cmdParams);
 	this->server.addClientByNickname(this->cmdParams, this->client);
-	server.castMsg(client_fd, server.makeMsg(client->getPrefix(), ERR_NEEDMOREPARAMS(client->getNickname(), "PASS")).c_str());
+	if (this->client->getRegisteredStatus()) {
+		server.castMsg(client_fd, server.makeMsg(client->getPrefix(), "NICK :" + getCmdParams()));
+	}
 }
