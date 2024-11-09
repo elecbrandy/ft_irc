@@ -31,8 +31,12 @@
 
 #define PATH_GOAT "./goat.txt"
 
-#define CRLF "\r\n"
 #define PING_INTERVAL 120
+
+#define CRLF "\r\n"
+#define SERVER_PREFIX(servername)					":" + servername
+#define USER_PREFIX(nickname, username, hostname)	":" + nickname + "!" + username + "@" + hostname
+
 
 class IrcServer {
 private:
@@ -73,7 +77,7 @@ public:
 	
 	const std::map<std::string, Client*>& getNickNameClientMap() const;
 	void addClientByNickname(const std::string& nickname, Client* client);
-	std::string makeMsg(const std::string& msg);
+	std::string makeMsg(const std::string& prefix, const std::string& msg);
 
 	void checkConnections();
 	std::string	getPassword();
