@@ -36,6 +36,9 @@
 #define SERVER_NAME "ircserv"
 
 #define CRLF "\r\n"
+#define SERVER_PREFIX(servername) 					":" + servername
+#define USER_PREFIX(nickname, username, hostname) 	":" + nickname + "!" + username + "@" + hostname
+
 #define TIME_OUT 60
 #define TIME_CHECK_INTERVAL 180
 
@@ -79,7 +82,7 @@ public:
 	
 	const std::map<std::string, Client*>& getNickNameClientMap() const;
 	void addClientByNickname(const std::string& nickname, Client* client);
-	std::string makeMsg(const std::string& msg);
+	std::string makeMsg(const std::string& prefix, const std::string& msg);
 
 	void checkConnections();
 	std::string	getPassword();
