@@ -3,10 +3,10 @@
 
 /* COUT LOG */
 #define LOG_SERVER_INIT			" SERV_LOG: IRC Server INIT!: port:"
-#define LOG_NEW_CONNECTED		" SERV_LOG: new client connected: fd: "
+#define LOG_NEW_CONNECTED		" SERV_LOG: new client connected: fd:"
 #define LOG_END_CONNECTED		" SERV_LOG: client connection closed: fd:"
 #define LOG_CLINET_INPUT		" SERV_LOG: client input received:"
-#define LOG_CONNECTION_TIMEOUT	" SERV_LOG: client connection timed out"
+#define LOG_CONNECTION_TIMEOUT	" SERV_LOG: client connection timed out fd:"
 #define LOG_SERVER_SHUTDOWN		" SERV_LOG: server Closed"
 
 /* !ERROR! */

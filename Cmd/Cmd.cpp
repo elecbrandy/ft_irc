@@ -74,19 +74,19 @@ bool Cmd::handleClientCmd() {
 			} else if (this->cmd == "PING") {
 				cmdPong();
 			} else if (this->cmd == "JOIN") {
-				cmdJoin();
+				// cmdJoin();
 			} else if (cmd == "PART") {
-				cmdPart();
+				// cmdPart();
 			} else if (cmd == "PRIVMSG") {
-				cmdPrivmsg();
+				// cmdPrivmsg();
 			} else if (cmd == "KICK") {
-				cmdKick();
+				// cmdKick();
 			} else if (cmd == "INVITE") {
-				cmdInvite();
+				// cmdInvite();
 			} else if (cmd == "MODE") {
-				cmdMode();
+				// cmdMode();
 			} else if (cmd == "TOPIC") {
-				cmdTopic();
+				// cmdTopic();
 			} else if (cmd == "QUIT") {
 				cmdQuit();
 			} else {

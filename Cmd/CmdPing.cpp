@@ -13,5 +13,5 @@
 
 void Cmd::cmdPong() {
 	client->setlastActivityTime();
-	server.castMsg(client_fd, server.makeMsg(std::string("PONG") + ' ' + getCmdParams()).c_str());
+	server.castMsg(client_fd, server.makeMsg(PREFIX_SERVER(server.getName()), "PONG " + getCmdParams()));
 }

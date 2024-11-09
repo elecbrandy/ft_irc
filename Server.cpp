@@ -393,5 +393,8 @@ const char* IrcServer::ServerException::what() const throw() {
 }
 
 std::string IrcServer::makeMsg(const std::string& prefix, const std::string& msg) {
+	if (prefix.empty()) {
+		return (msg + CRLF);
+	}
 	return (prefix + " " + msg + CRLF);
 }
