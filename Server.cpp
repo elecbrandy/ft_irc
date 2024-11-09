@@ -169,12 +169,11 @@ void IrcServer::handleClientMessage(int client_fd) {
 			if (errno == EWOULDBLOCK && errno == EAGAIN) {
 				return ;
 			} else {
-				removeClient(client_fd);	// quit
-				std::cout << "here?" << std::endl;
+				removeClinetFromServer(client);
 				throw ServerException(ERR_RECV);
 			}
 		} else if (bytes_received == 0) {
-			return ;
+			removeClinetFromServer(client);
 		} else {
 			buffer[bytes_received] = '\0';
 			client->appendToRecvBuffer(buffer);
