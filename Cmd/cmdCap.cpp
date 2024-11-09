@@ -1,6 +1,5 @@
 #include "Cmd.hpp"
 
 void Cmd::cmdCap() {
-    const std::string response = "CAP * LS :\r\n";
-    send(client_fd, response.c_str(), response.size(), 0);
+	server.castMsg(client_fd, server.makeMsg(client->getPrefix(), RPL_CAP));
 }

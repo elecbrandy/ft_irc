@@ -4,16 +4,15 @@
 IrcServer::IrcServer() {}
 
 IrcServer::IrcServer(int port, const std::string& password)
-: _name(SERVER_NAME), port(port), password(password) {}
+: _servername(SERVER_NAME), port(port), password(password) {}
 
 IrcServer::~IrcServer() {}
-
 
 /* getter */
 
 std::string IrcServer::getPassword() {return this->password;}
 
-const std::string IrcServer::getName() const {return this->_name;}
+const std::string IrcServer::getName() const {return this->_servername;}
 
 time_t IrcServer::getStartTime() const {return this->_startTime;}
 

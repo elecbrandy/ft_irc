@@ -204,3 +204,4 @@
 
 #define ERR_ERRUSERCMD "Error: "
 
+#define RPL_CAP "CAP * LS :"

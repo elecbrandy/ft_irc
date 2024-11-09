@@ -69,5 +69,5 @@ void Cmd::cmdNick() {
 	checkNick(this->cmdParams);
 	client->setNickname(this->cmdParams);
 	this->server.addClientByNickname(this->cmdParams, this->client);
-	server.castMsg(client_fd, server.makeMsg(client->getPrefix(), ERR_NEEDMOREPARAMS(client->getNickname(), "PASS")).c_str());
+	server.castMsg(client_fd, server.makeMsg(client->getPrefix(), "NICK :" + getCmdParams()));
 }

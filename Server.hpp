@@ -44,7 +44,7 @@
 
 class IrcServer {
 private:
-	const std::string					_name;
+	const std::string					_servername;
 	int									_fd;
 	int									port;
 	std::string							password;

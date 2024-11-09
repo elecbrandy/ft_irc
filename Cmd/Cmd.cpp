@@ -46,16 +46,15 @@ void Cmd::authorizeClient() {
 		client->setRegisteredStatus(true);
 
 		/* RPL */
-		server.castMsg(client_fd, server.makeMsg(RPL_WELCOME(client->getNickname(), client->getServername())).c_str());
-		server.castMsg(client_fd, server.makeMsg(RPL_YOURHOST(client->getNickname(), client->getServername())).c_str());
-		server.castMsg(client_fd, server.makeMsg(RPL_CREATED(client->getNickname(), server.formatDateToString(server.getStartTime()))).c_str());
-		server.castMsg(client_fd, server.makeMsg(RPL_MYINFO(client->getNickname())).c_str());
+		server.castMsg(client_fd, server.makeMsg(PREFIX_SERVER(server.getName()), RPL_WELCOME(client->getNickname(), client->getServername())));
+		server.castMsg(client_fd, server.makeMsg(PREFIX_SERVER(server.getName()), RPL_YOURHOST(client->getNickname(), client->getServername())));
+		server.castMsg(client_fd, server.makeMsg(PREFIX_SERVER(server.getName()), RPL_CREATED(client->getNickname(), server.formatDateToString(server.getStartTime()))));
+		server.castMsg(client_fd, server.makeMsg(PREFIX_SERVER(server.getName()), RPL_MYINFO(client->getNickname())));
 
 		/* MOTD */
-		server.castMsg(client_fd, server.makeMsg(RPL_MOTDSTART(client->getNickname())).c_str());
-		server.castMsg(client_fd, server.makeMsg(RPL_MOTD(client->getNickname())).c_str());
-		server.castMsg(client_fd, server.makeMsg(RPL_ENDOFMOTD(client->getNickname())).c_str());
-
+		server.castMsg(client_fd, server.makeMsg(PREFIX_SERVER(server.getName()), RPL_MOTDSTART(client->getNickname())));
+		server.castMsg(client_fd, server.makeMsg(PREFIX_SERVER(server.getName()), RPL_MOTD(client->getNickname())));
+		server.castMsg(client_fd, server.makeMsg(PREFIX_SERVER(server.getName()), RPL_ENDOFMOTD(client->getNickname())));
 	}
 }
 
@@ -91,13 +90,12 @@ bool Cmd::handleClientCmd() {
 			} else if (cmd == "QUIT") {
 				cmdQuit();
 			} else {
-				server.castMsg(client_fd, server.makeMsg(ERR_UNKNOWNCOMMAND(client->getNickname())).c_str());
+				server.castMsg(client_fd, server.makeMsg(PREFIX_SERVER(server.getName()), ERR_UNKNOWNCOMMAND(client->getNickname())));
 			}
 		}
 	}
 	catch (const CmdException& e) {
-		if (!this->client->getPassStatus() || \
-			!this->client->getRegisteredStatus()) {	
+		if (!this->client->getPassStatus() || !this->client->getRegisteredStatus()) {	
 			server.castMsg(client_fd, e.what());
 			server.removeClient(client_fd);
 			return false;
