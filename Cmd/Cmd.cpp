@@ -44,7 +44,7 @@ void Cmd::authorizeClient() {
 	}
 	if (client->getPassStatus() && client->getNickStatus() && client->getUserStatus()) {
 		client->setRegisteredStatus(true);
-		// client->printLog();
+
 		/* RPL */
 		server.castMsg(client_fd, server.makeMsg(RPL_WELCOME(client->getNickname(), client->getServername())).c_str());
 		server.castMsg(client_fd, server.makeMsg(RPL_YOURHOST(client->getNickname(), client->getServername())).c_str());

@@ -36,8 +36,8 @@
 #define SERVER_NAME "ircserv"
 
 #define CRLF "\r\n"
-#define SERVER_PREFIX(servername) 					":" + servername
-#define USER_PREFIX(nickname, username, hostname) 	":" + nickname + "!" + username + "@" + hostname
+#define PREFIX_SERVER(servername) 					":" + servername
+#define PREFIX_USER(nickname, username, hostname) 	":" + nickname + "!" + username + "@" + hostname
 
 #define TIME_OUT 60
 #define TIME_CHECK_INTERVAL 180

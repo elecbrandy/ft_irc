@@ -14,6 +14,18 @@
 	ERR_ERRONEUSNICKNAME: 잘못된 형식의 닉네임이 제공되었을 때 발생
 	? - ERR_UNAVAILRESOURCE: 사용할 수 없는 자원이거나 닉네임이 제한되어 있을 때 발생
 	? - ERR_RESTRICTED: 사용자가 닉네임 변경 권한이 제한되어 있을 때 발생
+
+	Sat Nov 09 2024 08:49:52 USERINPUT: C[811AAAAAH] I NICK 1234
+	Sat Nov 09 2024 08:49:52 USEROUTPUT: C[811AAAAAH] O :irc.local 432 ranchoi 1234 :Erroneous Nickname
+
+	Sat Nov 09 2024 08:50:32 USERINPUT: C[811AAAAAH] I NICK
+	Sat Nov 09 2024 08:50:32 USEROUTPUT: C[811AAAAAH] O :irc.local 461 ranchoi NICK :Not enough parameters
+
+	Sat Nov 09 2024 08:50:46 USERINPUT: C[811AAAAAH] I NICK
+	Sat Nov 09 2024 08:50:46 USEROUTPUT: C[811AAAAAH] O :irc.local 461 ranchoi NICK :Not enough parameters.
+
+	Sat Nov 09 2024 08:50:58 USERINPUT: C[811AAAAAH] I NICK a
+	Sat Nov 09 2024 08:50:58 USEROUTPUT: C[811AAAAAH] O :ranchoi!root@127.0.0.1 NICK :a
 */
 
 void Cmd::checkNick(const std::string& str) {
@@ -24,38 +36,38 @@ void Cmd::checkNick(const std::string& str) {
 	}
 
 	/* EMPTY check */
-	if (str.empty()) {
-		if (this->client->getNickname().empty() == 1) {
-			throw CmdException(ERR_NONICKNAMEGIVEN(tmp));	// empty nick
-		}
-	}
+	// if (str.empty()) {
+	// 	if (this->client->getNickname().empty() == 1) {
+	// 		throw CmdException(ERR_NONICKNAMEGIVEN(tmp));	// empty nick
+	// 	}
+	// }
 
 	/* SIZE check */
 	if (str.size() > NICK_MAX_LEN) {
-		throw CmdException(ERR_ERRONEUSNICKNAME(tmp));
+		throw CmdException(server.makeMsg(SERVER_PREFIX(server.getName()), ERR_ERRONEUSNICKNAME(tmp)));
 	}
-	
+
 	/* ALNUM check */
 	for (std::string::const_iterator it = str.begin(); it != str.end(); ++it) {
 		if (!std::isalnum(static_cast<unsigned char>(*it))) {
-			throw CmdException(ERR_ERRONEUSNICKNAME(tmp));
+			throw CmdException(server.makeMsg(SERVER_PREFIX(server.getName()), ERR_ERRONEUSNICKNAME(tmp)));
 		}
 	}
 
 	/* INUSE check */
 	if (server.getClient(str) != NULL) {
-		throw CmdException(ERR_NICKNAMEINUSE(tmp));
+		throw CmdException(server.makeMsg(SERVER_PREFIX(server.getName()), ERR_NICKNAMEINUSE(tmp)));
 	}
 }
 
 void Cmd::cmdNick() {
 	/* Pass check */
-
 	if (!this->client->getPassStatus()) {
-		throw CmdException(ERR_NEEDMOREPARAMS(client->getNickname(), "PASS"));
+		throw CmdException(server.makeMsg(SERVER_PREFIX(server.getName()), ERR_NEEDMOREPARAMS(client->getNickname(), "PASS")));
 	}
+
 	checkNick(this->cmdParams);
 	client->setNickname(this->cmdParams);
 	this->server.addClientByNickname(this->cmdParams, this->client);
-	// std::cout << "client->getNickname() : " << client->getNickname() << std::endl;
+	castMsg(server.makeMsg(USER_PREFIX(server.getName()), ERR_NEEDMOREPARAMS(client->getNickname(), "PASS")));
 }
