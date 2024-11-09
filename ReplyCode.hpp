@@ -10,7 +10,7 @@
 // 004: 서버의 설정 및 버전 관련 정보를 알림
 #define RPL_MYINFO(nick)                        "004 " + nick + " :ft_irc, Simple IRC server for 42 cursus project"
 
-#define RPL_CHANNELMODEIS(ch, params)     "324 " + ch + " " + params
+#define RPL_CHANNELMODEIS(ch, mode, params)     "324 " + ch + " " + mode + " " + params
 
 // 331: 해당 채널에 설정된 토픽이 없음
 #define RPL_NOTOPIC(nick, ch)					"331 " + nick + " " + ch + " :No topic is set" 
@@ -19,7 +19,7 @@
 #define RPL_TOPIC(nick, ch, topic)				"332" + nick + " " + ch + " :" + topic
 
 // 341: 해당 채널에 초대가 전송됨
-#define RPL_INVITING(nick, target, ch)			"341 " + nick + " " + target + " " + ch
+#define RPL_INVITING(nick, target, ch)			"341 " + nick + " " + ch + " " + target
 
 // 353: 해당 채널에 참여 중인 사용자 목록을 반환
 #define RPL_NAMREPLY(nick, symbol, ch, participants) "353 " + nick + " " + symbol + " " + ch + " :" + participants
@@ -196,7 +196,8 @@
 #define RPL_PART(nick, ch) nick + " PART " + ch
 
 //채널 초대 완료시 초대 당한 사용자에게 보내는 메세지
-#define RPL_INVITE(nick, ch) "INVITE " + nick + " " + ch
+#define RPL_INVITE(nick, target, ch) ":" + nick + " INVITE " + target + " " + ch
+
 // 417: 메세지가 512자를 넘어가는 경우 (InspIRCd 기준)
 #define ERR_LINETOOLONG(nick)					"417 " + nick + " :Input Line too long"
 

@@ -66,10 +66,8 @@ std::vector<std::string> Cmd::privmsgSplit() {
         }
     }
 
-    // 마지막 부분 추가
-    if (!currentPart.empty()) {
+    if (!currentPart.empty())
         res.push_back(currentPart);
-    }
 
     return res;
 }
@@ -88,29 +86,37 @@ bool Cmd::isDupReceiver(std::vector<std::string> &receivers) {
 
 void Cmd::cmdPrivmsg() {
 	std::vector<std::string> params = privmsgSplit();
+	for (size_t i = 0; i < params.size(); i++) {
+		std::cout << "params[" << i << "] : " << params[i] << std::endl;
+	}
+
 	std::vector<std::string> receivers;
 	std::string msg;
 	bool chFlag = false;
 
 	for (size_t i = 0; i < params.size(); i++) {
 		if (params[i][0] != ':') {
-			if (i == 1 && params[i][0] == '#') // 첫 수신자의 타입을 기준으로 PRIVMSG를 처리
+			if (i == 0 && params[i][0] == '#') // 첫 수신자의 타입을 기준으로 PRIVMSG를 처리
 				chFlag = true;
-			if (chFlag == true && params[i][0] == '#') { // 채널이 첫 수신자인 경우
+			if (chFlag == true && params[i][0] == '#') // 채널이 첫 수신자인 경우
 				receivers.push_back(params[i]);
-			}
-			if (chFlag == false && params[i][0] != '#') { // 사용자가 첫 수신자인 경우
+			else if (chFlag == false && params[i][0] != '#') // 사용자가 첫 수신자인 경우
 				receivers.push_back(params[i]);
+			else {
+				server.castMsg(client_fd, server.makeMsg(ERR_UNKNOWNCOMMAND(client->getNickname())).c_str());
+				server.castMsg(client_fd, server.makeMsg("Sending messages to both a channel and a regular user at the same time is not permitted.").c_str());
+				throw Cmd::CmdException(ERR_UNKNOWNCOMMAND(client->getNickname()));
 			}
-		} else if (params[i][0] == ':')
+		} else
 			msg = params[i];
 	}
-	
+
 	//케이스 1 : 수신자가 없는 경우
 	if (receivers.empty()) {
 		server.castMsg(client_fd, server.makeMsg(ERR_NORECIPIENT(client->getNickname(), "PRIVMSG")).c_str());
 		throw Cmd::CmdException(ERR_NORECIPIENT(client->getNickname(), "PRIVMSG")); // getcmd() 해서 객체에 저장해놓고 사용하기
 	}
+
 	//케이스 2 : 수신자가 5명을 초과하거나, 수신자가 중복되는 경우
 	if (receivers.size() > 5 || isDupReceiver(receivers) == true) {
 		std::string receiverStr;
@@ -138,11 +144,11 @@ void Cmd::cmdPrivmsg() {
 			if (it == server.getChannels().end()) {
 				server.castMsg(client_fd, server.makeMsg(ERR_NOSUCHNICK(client->getNickname(), receivers[i])).c_str());
 				throw Cmd::CmdException(ERR_NOSUCHNICK(client->getNickname(), receivers[i]));
-			} else {
-				if (it->second->getParticipant().find(client->getNickname()) == it->second->getParticipant().end()) {
+			}
+			std::string nick = it->second->isOperatorNickname(client->getNickname());
+			if (it->second->getParticipant().find(nick) == it->second->getParticipant().end()) {
 				server.castMsg(client_fd, server.makeMsg(ERR_CANNOTSENDTOCHAN(client->getNickname(), receivers[i])).c_str());
 				throw Cmd::CmdException(ERR_CANNOTSENDTOCHAN(client->getNickname(), receivers[i]));
-				}
 			}
 		} else { // 수신자집단이 사용자인 경우
 			Client* receiver = server.getClient(receivers[i]);
@@ -158,7 +164,7 @@ void Cmd::cmdPrivmsg() {
 			std::string privmsg = ':' + client->getNickname() + ' ' + cmd + ' ' + receivers[i] + ' ' +  msg;
 			std::map<std::string, Channel*> chs = server.getChannels();
 			Channel* ch = chs.find(receivers[i])->second;
-			server.broadcastMsg(server.makeMsg(privmsg), ch);
+			server.broadcastMsg(server.makeMsg(privmsg), ch, client_fd);
 		}
 	} else {
 		for (size_t i = 0; i < receivers.size(); i++) {

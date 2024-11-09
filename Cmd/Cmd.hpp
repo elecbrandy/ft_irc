@@ -37,11 +37,12 @@ public:
 	void		cmdUser();
 	void		cmdNick();
 	void		cmdPass();
-	void		cmdPing();
+	void		cmdPong();
 	void		cmdJoin();
 	void		cmdMode();
 	void		cmdTopic();
 	void		cmdPrivmsg();
+	void		cmdQuit();
 	void		cmdKick();
 	void		cmdPart();
 	void		cmdInvite();
@@ -57,7 +58,7 @@ public:
 	std::vector<std::string> topicSplit();
 	std::vector<std::string> joinSplit(std::string &cmdParams);
 	std::vector<std::string> privmsgSplit();
-	std::vector<std::string> split(char delimeter);
+	std::vector<std::string> split(char delim);
 
 	/* Setter & Getter */
 	std::string getCmdParams() const;

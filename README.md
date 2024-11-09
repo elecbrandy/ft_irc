@@ -1,4 +1,5 @@
 # ft_irc
+
 ## docker set
 
 1. **docker desktop** 키기
@@ -25,13 +26,13 @@ __________
 ### Cmd
 - [x] PASS
 - [x] USER
-- [ ] PING : 클라에서 임의로 `/ping a` 입력 시 `PRIVMSG a :PING 1730057358 334518` 이런 식으로 입력됨. 이때 PRIVMSG 등 처리 해야할듯
-- [x] NICK : 완성하긴했는데, MAX_LEN 어떻게 할지 정해야 함. 제대로 바뀌었는지 확인 하는 방법을 넣어야 하나? 중복 등 아직 테스트 안해봄
+- [x] PING
+- [x] NICK
 
 ### Channel 기본 구현
 - [x] 클라이언트가 채널에 참여 가능
-- [ ] 클라이언트가 채널에 보낸 모든 메세지는 같은 채널에 속한 다른 클라이언트에게 전달
-- [ ] 클라이언트는 운영자(`operators`) 일반사용자 (`regular users`)로 구분
+- [x] 클라이언트가 채널에 보낸 모든 메세지는 같은 채널에 속한 다른 클라이언트에게 전달
+- [x] 클라이언트는 운영자(`operators`) 일반사용자 (`regular users`)로 구분
 
 ### Channel 내 `operators` 전용 명령어
 - [ ] KICK : 채널에서 클라 강제퇴장
@@ -48,3 +49,26 @@ __________
 - [ ] Handle file transfer
 - [ ] A bot
 
+### etc
+
+#### `recv` 의 반환값
+- 리눅스 man 페이지에 따르면, 논블로킹 소켓에서 recv 호출 시 읽을 데이터가 없으면 -1을 반환하고 errno를 EAGAIN 또는 EWOULDBLOCK으로 설정.
+- https://www.man7.org/linux/man-pages/man2/recv.2.html
+
+#### `EAGAIN` 과 `EWOULDBLOCK` 의 의미
+- `EAGAIN`: 비동기 소켓에서 호출이 즉시 완료될 수 없을 때 반환되는 오류 코드
+	- 읽기(recv)의 경우: 수신 버퍼에 데이터가 없을 때 recv가 -1을 반환하고 errno에 EAGAIN이 설정
+	- 쓰기(send)의 경우: 송신 버퍼가 가득 찬 상태에서 send를 호출하면 -1을 반환하고 errno에 EAGAIN이 설정
+- 예시: `EAGAIN`이 발생하는 상황
+	- 읽기(recv) 작업 시
+		- 소켓이 논블로킹 모드로 설정되어 있고, 수신 버퍼에 데이터가 없는 경우 recv는 -1을 반환하고 errno에 EAGAIN이 설정
+		- 대처 방법: 이 상황에서는 데이터를 기다리는 대신 다음 이벤트를 기다리거나 다시 시도하는 방식으로 처리
+	- 쓰기(send) 작업 시
+		- 송신 버퍼가 꽉 차서 더 이상 데이터를 보내지 못하는 경우, send는 -1을 반환하고 errno에 EAGAIN이 설정됩
+		- 대처 방법: 송신 버퍼가 비워질 때까지 기다렸다가, 다시 시도
+
+#### POLLIN과 POLLOUT
+- POLLIN 값: 0x0001 (2진수로 0001)
+- POLLOUT 값: 0x0004 (2진수로 0100)
+- 비트 연산을 통해 POLLIN | POLLOUT을 계산하면: 0001 | 0100 = 0101 (10진수로 5)
+- `1010`을 감지한 **poll** 함수는  pollin과 pollout 둘다 인지

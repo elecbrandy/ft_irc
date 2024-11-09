@@ -14,7 +14,8 @@ typedef struct s_register {
 class Client {
 	private:
 		int			_fd;
-		std::string _msgBuf;
+		std::string	_recvBuffer;
+		std::string	_sendBuffer;
 		std::string	_nickname;
 		std::string	_username;
 		std::string	_hostname;
@@ -56,11 +57,15 @@ class Client {
 		bool		getUserStatus() const;
 		bool		getRegisteredStatus() const;
 
-		void		appendToBuffer(const std::string& str);
+		void		appendToRecvBuffer(const std::string& str);
 		bool		extractMessage(std::string& message);
 		bool		isConnectionTimedOut(time_t timeout);
 
 		void		printLog();
+		void		appendToSendBuffer(const std::string& str);
+		const std::string& getSendBuffer() const;
+		void		clearSendBuffer(size_t count);
+		bool		hasDataToSend() const;
 };
 
 #endif

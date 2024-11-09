@@ -24,20 +24,31 @@ ERR_CHANOPRIVSNEEDED - 채널 오퍼레이터 권한이 없음
 4. 채널 오퍼레이터 권한이 없는 경우
 */
 
-std::vector<std::string> Cmd::split(char delimeter) {
-	std::vector<std::string> res;
-	std::string paramCopy = getCmdParams();
+std::vector<std::string> Cmd::split(char delim) {
+    std::vector<std::string> res;
+    std::string paramCopy = getCmdParams();
+    size_t start = 0, pos;
 
-	for (size_t i = 0; i < paramCopy.size(); i++) {
-		if (paramCopy[i] == delimeter) {
-			res.push_back(paramCopy.substr(0, i - 1));
-			paramCopy = paramCopy.substr(i + 1);
-		}
-	}
-	res.push_back(paramCopy);
+    // ':'가 나올 때까지 delim을 기준으로 나누기
+    while ((pos = paramCopy.find(delim, start)) != std::string::npos) {
+        // ':'를 만나면 루프를 종료하고 이후 문자열을 결과에 추가
+        if (paramCopy[start] == ':') {
+            res.push_back(paramCopy.substr(start + 1));
+            return res;
+        }
 
-	return res;
+        res.push_back(paramCopy.substr(start, pos - start));
+        start = pos + 1;
+    }
+
+    // 마지막 남은 부분 확인 및 ':' 처리
+    if (start < paramCopy.size())
+        res.push_back(paramCopy.substr(start));
+	
+
+    return res;
 }
+
 
 void Cmd::cmdKick() {
 	std::vector<std::string> params = split(' ');
@@ -51,6 +62,10 @@ void Cmd::cmdKick() {
 	std::string chName = params[0];
 	std::string target = params[1];
 	std::string comment = "";
+
+	for (size_t i = 0; i < params.size(); i++) {
+		std::cout << "params[" << i << "]: |" << params[i] << "|" << std::endl;
+	}
 
 	if (params.size() == 3)
 		std::string comment = params[2];
@@ -83,6 +98,6 @@ void Cmd::cmdKick() {
 	}
 	
 	// 강퇴 되었다고 채널의 모든 참여자(강퇴 대상자 포함)에게 알림 후 강퇴
-	// server.broadcastMsg(server.makeMsg(RPL_KICK(client->getNickname(), client->getUsername(), client->getHostname(), chName, target, comment).c_str()), ch);
+	server.broadcastMsg(server.makeMsg(RPL_KICK(client->getNickname(), client->getUsername(), client->getHostname(), chName, target, comment).c_str()), ch, -1);
 	ch->removeParticipant(target);
 }

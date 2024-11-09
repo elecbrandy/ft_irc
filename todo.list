@@ -1,10 +1,2 @@
-- option
-client nickname 
-option +l 0명 막기  v
-옵션 부여 중 예외 발생 시 초기화 필요
-
-/mode #ch -o user -k -l -> /mode #ch -ok user -l 로 들어옴
-
-channel 인원 예외 처리
-
-cmd + k  + f
+// POLLOUT (소켓에 써야하는 플래그) 를 감지하도록 설정. 임시저장한 데이터를 언젠가 소켓 버퍼에 써야하므로
+modifyPollEvent(client, POLL) 

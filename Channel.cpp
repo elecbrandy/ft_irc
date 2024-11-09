@@ -89,7 +89,11 @@ const std::string Channel::isOperatorNickname(std::string nickname) const
 		return nickname;
 }
 
-void Channel::removeParticipant(std::string participantName){_participant.erase(participantName);}
+void Channel::removeParticipant(std::string target){
+	_participant.erase(target);
+	if (isOperator(target) == true)
+		_operator.erase(target);
+}
 
 /* getter */
 std::string Channel::getName() {return this->_name;}
@@ -139,6 +143,11 @@ bool Channel::isParticipant(std::string nickname) const
 		return true;
 }
 
+void Channel::updateInviteList(std::string nickname) {
+	if (std::find(_invited.begin(), _invited.end(), nickname) != _invited.end())
+		_invited.erase(std::remove(_invited.begin(), _invited.end(), nickname), _invited.end());
+}
+
 std::map<std::string, Client*> Channel::getOperator() {return this->_operator;}
 
 unsigned int Channel::getLimit() const {return this->_limit;} 
@@ -146,4 +155,3 @@ unsigned int Channel::getLimit() const {return this->_limit;}
 std::vector<std::string> Channel::getInvited() {return this->_invited;}
 
 std::vector<std::string> Channel::getBanned() {return this->_banned;}
-

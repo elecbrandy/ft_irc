@@ -44,7 +44,7 @@ void Cmd::authorizeClient() {
 	}
 	if (client->getPassStatus() && client->getNickStatus() && client->getUserStatus()) {
 		client->setRegisteredStatus(true);
-		client->printLog();
+		// client->printLog();
 		/* RPL */
 		server.castMsg(client_fd, server.makeMsg(RPL_WELCOME(client->getNickname(), client->getServername())).c_str());
 		server.castMsg(client_fd, server.makeMsg(RPL_YOURHOST(client->getNickname(), client->getServername())).c_str());
@@ -61,6 +61,7 @@ void Cmd::authorizeClient() {
 
 bool Cmd::handleClientCmd() {
 	try {
+		// ScopedTimer("Cmd");
 		this->cmd = extractCmd();
 		this->cmdParams = extractCmdParams();
 
@@ -72,7 +73,7 @@ bool Cmd::handleClientCmd() {
 			} else if (this->cmd == "USER") {
 				cmdUser();
 			} else if (this->cmd == "PING") {
-				cmdPing();
+				cmdPong();
 			} else if (this->cmd == "JOIN") {
 				cmdJoin();
 			} else if (cmd == "PART") {
@@ -87,6 +88,8 @@ bool Cmd::handleClientCmd() {
 				cmdMode();
 			} else if (cmd == "TOPIC") {
 				cmdTopic();
+			} else if (cmd == "QUIT") {
+				cmdQuit();
 			} else {
 				server.castMsg(client_fd, server.makeMsg(ERR_UNKNOWNCOMMAND(client->getNickname())).c_str());
 			}
@@ -94,7 +97,7 @@ bool Cmd::handleClientCmd() {
 	}
 	catch (const CmdException& e) {
 		if (!this->client->getPassStatus() || \
-			!this->client->getRegisteredStatus()) {
+			!this->client->getRegisteredStatus()) {	
 			server.castMsg(client_fd, e.what());
 			server.removeClient(client_fd);
 			return false;

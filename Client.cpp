@@ -2,12 +2,7 @@
 #include "Server.hpp"
 
 Client::Client(in_addr addr)
-:	_nickname(""), 
-	_username(""), 
-	_hostname(inet_ntoa(addr)), 
-	_realname(""), 
-	_password(""),
-	_servername(""),
+:	_hostname(inet_ntoa(addr)), 
 	_lastActivityTime(time(NULL)) {
 	_registerStatus.pass = false;
 	_registerStatus.nick = false;
@@ -15,7 +10,9 @@ Client::Client(in_addr addr)
 	_registerStatus.registered = false;
 }
 
-Client:: ~Client() {}
+Client:: ~Client() {
+	close(this->_fd);
+}
 
 /* setter */
 
@@ -78,15 +75,15 @@ bool Client::getUserStatus() const {return this->_registerStatus.user;}
 bool Client::getRegisteredStatus() const {return this->_registerStatus.registered;}
 
 /* other */
-void Client::appendToBuffer(const std::string& str) {
-	_msgBuf += str;
+void Client::appendToRecvBuffer(const std::string& str) {
+	this->_recvBuffer += str;
 }
 
 bool Client::extractMessage(std::string& message) {
-	size_t pos = _msgBuf.find("\r\n");
+	size_t pos = _recvBuffer.find("\r\n");
 	if (pos != std::string::npos) {
-		message = _msgBuf.substr(0, pos);
-		_msgBuf.erase(0, pos + 2);
+		message = _recvBuffer.substr(0, pos);
+		_recvBuffer.erase(0, pos + 2);
 		return true;
 	}
 	return false;
@@ -97,6 +94,25 @@ bool Client::isConnectionTimedOut(time_t timeout) {
 	if (now - this->_lastActivityTime > timeout)
 		return true;
 	return false;
+}
+
+void Client::appendToSendBuffer(const std::string& data) {
+	this->_sendBuffer += data;
+}
+
+const std::string& Client::getSendBuffer() const {
+	return this->_sendBuffer;
+}
+
+void Client::clearSendBuffer(size_t count) {
+	this->_sendBuffer.erase(0, count);
+}
+
+bool Client::hasDataToSend() const {
+	if (this->_sendBuffer.empty()) {
+		return false;
+	}
+	return true;
 }
 
 void Client::printLog() {

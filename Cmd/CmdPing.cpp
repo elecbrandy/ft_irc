@@ -11,7 +11,7 @@
 	PONG irc.local
 */
 
-void Cmd::cmdPing() {
+void Cmd::cmdPong() {
 	client->setlastActivityTime();
 	server.castMsg(client_fd, server.makeMsg(std::string("PONG") + ' ' + getCmdParams()).c_str());
 }

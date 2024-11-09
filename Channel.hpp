@@ -64,6 +64,7 @@ class Channel {
 		std::vector<std::string> getBanned();
 
 		void removeParticipant(std::string target);
+		void updateInviteList(std::string nickname);
 };
 
 

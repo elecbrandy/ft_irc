@@ -23,6 +23,9 @@ void Cmd::cmdInvite() {
     std::istringstream iss(cmdParams);
     std::vector<std::string> params = split(' ');
 
+    for(size_t i = 0; i < params.size(); i++) {
+        std::cout << "params[" << i << "]: |" << params[i] << "|" << std::endl;
+    }
     // 파라미터 부족/과다
     if (params.size() != 2) {
         throw Cmd::CmdException(ERR_NEEDMOREPARAMS(client->getNickname(), cmd));
@@ -33,7 +36,8 @@ void Cmd::cmdInvite() {
     Channel* ch = chs[params[1]];
 
     // 초대를 보내는 사용자가 해당 채널의 참여자가 아닌 경우
-    if (ch->getParticipant().find(client->getNickname()) == ch->getParticipant().end()) {
+    std::string nick = ch->isOperatorNickname(client->getNickname());
+    if (ch->getParticipant().find(nick) == ch->getParticipant().end()) {
         throw Cmd::CmdException(ERR_NOTONCHANNEL(client->getNickname(), params[1]));
         server.castMsg(this->client_fd, server.makeMsg(ERR_NOTONCHANNEL(client->getNickname(), params[1])));
     }
@@ -62,11 +66,11 @@ void Cmd::cmdInvite() {
     if (std::find(ch->getInvited().begin(), ch->getInvited().end(), params[0]) == ch->getInvited().end())
         ch->setInvited(params[0]);
 
-    // 초대 당한 사용자에게 초대 메시지 전송
-    server.castMsg(server.getClient(params[0])->getFd(), server.makeMsg(RPL_INVITE(client->getNickname(), params[1]).c_str()));
+    // 초대된 사용자에게 초대 메시지 전송
+    server.castMsg(server.getClient(params[0])->getFd(), server.makeMsg(RPL_INVITE(client->getNickname(), params[0], params[1]).c_str()));
 
     // 초대한 사용자에게 초대 메시지 전송
-    server.castMsg(client_fd, server.makeMsg(RPL_INVITING(client->getNickname(), params[0], params[1]).c_str()));
+    server.castMsg(client_fd, server.makeMsg(RPL_INVITING(client->getNickname(), params[1], params[0]).c_str()));
 }
 
 

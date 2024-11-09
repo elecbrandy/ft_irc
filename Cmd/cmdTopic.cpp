@@ -75,7 +75,7 @@ void Cmd::cmdTopic() {
 			throw Cmd::CmdException(ERR_NOTONCHANNEL(client->getNickname(), chName));
 		}
 
-		server.broadcastMsg(server.makeMsg(RPL_TOPIC(client->getNickname(), chName, ch->getTopic())), ch);
+		server.broadcastMsg(server.makeMsg(RPL_TOPIC(client->getNickname(), chName, ch->getTopic())), ch, -1);
 	} else { // 2: 토픽 파라미터가 있을 때
 		if (ch->getParticipant().find(client->getNickname()) == ch->getParticipant().end()) { // 2-1: 채널에 참여한 클라이언트가 아닐 때
 			server.castMsg(this->client_fd, server.makeMsg(ERR_NOTONCHANNEL(client->getNickname(), chName)));
@@ -94,11 +94,11 @@ void Cmd::cmdTopic() {
 					throw Cmd::CmdException(ERR_CHANOPRIVSNEEDED(client->getNickname(), chName));
 				}
 				ch->setTopic(topic);
-				server.broadcastMsg(server.makeMsg(RPL_TOPIC(client->getNickname(), chName, ch->getTopic())), ch);
+				server.broadcastMsg(server.makeMsg(RPL_TOPIC(client->getNickname(), chName, ch->getTopic())), ch, -1);
 			}
 		} else { // 2-2: topic모드가 아닐 때 (일반 참여자도 토픽 변경 가능)
 			ch->setTopic(topic);
-			server.broadcastMsg(server.makeMsg(RPL_TOPIC(client->getNickname(), chName, ch->getTopic())), ch);
+			server.broadcastMsg(server.makeMsg(RPL_TOPIC(client->getNickname(), chName, ch->getTopic())), ch, -1);
 		}
 
 	}

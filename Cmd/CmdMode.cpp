@@ -28,20 +28,6 @@
     4. 옵션 처리
         1) option - param 비교하며 처리
 
-        ERR_NEEDMOREPARAMS
-ERR_KEYSET
-ERR_NOCHANMODES
-ERR_CHANOPRIVSNEEDED
-ERR_USERNOTINCHANNEL
-ERR_UNKNOWNMODE
-RPL_CHANNELMODEIS
-RPL_BANLIST
-RPL_ENDOFBANLIST
-RPL_EXCEPTLIST
-RPL_ENDOFEXCEPTLIST
-RPL_INVITELIST
-RPL_ENDOFINVITELIST
-RPL_UNIQOPIS
 */
 
 void printParam(std::vector<std::string> param)
@@ -55,20 +41,19 @@ void printParam(std::vector<std::string> param)
 // option +-o
 void Cmd::validationNickName(std::string nickname, Channel* channel, int option_flag)
 {
-    std::map<std::string, Client*> map = this->server.getNickNameClientMap();
-    std::map<std::string, Client*>::iterator client = map.find(nickname);
-    
-    //해당 클라이언트 등록 안되어 있음
+    //해당 클라이언트가 채널에 없음
     if (option_flag == 1)
     {
-        if (client == map.end())
+        if (channel->isParticipant(nickname) == false)
             throw CmdException(ERR_NOSUCHNICK(this->client->getUsername(), nickname));
     }
     else
     // option_flag == 0, 채널의 운영자에 nickname이 포함되어 있는지 검증
     {
-        if (channel->isOperator(client->second->getNickname()) == false)
+        if (channel->isOperator(nickname) == false)
+        {
             throw CmdException(ERR_NOSUCHNICK(this->client->getUsername(), nickname));
+        }
     }
 }
 
@@ -118,6 +103,10 @@ void Cmd::addChannelOperator(std::string nickname, Channel* channel)
     //client->option_o (flag = 1)
     channel->addOperator(nickname, client->second);
     channel->setMode('o');
+
+    std::map<std::string, Client*> participant = channel->getParticipant();
+    channel->removeParticipant(nickname);
+    channel->setParticipant("@" + nickname, client->second);
 }
 
 // #ch -o user
@@ -126,9 +115,13 @@ void Cmd::removeChannelOperator(std::string nickname, Channel* channel)
     std::map<std::string, Client*> map = this->server.getNickNameClientMap();
     std::map<std::string, Client*>::iterator client = map.find(nickname);
     
-    //client->option_o (flag = 1)
+    //client->option_o (flag = 0)
     channel->removeOperator(client->second);
     channel->removeMode('o');
+
+    std::map<std::string, Client*> participant = channel->getParticipant();
+    channel->removeParticipant(nickname);
+    channel->setParticipant(nickname, client->second);
 }
 
 void Cmd::setChannelKey(std::string key, Channel* channel)
@@ -220,7 +213,6 @@ void Cmd::handleMinusFlagOption(std::vector<std::string> modeParse, std::map<std
             option_index++;
             param_index++;
         }
-        std::cout << "flag 1 success!!!!!!!!!!!!!!!" << '\n';
 }
 
 void Cmd::handlePlusFlagOption(std::vector<std::string> modeParse, std::map<std::string, Channel*>::iterator channel, int option_flag)
@@ -249,7 +241,6 @@ void Cmd::handlePlusFlagOption(std::vector<std::string> modeParse, std::map<std:
         }
         if (mode_kol.size() > 3)
             throw CmdException(ERR_NEEDMOREPARAMS(this->client->getUsername(), this->cmdParams));
-
 
         // o의 개수와 파라미터 개수가 동일한가
         // 3개를 넘지 않는가
@@ -288,12 +279,10 @@ void Cmd::handlePlusFlagOption(std::vector<std::string> modeParse, std::map<std:
             option_index++;
             param_index++;
         }
-        std::cout << "flag 0 success!!!!!!!!!!!!!!!" << '\n';
 }
 
 void Cmd::cmdMode()
 {
-    std::cout << "_______this is MODE_______" << '\n';
     std::vector<std::string> modeParse;
     std::istringstream stream(this->cmdParams);
     std::string token;
@@ -302,19 +291,6 @@ void Cmd::cmdMode()
     
     while (stream >> token)
         modeParse.push_back(token);
-
-    // printParam(modeParse);
-    // std::cout << "this is start" << '\n';
-    // for(std::map<std::string, Channel*>::iterator it = _channels.begin(); it != _channels.end(); it++)
-    //     std::cout << it->second->getName() << '\n';
-    // std::cout << "this is end" << '\n';
-
-    //mode nickname +i (/connect 하고 한번 요청, 과제 요구사항 x)
-    //채널 이름이 #으로 시작하는가
-    // if (modeParse.size() == 1 && modeParse[0].at(0) == '#')
-    //     return;
-    // if (modeParse.size() < 2 || modeParse[0].at(0) != '#')
-    //     throw CmdException(ERR_NEEDMOREPARAMS(this->client->getUsername(), this->cmdParams));
 
     std::string channelName = modeParse[0];
 
@@ -332,30 +308,22 @@ void Cmd::cmdMode()
     // /mode #ch -> #ch의 옵션 정보 출력
     if (modeParse.size() == 1)
     {
-        std::set<char> s = channel->second->getMode();
-        std::string params;
-        for(std::set<char>::iterator it = s.begin(); it != s.end(); it++)
-            params += *it;
-        if (s.size() == 0)
-            params = ":";
-        else
-            params = "+" + params;
-        server.castMsg(client_fd, server.makeMsg(RPL_CHANNELMODEIS(modeParse[0], params)));
+        // std::set<char> s = channel->second->getMode();
+        // std::string mode;
+        // for(std::set<char>::iterator it = s.begin(); it != s.end(); it++)
+        //     mode += *it;
+        // if (s.size() == 0)
+        //     mode = ":";
+        // else
+        //     mode = "+" + mode;
+        // server.broadcastMsg(server.makeMsg(RPL_CHANNELMODEIS(modeParse[0], params)), channel->second);
         return;
     }
     //채널의 운영자가 현재 호출 클라이언트인가
     if ((channel->second)->isOperator(this->client->getNickname()) == false)
         throw CmdException(ERR_CHANOPRIVSNEEDED(this->client->getUsername(), modeParse[0]));
 
-    //      std::cout << "this is start" << '\n';
-    // std::map<std::string, Client*> ch = channel->second->getParticipant();
-    // for(std::map<std::string, Client*>::iterator it = ch.begin(); it != ch.end(); it++)
-    //     std::cout << it->second->getNickname() << '\n';
-    // std::cout << "this is end" << '\n';
-
-
-    // option validation
-    // 옵션이 +나 -로 시작하는가
+    // option validation // 옵션이 +나 -로 시작하는가
     if (modeParse[1].at(0) == '+')
         option_flag = 1;
     else if (modeParse[1].at(0) == '-')

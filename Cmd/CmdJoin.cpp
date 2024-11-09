@@ -112,13 +112,6 @@ void Cmd::cmdJoin() {
 		Channel* ch = it->second;
 
 
-		// 비밀번호 필요 시 확인
-		if (ch->getMode().find(KEY_MODE) != ch->getMode().end()) {
-			if (chKey.empty() || chKey != ch->getKey()) {
-				server.castMsg(client_fd, server.makeMsg(ERR_BADCHANNELKEY(client->getNickname(), chName)).c_str());
-				return;
-			}
-		}
 
 		// 인원 초과 시 에러
 		if (ch->getMode().find(LIMIT_MODE) != ch->getMode().end() &&
@@ -136,42 +129,33 @@ void Cmd::cmdJoin() {
 			}
 		}
 
-		// 차단된 사용자 확인
-		std::vector<std::string> bannedList = ch->getBanned();
-		if (std::find(bannedList.begin(), bannedList.end(), client->getNickname()) != bannedList.end())
-		{
-			server.castMsg(client_fd, server.makeMsg(ERR_BANNEDFROMCHAN(client->getNickname(), chName)).c_str());
-			return;
+		// 비밀번호 필요 시 확인
+		if (ch->getMode().find(KEY_MODE) != ch->getMode().end()) {
+			if (chKey.empty() || chKey != ch->getKey()) {
+				server.castMsg(client_fd, server.makeMsg(ERR_BADCHANNELKEY(client->getNickname(), chName)).c_str());
+				return;
+			}
 		}
 
 		// 참여자 추가
-		//  std::map<std::string, Client*> participant = ch->getParticipant();
-		//  std::string participantName = (participant.empty()) ? '@' + client->getNickname() : client->getNickname();
-		//  ch->setParticipant(participantName, client);
-		//  std::cout << "size :" << ch->getParticipant().size() << std::endl;
-		std::map<std::string, Client *> participant = ch->getParticipant();
-		std::string nickname = client->getNickname();
-		// 닉네임에서 공백 이후의 문자열 제거
-		size_t spacePos = nickname.find(' ');
-		if (spacePos != std::string::npos)
-		{
-			nickname = nickname.substr(0, spacePos);
-		}
-		// 참가자가 없으면 운영자로 설정
-		std::string participantName = (participant.empty()) ? '@' + nickname : nickname;
-		ch->setParticipant(participantName, client);
+		 std::map<std::string, Client*> participant = ch->getParticipant();
+		 std::string participantName = (participant.empty()) ? '@' + client->getNickname() : client->getNickname();
+		 ch->setParticipant(participantName, client);
 
 		// 참여자 목록 전송
 		server.castMsg(client_fd, server.makeMsg(RPL_NAMREPLY(client->getNickname(), "=", ch->getName(), ch->getParticipantNameStr())).c_str());
 		server.castMsg(client_fd, server.makeMsg(RPL_ENDOFNAMES(client->getNickname(), ch->getName())).c_str());
 
 		// JOIN 알림
-		server.broadcastMsg(server.makeMsg(RPL_JOIN(client->getServername(), chName)), ch);
+		server.broadcastMsg(server.makeMsg(RPL_JOIN(client->getServername(), chName)), ch, -1);
 		
 		// 토픽 전송
 		if (ch->getTopic().empty())
 			server.castMsg(client_fd, server.makeMsg(RPL_NOTOPIC(client->getNickname(), ch->getName())).c_str());
 		else
 			server.castMsg(client_fd, server.makeMsg(RPL_TOPIC(client->getNickname(), ch->getName(), ch->getTopic())).c_str());
+		
+		if (ch->getMode().find(KEY_MODE) != ch->getMode().end())
+			ch->updateInviteList(client->getNickname());
 	}
 }

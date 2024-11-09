@@ -19,6 +19,10 @@ ERR_NOTONCHANNEL
 void Cmd::cmdPart() {
     std::vector<std::string> params = split(',');
 
+    for (size_t i = 0; i < params.size(); i++) {
+        std::cout << "params[" << i << "]: |" << params[i] << "|" << std::endl;
+    }
+    
     if (params.empty()){
         server.castMsg(this->client_fd, server.makeMsg(ERR_NEEDMOREPARAMS(client->getNickname(), cmd)));
         throw Cmd::CmdException(ERR_NEEDMOREPARAMS(client->getNickname(), cmd));
@@ -49,5 +53,8 @@ void Cmd::cmdPart() {
 
         // server.broadcastMsg(server.makeMsg(RPL_PART(client->getNickname(), chName)).c_str());
         ch->removeParticipant(client->getNickname());
+        
+        if (ch->getParticipant().empty())
+            server.removeChannel(chName);
     }
 }
