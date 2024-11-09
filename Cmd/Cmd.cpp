@@ -29,7 +29,7 @@ std::string Cmd::extractCmdParams() {
 	}
 }
 
-void	Cmd::authorizeClient() {
+void Cmd::authorizeClient() {
 	if (this->cmd == "CAP") {
 		cmdCap();
 	} else if (this->cmd == "PASS") {
@@ -39,46 +39,57 @@ void	Cmd::authorizeClient() {
 		cmdNick();
 		client->setNickStatus(true);
 	} else if (this->cmd == "USER") {
-		cmdUser(cmdParams, client_fd);
+		cmdUser();
 		client->setUserStatus(true);
 	}
-	if (client->getPassStatus() &&	\
-		client->getNickStatus() &&	\
-		client->getUserStatus()) {
+	if (client->getPassStatus() && client->getNickStatus() && client->getUserStatus()) {
 		client->setRegisteredStatus(true);
-		server.castMsg(client_fd, server.makeMsg(RPL_WELCOME(client->getUsername())).c_str());
+		// client->printLog();
+		/* RPL */
+		server.castMsg(client_fd, server.makeMsg(RPL_WELCOME(client->getNickname(), client->getServername())).c_str());
+		server.castMsg(client_fd, server.makeMsg(RPL_YOURHOST(client->getNickname(), client->getServername())).c_str());
+		server.castMsg(client_fd, server.makeMsg(RPL_CREATED(client->getNickname(), server.formatDateToString(server.getStartTime()))).c_str());
+		server.castMsg(client_fd, server.makeMsg(RPL_MYINFO(client->getNickname())).c_str());
+
+		/* MOTD */
+		server.castMsg(client_fd, server.makeMsg(RPL_MOTDSTART(client->getNickname())).c_str());
+		server.castMsg(client_fd, server.makeMsg(RPL_MOTD(client->getNickname())).c_str());
+		server.castMsg(client_fd, server.makeMsg(RPL_ENDOFMOTD(client->getNickname())).c_str());
+
 	}
 }
 
 bool Cmd::handleClientCmd() {
 	try {
+		// ScopedTimer("Cmd");
 		this->cmd = extractCmd();
 		this->cmdParams = extractCmdParams();
-		// std::cout << YELLOW << "cmd: " << this->cmd << C_RESET << std::endl;
-		// std::cout << YELLOW << "params: " << this->cmdParams << C_RESET << "\n" << std::endl;
+
 		if (!client->getRegisteredStatus()) {
 			authorizeClient();
 		} else {
 			if (this->cmd == "NICK") {
 				cmdNick();
 			} else if (this->cmd == "USER") {
-				cmdUser(cmdParams, client_fd);
+				cmdUser();
 			} else if (this->cmd == "PING") {
-				cmdPing();
+				cmdPong();
 			} else if (this->cmd == "JOIN") {
-				// cmdJoin(cmdParams, client_fd);
+				cmdJoin();
 			} else if (cmd == "PART") {
-				// cmdMode(client_fd, clientMsg);
+				cmdPart();
 			} else if (cmd == "PRIVMSG") {
-				// cmdPrivmsg(client_fd, clientMsg);
+				cmdPrivmsg();
 			} else if (cmd == "KICK") {
-				// cmdKick(client_fd, clientMsg);
+				cmdKick();
 			} else if (cmd == "INVITE") {
-				// cmdInvite(client_fd, clientMsg);
+				cmdInvite();
 			} else if (cmd == "MODE") {
-				// cmdPart(client_fd, clientMsg);
+				cmdMode();
 			} else if (cmd == "TOPIC") {
-				// cmdTopic(client_fd, clientMsg);
+				cmdTopic();
+			} else if (cmd == "QUIT") {
+				cmdQuit();
 			} else {
 				server.castMsg(client_fd, server.makeMsg(ERR_UNKNOWNCOMMAND(client->getNickname())).c_str());
 			}
@@ -86,7 +97,7 @@ bool Cmd::handleClientCmd() {
 	}
 	catch (const CmdException& e) {
 		if (!this->client->getPassStatus() || \
-			!this->client->getRegisteredStatus()) {
+			!this->client->getRegisteredStatus()) {	
 			server.castMsg(client_fd, e.what());
 			server.removeClient(client_fd);
 			return false;

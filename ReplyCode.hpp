@@ -1,17 +1,41 @@
 // 001: 서버에 연결됨
-#define RPL_WELCOME(nick) 						"001 " + nick + " :Welcome to the Internet Relay Network, " + nick + "!"
+#define RPL_WELCOME(nick, servername) 			":" + servername + " 001 " + nick + " :Welcome to the Internet Relay Network, " + nick + "!"
+
+// 002: 서버의 호스트 정보와 버전을 알림
+#define RPL_YOURHOST(nick, servername)          "002 " + nick + " :Your host is " + servername
+
+// 003: 서버 생성 시간을 알림
+#define RPL_CREATED(nick, time_msg)             "003 " + nick + " :This server was created " + time_msg
+
+// 004: 서버의 설정 및 버전 관련 정보를 알림
+#define RPL_MYINFO(nick)                        "004 " + nick + " :ft_irc, Simple IRC server for 42 cursus project"
+
+#define RPL_CHANNELMODEIS(ch, mode, params)     "324 " + ch + " " + mode + " " + params
 
 // 331: 해당 채널에 설정된 토픽이 없음
-#define RPL_NOTOPIC(nick, ch)					"331" + nick + " " + ch + " :No topic is set" 
+#define RPL_NOTOPIC(nick, ch)					"331 " + nick + " " + ch + " :No topic is set" 
 
 // 332: 해당 채널의 토픽을 반환
 #define RPL_TOPIC(nick, ch, topic)				"332" + nick + " " + ch + " :" + topic
+
+// 341: 해당 채널에 초대가 전송됨
+#define RPL_INVITING(nick, target, ch)			"341 " + nick + " " + ch + " " + target
 
 // 353: 해당 채널에 참여 중인 사용자 목록을 반환
 #define RPL_NAMREPLY(nick, symbol, ch, participants) "353 " + nick + " " + symbol + " " + ch + " :" + participants
 
 // 366: 해당 채널의 사용자 목록을 모두 반환했음
 #define RPL_ENDOFNAMES(nick, ch)				"366 " + nick + " " + ch + " :End of /NAMES list"
+
+// 375: MOTD 메세지의 시작을 알림
+#define RPL_MOTDSTART(nick)                     "375 " + nick + " :==========start of /MOTD command"
+
+// 372: MOTD 메세지의 본문
+#define RPL_MOTD(nick)                          "372 " + nick + " :========== Welcome to FT_IRC"
+
+// 376: MOTD 메세지의 끝을 알림
+#define RPL_ENDOFMOTD(nick)                     "376 " + nick + " :==========end of /MOTD command"
+
 // 401: 대상 닉네임을 가진 사용자가 존재하지 않음
 #define ERR_NOSUCHNICK(nick, target)			"401 " + nick + " " + target + " :No such nick/channel"
 
@@ -79,7 +103,7 @@
 #define ERR_NOTONCHANNEL(nick, ch) 				"442 " + nick + " " + ch + " :You're not on that channel"
 
 // 443: 사용자가 이미 해당 채널에 속해 있음
-#define ERR_nickONCHANNEL 						"443 " + nick + " "
+#define ERR_USERONCHANNEL(nick, ch) 						"443 " + nick + " " + ch + " :is already on channel"
 
 // 444: 사용자가 로그인하지 않음
 #define ERR_NOLOGIN 							"444 " + nick + " "
@@ -97,8 +121,8 @@
 #define ERR_NEEDMOREPARAMS(nick, cmd) 		"461 " + nick + " " + cmd + " :Not enough parameters"
 
 // 462: 클라이언트가 이미 등록된 상태에서 다시 등록 시도
-#define ERR_ALREADYREGISTERED 					"462 " + nick + " "
-
+#define ERR_ALREADYREGISTERED 					"462 :You may not reregister"
+                        
 // 463: 호스트에 대한 권한이 부족함
 #define ERR_NOPERMFORHOST 						"463 " + nick + " "
 
@@ -115,7 +139,7 @@
 #define ERR_CHANNELISFULL(nick, ch) 						"471 " + nick + " " + ch + " :Cannot join channel (+l)"
 
 // 472: 알 수 없는 모드를 사용함
-#define ERR_UNKNOWNMODE(user, command, channel) "472 " + user + " " + command + " " + channel + " :is unknown mode"
+#define ERR_UNKNOWNMODE(ch)                     "472 " + ch + " :is unknown mode char to me"
 
 // 473: 초대받은 사용자만 들어갈 수 있는 채널임
 #define ERR_INVITEONLYCHAN(nick, ch) 						"473 " + nick + " " + ch + " :Cannot join channel (+i)"
@@ -127,7 +151,7 @@
 #define ERR_BADCHANNELKEY(nick, ch) 						"475 " + nick + " " + ch + " :Cannot join channel (+k)"
 
 // 476: 잘못된 채널 이름 형식을 사용함
-#define ERR_BADCHANMASK 						"476 " + nick + " "
+#define ERR_BADCHANMASK(nick,ch) 						"476 " + nick + " " + ch + " :Invalid channel mask"
 
 // 477: 채널이 모드를 지원하지 않음
 #define ERR_NOCHANMODES 						"477 " + nick + " "
@@ -163,7 +187,20 @@
 /* 사용자 정의 */
 
 // 채널에 참여 완료시
-#define RPL_JOIN(nick, username, hostname, ch) nick + "!" + username + "@" + hostname + " JOIN :" + ch
+#define RPL_JOIN(servername, ch) ":" + servername + " JOIN :" + ch
+
+// 채널에서 강퇴 완료시
+#define RPL_KICK(nick, username, hostname, ch, target, comment) nick + "!" + username + "@" + hostname + " KICK " + ch + " " + target + " :" + comment
+
+// 채널에서 나가기 완료시
+#define RPL_PART(nick, ch) nick + " PART " + ch
+
+//채널 초대 완료시 초대 당한 사용자에게 보내는 메세지
+#define RPL_INVITE(nick, target, ch) ":" + nick + " INVITE " + target + " " + ch
 
 // 417: 메세지가 512자를 넘어가는 경우 (InspIRCd 기준)
 #define ERR_LINETOOLONG(nick)					"417 " + nick + " :Input Line too long"
+
+
+#define ERR_ERRUSERCMD "Error: "
+

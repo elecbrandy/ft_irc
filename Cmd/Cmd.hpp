@@ -4,9 +4,12 @@
 #include "../Server.hpp"
 #include "../Color.hpp"
 
-#define NICK_MAX_LEN 15
+#define NICK_MAX_LEN 20
+#define USERNAME_MAX_LEN 100
+#define REALNAME_MAX_LEN 100
 
 class IrcServer;
+class Client;
 
 class Cmd {
 private:
@@ -31,24 +34,31 @@ public:
 
 	/* Commands */
 	void		cmdCap();
-	void		cmdUser(std::string &cmdParams, int client_fd);
+	void		cmdUser();
 	void		cmdNick();
 	void		cmdPass();
-	void		cmdPing();
+	void		cmdPong();
 	void		cmdJoin();
 	void		cmdMode();
 	void		cmdTopic();
 	void		cmdPrivmsg();
+	void		cmdQuit();
+	void		cmdKick();
+	void		cmdPart();
+	void		cmdInvite();
 
 	/* Utils */
 	void checkNick(const std::string& str);
 	void checkPassword(const std::string& str);
+	void checkUsername(const std::string& str);
+	void checkRealname(const std::string& str);
 	// std::vector<std::string> joinSplit(std::string &msg);
 	bool isValidChannelName(std::vector<std::string> &channel);
 	bool isDupReceiver(std::vector<std::string> &receivers);
 	std::vector<std::string> topicSplit();
 	std::vector<std::string> joinSplit(std::string &cmdParams);
 	std::vector<std::string> privmsgSplit();
+	std::vector<std::string> split(char delim);
 
 	/* Setter & Getter */
 	std::string getCmdParams() const;
@@ -63,6 +73,7 @@ public:
 	void removeChannelOperator(std::string nickname, Channel* channel);
 	void removeChannelKey(Channel* channel);
 	void removeChannelUserLimit(Channel* channel);
+	void removeParticipant(std::string target);
 
 	void handleMinusFlagOption(std::vector<std::string> modeParse, std::map<std::string, Channel*>::iterator channel, int option_flag);
 	void handlePlusFlagOption(std::vector<std::string> modeParse, std::map<std::string, Channel*>::iterator channel, int option_flag);

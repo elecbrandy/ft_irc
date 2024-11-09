@@ -35,7 +35,7 @@
 #include "Channel.hpp"
 
 Channel::Channel(std::string name) :
-_name(name), _key(""), _topic(""), _mode() , _participant(), b_topic_mode(false), b_invite_mode(false) {}
+_name(name), _key(""), _topic(""), _mode() , _participant() {}
 
 Channel::~Channel() {}
 
@@ -48,7 +48,6 @@ void Channel::setMode(char mode) {_mode.insert(mode);}
 
 void Channel::setParticipant(std::string participantName, Client* client) {
     _participant.insert(std::make_pair(participantName, client));
-    _participantName += participantName + " ";
 }
 
 // void Channel::setOperator(std::string nick, Client* client) {_operator.insert(std::make_pair(nick, client));}
@@ -62,6 +61,11 @@ void Channel::addOperator(std::string nick, Client* client)
 	this->_operator[nick] = client;
 }
 
+void Channel::addInvited(std::string nickname)
+{
+	this->_invited.push_back(nickname);
+}
+
 void Channel::removeOperator(Client* client)
 {
 	this->_operator.erase(client->getNickname());
@@ -72,14 +76,23 @@ void Channel::removeKey()
 	this->_key = "";
 }
 
-void Channel::set_b_topic_mode(bool value)
+void Channel::removeMode(char mode)
 {
-	this->b_topic_mode = value;
+	this->_mode.erase(mode);
 }
 
-void Channel::set_b_invite_mode(bool value)
+const std::string Channel::isOperatorNickname(std::string nickname) const
 {
-	this->b_invite_mode = value;
+	if (isOperator(nickname) == true)
+		return "@" + nickname;
+	else
+		return nickname;
+}
+
+void Channel::removeParticipant(std::string target){
+	_participant.erase(target);
+	if (isOperator(target) == true)
+		_operator.erase(target);
 }
 
 /* getter */
@@ -89,29 +102,52 @@ std::string Channel::getKey() {return this->_key;}
 
 std::string Channel::getTopic() {return this->_topic;}
 
-std::set<char> Channel::getMode() {return this->_mode;}
+const std::set<char>& Channel::getMode() const {return this->_mode;}
 
 std::map<std::string, Client*>& Channel::getParticipant() {return this->_participant;}
 
-std::string Channel::getParticipantName() {return this->_participantName;}
+#include <iostream>
+std::string Channel::getParticipantNameStr() {
+    std::string names = "";
+    std::map<std::string, Client*>::iterator it = _participant.begin();
+    while (it != _participant.end()) {
+        // Client 객체에서 순수한 닉네임만 가져오기
+        std::string nickname = it->second->getNickname();
+        // 운영자(@) 표시가 필요한 경우 보존
+        if (it->first[0] == '@') {
+            names += '@';
+        }
+        names += nickname;
+        ++it;
+        if (it != _participant.end()) {
+            names += " ";
+        }
+    }
+    std::cout << "names: |" << names << "|" << std::endl;
+    return names;
+}
 
-bool Channel::isOperator(Client* client) const
+bool Channel::isOperator(std::string nickname) const
 {
-	if (this->_operator.find(client->getNickname()) == this->_operator.end())
+	if (this->_operator.find(nickname) == this->_operator.end())
 		return false;
 	else
 		return true;
 }
 
-bool Channel::get_b_topic_mode() const
+bool Channel::isParticipant(std::string nickname) const
 {
-	return (this->b_topic_mode);
+	if (this->_participant.find(nickname) == this->_participant.end())
+		return false;
+	else
+		return true;
 }
 
-bool Channel::get_b_invite_mode() const
-{
-	return (this->b_invite_mode);
+void Channel::updateInviteList(std::string nickname) {
+	if (std::find(_invited.begin(), _invited.end(), nickname) != _invited.end())
+		_invited.erase(std::remove(_invited.begin(), _invited.end(), nickname), _invited.end());
 }
+
 std::map<std::string, Client*> Channel::getOperator() {return this->_operator;}
 
 unsigned int Channel::getLimit() const {return this->_limit;} 
@@ -119,4 +155,3 @@ unsigned int Channel::getLimit() const {return this->_limit;}
 std::vector<std::string> Channel::getInvited() {return this->_invited;}
 
 std::vector<std::string> Channel::getBanned() {return this->_banned;}
-

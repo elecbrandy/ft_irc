@@ -1,39 +1,44 @@
 #include "Client.hpp"
 #include "Server.hpp"
 
-Client::Client():	_nickname(""), 
-					_username(""), 
-					_hostname(""), 
-					_realname(""), 
-					_password(""),
-					_servername(""),
-					_lastPongTime(time(NULL)) {
-					_registerStatus.pass = false;
-					_registerStatus.nick = false;
-					_registerStatus.user = false;
-					_registerStatus.registered = false;
+Client::Client(in_addr addr)
+:	_hostname(inet_ntoa(addr)), 
+	_lastActivityTime(time(NULL)) {
+	_registerStatus.pass = false;
+	_registerStatus.nick = false;
+	_registerStatus.user = false;
+	_registerStatus.registered = false;
 }
 
-Client:: ~Client() {}
+Client:: ~Client() {
+	close(this->_fd);
+}
 
 /* setter */
-void Client::setNickname(const std::string& str) {this->_nickname = str;}
+
+void Client::setFd(int fd) {this->_fd = fd;}
+
+void Client::setNickname(const std::string& str) {
+	//this->_nickname = str;
+	size_t spacePos = str.find(' ');
+    if (spacePos != std::string::npos) {
+        this->_nickname = str.substr(0, spacePos);
+    } else {
+        this->_nickname = str;
+    }
+}
 
 void Client::setUsername(const std::string& str) {this->_username = str;}
 
 void Client::setHostname(const std::string& str) {this->_hostname = str;}
 
-void Client::setRealname(const std::string& str) {
-	size_t pos = str.find(":");
-	if (pos != std::string::npos)
-		this->_realname = str.substr(pos + 1);
-}
+void Client::setRealname(const std::string& str) {this->_realname = str;}
 
 void Client::setPassword(const std::string str) {this->_password = str;}
 
-void Client::setServername(const std::string& str) {this->_servername = str;}
+void Client::setServername(const std::string& str) {this->_servername = str; std::cout << "servername: " << this->_servername << std::endl;}
 
-void Client::setLastPongTime() {this->_lastPongTime = time(NULL);}
+void Client::setlastActivityTime() {this->_lastActivityTime = time(NULL);}
 
 void Client::setPassStatus(bool status) {this->_registerStatus.pass = status;}
 
@@ -59,7 +64,7 @@ std::string	Client::getPassword() const {return this->_password;}
 
 std::string	Client::getServername() const {return this->_servername;}
 
-time_t	Client::getLastPongTime() const {return this->_lastPongTime;}
+time_t	Client::getLastActivityTime() const {return this->_lastActivityTime;}
 
 bool Client::getPassStatus() const {return this->_registerStatus.pass;}
 
@@ -70,15 +75,15 @@ bool Client::getUserStatus() const {return this->_registerStatus.user;}
 bool Client::getRegisteredStatus() const {return this->_registerStatus.registered;}
 
 /* other */
-void Client::appendToBuffer(const std::string& str) {
-	_msgBuf += str;
+void Client::appendToRecvBuffer(const std::string& str) {
+	this->_recvBuffer += str;
 }
 
 bool Client::extractMessage(std::string& message) {
-	size_t pos = _msgBuf.find("\r\n");
+	size_t pos = _recvBuffer.find("\r\n");
 	if (pos != std::string::npos) {
-		message = _msgBuf.substr(0, pos);
-		_msgBuf.erase(0, pos + 2);
+		message = _recvBuffer.substr(0, pos);
+		_recvBuffer.erase(0, pos + 2);
 		return true;
 	}
 	return false;
@@ -86,7 +91,38 @@ bool Client::extractMessage(std::string& message) {
 
 bool Client::isConnectionTimedOut(time_t timeout) {
 	time_t now = time(NULL);
-	if (now - this->_lastPongTime > timeout)
+	if (now - this->_lastActivityTime > timeout)
 		return true;
 	return false;
+}
+
+void Client::appendToSendBuffer(const std::string& data) {
+	this->_sendBuffer += data;
+}
+
+const std::string& Client::getSendBuffer() const {
+	return this->_sendBuffer;
+}
+
+void Client::clearSendBuffer(size_t count) {
+	this->_sendBuffer.erase(0, count);
+}
+
+bool Client::hasDataToSend() const {
+	if (this->_sendBuffer.empty()) {
+		return false;
+	}
+	return true;
+}
+
+void Client::printLog() {
+	std::cout << C_LOG << std::boolalpha
+	<< ">>>>> client log <<<<<\n"
+	<< "nickname: " << this->getNickname() << "\n"
+	<< "username: " << this->getUsername() << "\n"
+	<< "hostname: " << this->getHostname() << "\n"
+	<< "realname: " << this->getRealname() << "\n"
+	<< "servername: " << this->getServername() << "\n"
+	<< "registerStatus: " << this->getRegisteredStatus() << "\n"
+	<< C_RESET << std::endl;
 }

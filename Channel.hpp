@@ -22,9 +22,6 @@ class Channel {
 		std::set<char>			_mode; //채널 모드
 		std::map<std::string, Client*> 		_participant; //채널 참여자
 		std::map<std::string, Client*>		_operator; //채널 운영자  //set으로 하면 중복 안되고 자동 정렬이 유용함
-		std::string				_participantName; //참여자 이름
-		bool					b_topic_mode;
-		bool					b_invite_mode;
 
 		unsigned int						_limit; //채널 참여자 제한 수
 		std::vector<std::string> _invited; //초대된 사용자 목록
@@ -40,33 +37,35 @@ class Channel {
 		void addParticipantname(std::string participantName);
 		void removeOperator(Client* client);
 		void removeKey();
-		void set_b_topic_mode(bool value);
-		void set_b_invite_mode(bool value);
+		void removeMode(char mode);
 
-
+		const std::string isOperatorNickname(std::string nickanme) const;
 		void setParticipant(std::string participantName,Client* client);
-		// void setOperator(std::string operatorName, Client* client);
 		void setLimit(unsigned int limit);
 		void setInvited(std::string nickname);
 		void addOperator(std::string nick, Client* client);
 
-
 		void setBanned(std::string nickname);
+
+		void addInvited(std::string nickname);
 
 		std::string getName();
 		std::string getKey();
 		std::string getTopic();
-		std::set<char> getMode();
+		const std::set<char>& getMode() const;
 		std::map<std::string, Client*>& getParticipant();
 		std::map<std::string, Client*> getOperator();
-		std::string getParticipantName();
+		std::string getParticipantNameStr();
 
-		bool isOperator(Client* client) const;
-		bool get_b_topic_mode() const;
-		bool get_b_invite_mode() const;
+		bool isOperator(std::string nickname) const;
+		bool isParticipant(std::string nickname) const;
 		unsigned int getLimit() const;
 		std::vector<std::string> getInvited();
 		std::vector<std::string> getBanned();
+
+		void removeParticipant(std::string target);
+		void updateInviteList(std::string nickname);
 };
+
 
 #endif
