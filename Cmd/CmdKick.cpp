@@ -53,11 +53,11 @@ std::vector<std::string> Cmd::split(char delim) {
 void Cmd::cmdKick() {
 	std::vector<std::string> params = split(' ');
 
+	std::string servPrefix = PREFIX_SERVER(client->getServername());
+
 	// 파라미터 부족/과다 (최소 2개, 최대 3개)
-	if (params.size() < 2 || params.size() > 3) {
-		server.castMsg(this->client_fd, server.makeMsg(ERR_NEEDMOREPARAMS(client->getNickname(), cmd)));
-		throw Cmd::CmdException(ERR_NEEDMOREPARAMS(client->getNickname(), cmd));
-	}
+	if (params.size() < 2 || params.size() > 3)
+		throw Cmd::CmdException(server.makeMsg(servPrefix, ERR_NEEDMOREPARAMS(client->getNickname(), cmd)));
 
 	std::string chName = params[0];
 	std::string target = params[1];
@@ -70,34 +70,34 @@ void Cmd::cmdKick() {
 	if (params.size() == 3)
 		std::string comment = params[2];
 	
+
 	// 채널 이름의 형식이 잘못된 경우
-	if (chName[0] != '#') {
-		server.castMsg(this->client_fd, server.makeMsg(ERR_BADCHANMASK(client->getNickname(), chName)));
-		throw Cmd::CmdException(ERR_BADCHANMASK(client->getNickname(), chName));
-	}
+	if (chName[0] != '#') 
+		throw Cmd::CmdException(server.makeMsg(servPrefix, ERR_BADCHANMASK(client->getNickname(), chName)));
+
 	// 채널이 존재하지 않는 경우
-	if (server.getChannels().find(chName) == server.getChannels().end()) {
-		server.castMsg(this->client_fd, server.makeMsg(ERR_NOSUCHCHANNEL(client->getNickname(), chName)));
-		throw Cmd::CmdException(ERR_NOSUCHCHANNEL(client->getNickname(), chName));
-	}
+	if (server.getChannels().find(chName) == server.getChannels().end())
+		throw Cmd::CmdException(server.makeMsg(servPrefix, ERR_NOSUCHCHANNEL(client->getNickname(), chName)));
 
 	std::map<std::string, Channel*> chs = server.getChannels();
 	std::map<std::string, Channel*>::iterator it = chs.find(chName);
 	Channel* ch = it->second;
 
-	// 강퇴시킬 사용자가 채널의 참여자가 아닌 경우
-	if (ch->getParticipant().find(ch->isOperatorNickname(target)) == ch->getParticipant().end()) {
-		server.castMsg(this->client_fd, server.makeMsg(ERR_NOTONCHANNEL(client->getNickname(), chName)));
-		throw Cmd::CmdException(ERR_NOTONCHANNEL(client->getNickname(), chName));
-	}
+	// 명령어를 호출한 클라이언트가 채널에 참여한 클라이언트가 아닌 경우
+	if (ch->getParticipant().find(client->getNickname()) == ch->getParticipant().end())
+		throw Cmd::CmdException(server.makeMsg(servPrefix, ERR_NOTONCHANNEL(client->getNickname(), chName)));
 
 	// 채널 오퍼레이터 권한이 없는 경우
-	if (ch->isOperator(client->getNickname()) == false) {
-		server.castMsg(this->client_fd, server.makeMsg(ERR_CHANOPRIVSNEEDED(client->getNickname(), chName)).c_str());		
-		throw Cmd::CmdException(ERR_CHANOPRIVSNEEDED(client->getNickname(), chName));
-	}
+	if (ch->isOperator(client->getNickname()) == false)	
+		throw Cmd::CmdException(server.makeMsg(servPrefix, ERR_CHANOPRIVSNEEDED(client->getNickname(), chName)));
+
+	// 강퇴시킬 사용자가 채널의 참여자가 아닌 경우
+	if (ch->getParticipant().find(ch->isOperatorNickname(target)) == ch->getParticipant().end())
+		throw Cmd::CmdException(server.makeMsg(servPrefix, ERR_USERNOTINCHANNEL(client->getNickname(), target, chName)));
 	
-	// 강퇴 되었다고 채널의 모든 참여자(강퇴 대상자 포함)에게 알림 후 강퇴
-	server.broadcastMsg(server.makeMsg(RPL_KICK(client->getNickname(), client->getUsername(), client->getHostname(), chName, target, comment).c_str()), ch, -1);
+	// 강퇴 되었다고 채널의 모든 참여자(강퇴 대상자 포함)에게 알림 (-1: 강퇴자 포함 채널의 모든 참여자에게 알림)
+	server.broadcastMsg(server.makeMsg(client->getPrefix(), RPL_KICK(chName, target, comment)), ch, -1);
+	
+	// 알림 발송 됐으면 강퇴
 	ch->removeParticipant(target);
 }

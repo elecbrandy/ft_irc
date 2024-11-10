@@ -53,7 +53,7 @@ public:
 	void checkUsername(const std::string& str);
 	void checkRealname(const std::string& str);
 	// std::vector<std::string> joinSplit(std::string &msg);
-	bool isValidChannelName(std::vector<std::string> &channel);
+	bool isValidChannelName(const std::string &channel);
 	bool isDupReceiver(std::vector<std::string> &receivers);
 	std::vector<std::string> topicSplit();
 	std::vector<std::string> joinSplit(std::string &cmdParams);
@@ -81,12 +81,12 @@ public:
 
 	/* Exception */
 	class CmdException : public std::exception {
-	private:
-		std::string msg;
-	public:
-		CmdException(const std::string& str) : msg(str) {}
-		virtual ~CmdException() throw() {}
-		const char* what() const throw();
+		private:
+			std::string msg;
+		public:
+			CmdException(const std::string& str) : msg(str) {}
+			virtual ~CmdException() throw() {}
+			const char* what() const throw();
 	};
 };
 

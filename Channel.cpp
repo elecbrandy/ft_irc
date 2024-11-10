@@ -46,7 +46,7 @@ void Channel::setTopic(std::string topic) {_topic = topic;}
 
 void Channel::setMode(char mode) {_mode.insert(mode);}
 
-void Channel::setParticipant(std::string participantName, Client* client) {
+void Channel::addParticipant(std::string participantName, Client* client) {
     _participant.insert(std::make_pair(participantName, client));
 }
 
@@ -54,7 +54,7 @@ void Channel::setParticipant(std::string participantName, Client* client) {
 
 void Channel::setLimit(unsigned int limit) {_limit = limit;}
 
-void Channel::setInvited(std::string nickname) {_invited.push_back(nickname);}
+void Channel::addInvited(std::string nickname) {_invited.push_back(nickname);}
 
 void Channel::addOperator(std::string nick, Client* client)
 {
@@ -90,9 +90,9 @@ const std::string Channel::isOperatorNickname(std::string nickname) const
 }
 
 void Channel::removeParticipant(std::string target){
-	_participant.erase(target);
 	if (isOperator(target) == true)
 		_operator.erase(target);
+	_participant.erase(target);
 }
 
 /* getter */
@@ -143,9 +143,9 @@ bool Channel::isParticipant(std::string nickname) const
 		return true;
 }
 
-void Channel::updateInviteList(std::string nickname) {
-	if (std::find(_invited.begin(), _invited.end(), nickname) != _invited.end())
-		_invited.erase(std::remove(_invited.begin(), _invited.end(), nickname), _invited.end());
+void Channel::removeInvited(std::string nickname) {
+	// if (std::find(_invited.begin(), _invited.end(), nickname) != _invited.end())
+	_invited.erase(std::remove(_invited.begin(), _invited.end(), nickname), _invited.end());
 }
 
 std::map<std::string, Client*> Channel::getOperator() {return this->_operator;}

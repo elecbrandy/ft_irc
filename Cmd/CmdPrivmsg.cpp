@@ -40,34 +40,34 @@ InspIRCd에서는 혼합 수신자 PRIVMSG를 다음과 같이 처리:
 std::vector<std::string> Cmd::privmsgSplit() {
     std::vector<std::string> res;
     std::string paramCopy = cmdParams;
-    std::string currentPart;
+    std::string tmp;
 
     for (size_t i = 0; i < paramCopy.size(); ++i) {
         if (paramCopy[i] == ' ' || paramCopy[i] == ',') {
-            if (!currentPart.empty()) {
-                res.push_back(currentPart);
-                currentPart.clear();
+            if (!tmp.empty()) {
+                res.push_back(tmp);
+                tmp.clear();
             }
             continue; // 빈 문자열을 추가하지 않음
         } else if (paramCopy[i] == ':') {
-            if (!currentPart.empty()) {
-                res.push_back(currentPart);
-                currentPart.clear();
+            if (!tmp.empty()) {
+                res.push_back(tmp);
+                tmp.clear();
             }
             // ':'로 시작하는 메시지를 시작
-            currentPart += ':'; // ':'를 포함
+            tmp += ':'; // ':'를 포함
             // ':' 다음의 모든 내용을 추가
             for (++i; i < paramCopy.size(); ++i) {
-                currentPart += paramCopy[i];
+                tmp += paramCopy[i];
             }
             break; // 메시지 처리 후 루프 종료
         } else {
-            currentPart += paramCopy[i]; // 일반 문자열로 추가
+            tmp += paramCopy[i]; // 일반 문자열로 추가
         }
     }
 
-    if (!currentPart.empty())
-        res.push_back(currentPart);
+    if (!tmp.empty())
+        res.push_back(tmp);
 
     return res;
 }
@@ -85,14 +85,16 @@ bool Cmd::isDupReceiver(std::vector<std::string> &receivers) {
 }
 
 void Cmd::cmdPrivmsg() {
+	std::string servPrefix = PREFIX_SERVER(client->getServername());
 	std::vector<std::string> params = privmsgSplit();
-	for (size_t i = 0; i < params.size(); i++) {
-		std::cout << "params[" << i << "] : " << params[i] << std::endl;
-	}
+	// for (size_t i = 0; i < params.size(); i++) {
+	// 	std::cout << "params[" << i << "] : " << params[i] << std::endl;
+	// }
 
 	std::vector<std::string> receivers;
 	std::string msg;
 	bool chFlag = false;
+
 
 	for (size_t i = 0; i < params.size(); i++) {
 		if (params[i][0] != ':') {
@@ -103,74 +105,67 @@ void Cmd::cmdPrivmsg() {
 			else if (chFlag == false && params[i][0] != '#') // 사용자가 첫 수신자인 경우
 				receivers.push_back(params[i]);
 			else {
-				server.castMsg(client_fd, server.makeMsg(ERR_UNKNOWNCOMMAND(client->getNickname())).c_str());
-				server.castMsg(client_fd, server.makeMsg("Sending messages to both a channel and a regular user at the same time is not permitted.").c_str());
-				throw Cmd::CmdException(ERR_UNKNOWNCOMMAND(client->getNickname()));
+				server.castMsg(client_fd, server.makeMsg(servPrefix, "Sending messages to both a channel and a regular user at the same time is not permitted."));
+				throw Cmd::CmdException(server.makeMsg(servPrefix, ERR_UNKNOWNCOMMAND(client->getNickname(), cmd)));
 			}
 		} else
 			msg = params[i];
 	}
 
 	//케이스 1 : 수신자가 없는 경우
-	if (receivers.empty()) {
-		server.castMsg(client_fd, server.makeMsg(ERR_NORECIPIENT(client->getNickname(), "PRIVMSG")).c_str());
-		throw Cmd::CmdException(ERR_NORECIPIENT(client->getNickname(), "PRIVMSG")); // getcmd() 해서 객체에 저장해놓고 사용하기
-	}
+	if (receivers.empty())
+		throw Cmd::CmdException(server.makeMsg(servPrefix, ERR_NORECIPIENT(client->getNickname(), "PRIVMSG")));
 
 	//케이스 2 : 수신자가 5명을 초과하거나, 수신자가 중복되는 경우
-	if (receivers.size() > 5 || isDupReceiver(receivers) == true) {
+	if (isDupReceiver(receivers) == true) {
 		std::string receiverStr;
 		for (size_t i = 0; i < receivers.size(); i++) {
 			receiverStr = receiverStr + receivers[i] + ',';
 			if (i == receivers.size() - 1)
 				receiverStr += receivers[i];
 		}
-		server.castMsg(client_fd, server.makeMsg(ERR_TOOMANYTARGETS(client->getNickname(), receiverStr)).c_str());
-		throw Cmd::CmdException(ERR_TOOMANYTARGETS(client->getNickname(), receiverStr));
+		throw Cmd::CmdException(server.makeMsg(servPrefix, ERR_TOOMANYTARGETS(client->getNickname(), receiverStr)));
 	}
-	//케이스 3 : 메시지가 없거나 메세지의 형태가 잘못된 경우 -> 메세지 길이 재는 함수를 만들어야 하나...?
-	if (msg.empty() || msg[0] != ':') {
-		server.castMsg(client_fd, server.makeMsg(ERR_NOTEXTTOSEND(client->getNickname())).c_str());
-		throw Cmd::CmdException(ERR_NOTEXTTOSEND(client->getNickname()));
-	}
+
+	//케이스 3 : 메시지가 없거나 메세지의 형태가 잘못된 경우
+	if (msg.empty() || msg[0] != ':')
+		throw Cmd::CmdException(server.makeMsg(servPrefix, ERR_NOTEXTTOSEND(client->getNickname())));
+
 	//케이스 4 :
-	//	수신자 집단의 형태가 채널일 경우 -> 채널 존재 확인 -> 채널이 있으면, 채널에 참여하고 있는지 확인
+	//	수신자 집단의 형태가 채널일 경우 -> 채널 존재 확인 -> 채널에 참여하고 있는지 확인
 	//	수신자 집단의 형태가 사용자일 경우 -> 사용자가 존재하는지 확인
 	for (size_t i = 0; i < receivers.size(); i++) {
 		if (chFlag == true) { // 수신자집단이 채널인 경우
+			
 			std::map<std::string, Channel*> chs = server.getChannels();
 			std::map<std::string, Channel*>::iterator it = chs.find(receivers[i]);
 
-			if (it == server.getChannels().end()) {
-				server.castMsg(client_fd, server.makeMsg(ERR_NOSUCHNICK(client->getNickname(), receivers[i])).c_str());
-				throw Cmd::CmdException(ERR_NOSUCHNICK(client->getNickname(), receivers[i]));
-			}
+			//채널이 존재하는지 확인
+			if (it == server.getChannels().end())
+				throw Cmd::CmdException(server.makeMsg(servPrefix, ERR_NOSUCHNICK(client->getNickname(), receivers[i])));
+
+			//채널에 참여하고 있는지 확인
 			std::string nick = it->second->isOperatorNickname(client->getNickname());
-			if (it->second->getParticipant().find(nick) == it->second->getParticipant().end()) {
-				server.castMsg(client_fd, server.makeMsg(ERR_CANNOTSENDTOCHAN(client->getNickname(), receivers[i])).c_str());
-				throw Cmd::CmdException(ERR_CANNOTSENDTOCHAN(client->getNickname(), receivers[i]));
-			}
+			if (it->second->getParticipant().find(nick) == it->second->getParticipant().end())
+				throw Cmd::CmdException(server.makeMsg(servPrefix, ERR_CANNOTSENDTOCHAN(client->getNickname(), receivers[i])));
 		} else { // 수신자집단이 사용자인 경우
 			Client* receiver = server.getClient(receivers[i]);
-			if (receiver == NULL) {
-				server.castMsg(client_fd, server.makeMsg(ERR_NOSUCHNICK(client->getNickname(), receivers[i])).c_str());
-				throw Cmd::CmdException(ERR_NOSUCHNICK(client->getNickname(), receivers[i]));
-			}
+			if (receiver == NULL)
+				throw Cmd::CmdException(server.makeMsg(servPrefix, ERR_NOSUCHNICK(client->getNickname(), receivers[i])));
 		}
 	}
+
 	//모든 조건을 만족하면, 수신자 집단에 메세지를 전송
 	if (chFlag == true) {
 		for (size_t i = 0; i < receivers.size(); i++) {
-			std::string privmsg = ':' + client->getNickname() + ' ' + cmd + ' ' + receivers[i] + ' ' +  msg;
 			std::map<std::string, Channel*> chs = server.getChannels();
 			Channel* ch = chs.find(receivers[i])->second;
-			server.broadcastMsg(server.makeMsg(privmsg), ch, client_fd);
+			server.broadcastMsg(server.makeMsg(client->getPrefix(), RPL_PRIVMSG(ch->getName(), msg)), ch, client_fd);
 		}
 	} else {
 		for (size_t i = 0; i < receivers.size(); i++) {
-			std::string privmsg = ':' + client->getNickname() + ' ' + cmd + ' ' + receivers[i] + ' ' +  msg;
 			Client* receiver = server.getClient(receivers[i]);
-			server.castMsg(receiver->getFd(), server.makeMsg(privmsg));
+			server.castMsg(receiver->getFd(), server.makeMsg(client->getPrefix(), RPL_PRIVMSG(receiver->getNickname(), msg)));
 		}
 	}
 }

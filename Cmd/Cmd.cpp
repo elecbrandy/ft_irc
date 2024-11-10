@@ -91,7 +91,7 @@ bool Cmd::handleClientCmd() {
 			} else if (cmd == "QUIT") {
 				cmdQuit();
 			} else {
-				server.castMsg(client_fd, server.makeMsg(ERR_UNKNOWNCOMMAND(client->getNickname())).c_str());
+				return ;
 			}
 		}
 	}

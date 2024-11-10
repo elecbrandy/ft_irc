@@ -39,22 +39,13 @@
 // 401: 대상 닉네임을 가진 사용자가 존재하지 않음
 #define ERR_NOSUCHNICK(nick, target)			"401 " + nick + " " + target + " :No such nick/channel"
 
-// 402: 해당 서버를 찾을 수 없음
-#define ERR_NOSUCHSERVER						"402 " + nick + " "
-
 // 403: 해당 채널이 존재하지 않음
 #define ERR_NOSUCHCHANNEL(nick, ch) 			"403 " + nick + " " + ch + " :No such channel"
 
 // 404: 사용자가 채널에 메시지를 보낼 수 없음
 #define ERR_CANNOTSENDTOCHAN(nick, target) 		"404 " + nick + " " + target + " :Cannot send to channel"
 
-// 405: 사용자가 가입할 수 있는 채널 수를 초과함
-#define ERR_TOOMANYCHANNELS 					"405 " + nick + " "
-
-// 406: 해당 닉네임을 가진 사용자가 존재하지 않았음
-#define ERR_WASNOSUCHNICK 						"406 " + nick + " "
-
-// 407: 대상이 너무 많아서 명령을 처리할 수 없음
+// 407: 대상이 중복되어 메시지를 전달할 수 없음
 #define ERR_TOOMANYTARGETS(nick, target) 		"407 " + nick + " " + target + " :Duplicate recipients. No message delivered"
 
 // 409: 출처가 없거나 누락됨 (PING/PONG)
@@ -73,7 +64,7 @@
 // #define ERR_WILDTOPLEVEL 						"414 " + nick + " "
 
 // 421: 알 수 없는 명령을 보냄
-#define ERR_UNKNOWNCOMMAND(nick)  				"421 " + nick + " "
+#define ERR_UNKNOWNCOMMAND(nick, cmd)  			"421 " + nick + " " + cmd + " :Unknown command"
 
 // 422: 서버에 MOTD(메시지)가 설정되지 않음
 #define ERR_NOMOTD 								"422 " + nick + " "
@@ -85,7 +76,7 @@
 #define ERR_FILEERROR 							"424 " + nick + " "
 
 // 431: 닉네임이 주어지지 않음
-#define ERR_NONICKNAMEGIVEN(nick)				(std::string("431 ") + nick + " :No nickname given")
+#define ERR_NONICKNAMEGIVEN(nick)				"431 " + nick + " :No nickname given"
 
 // 432: 잘못된 형식의 닉네임 사용
 #define ERR_ERRONEUSNICKNAME(nick)				"432 " + nick + " :Erroneous nickname"
@@ -93,17 +84,17 @@
 // 433: 닉네임이 이미 사용 중임
 #define ERR_NICKNAMEINUSE(nick)					"433 " + nick + " :Nickname is already in use"
 
-// 436: 동일한 닉네임으로 다른 서버에서 충돌 발생
+// 436: 동일한 닉네임으로 충돌 발생
 #define ERR_NICKCOLLISION 						"436 " + nick + " "
 
 // 441: 사용자가 해당 채널에 있지 않음
-#define ERR_nickNOTINCHANNEL 					"441 " + nick + " "
+#define ERR_USERNOTINCHANNEL(nick, target, ch) 	"441 " + nick + " " + target + ch + " :They aren't on that channel"
 
 // 442: 사용자가 해당 채널에 속해 있지 않음
 #define ERR_NOTONCHANNEL(nick, ch) 				"442 " + nick + " " + ch + " :You're not on that channel"
 
 // 443: 사용자가 이미 해당 채널에 속해 있음
-#define ERR_USERONCHANNEL(nick, ch) 						"443 " + nick + " " + ch + " :is already on channel"
+#define ERR_USERONCHANNEL(nick, ch) 			"443 " + nick + " " + ch + " :is already on channel"
 
 // 444: 사용자가 로그인하지 않음
 #define ERR_NOLOGIN 							"444 " + nick + " "
@@ -111,14 +102,11 @@
 // 445: 서버에서 소환 기능이 비활성화됨
 #define ERR_SUMMONDISABLED 						"445 " + nick + " "
 
-// 446: 서버에서 nickS 명령이 비활성화됨
-#define ERR_nickSDISABLED 						"446 " + nick + " "
-
-// 451: 클라이언트가 등록되지 않음 (nick/NICK 명령을 사용하지 않음)
+// 451: 클라이언트가 등록되지 않음 (USER/NICK 명령을 사용하지 않음)
 #define ERR_NOTREGISTERED 						"451 " + nick + " "
 
 // 461: 명령에 필요한 파라미터가 부족함
-#define ERR_NEEDMOREPARAMS(nick, cmd) 		"461 " + nick + " " + cmd + " :Not enough parameters"
+#define ERR_NEEDMOREPARAMS(nick, cmd) 		    "461 " + nick + " " + cmd + " :Not enough parameters"
 
 // 462: 클라이언트가 이미 등록된 상태에서 다시 등록 시도
 #define ERR_ALREADYREGISTERED 					"462 :You may not reregister"
@@ -129,38 +117,26 @@
 // 464: 비밀번호가 틀림
 #define ERR_PASSWDMISMATCH 						"464 " + nick + " "
 
-// 465: 클라이언트가 서버에서 금지됨
-#define ERR_YOUREBANNEDCREEP 					"465 " + nick + " "
-
 // 467: 채널의 키가 이미 설정되어 있음
 #define ERR_KEYSET 								"467 " + nick + " "
 
 // 471: 채널이 가득 차서 더 이상 사용자가 들어올 수 없음
-#define ERR_CHANNELISFULL(nick, ch) 						"471 " + nick + " " + ch + " :Cannot join channel (+l)"
+#define ERR_CHANNELISFULL(nick, ch) 			"471 " + nick + " " + ch + " :Cannot join channel (+l)"
 
 // 472: 알 수 없는 모드를 사용함
 #define ERR_UNKNOWNMODE(ch)                     "472 " + ch + " :is unknown mode char to me"
 
 // 473: 초대받은 사용자만 들어갈 수 있는 채널임
-#define ERR_INVITEONLYCHAN(nick, ch) 						"473 " + nick + " " + ch + " :Cannot join channel (+i)"
+#define ERR_INVITEONLYCHAN(nick, ch) 			"473 " + nick + " " + ch + " :Cannot join channel (+i)"
 
 // 474: 사용자가 해당 채널에서 차단됨
-#define ERR_BANNEDFROMCHAN(nick, ch) 						"474 " + nick + " " + ch + " :Cannot join channel (+b)"
+#define ERR_BANNEDFROMCHAN(nick, ch) 			"474 " + nick + " " + ch + " :Cannot join channel (+b)"
 
 // 475: 잘못된 채널 키를 입력함
-#define ERR_BADCHANNELKEY(nick, ch) 						"475 " + nick + " " + ch + " :Cannot join channel (+k)"
+#define ERR_BADCHANNELKEY(nick, ch) 			"475 " + nick + " " + ch + " :Cannot join channel (+k)"
 
 // 476: 잘못된 채널 이름 형식을 사용함
-#define ERR_BADCHANMASK(nick,ch) 						"476 " + nick + " " + ch + " :Invalid channel mask"
-
-// 477: 채널이 모드를 지원하지 않음
-#define ERR_NOCHANMODES 						"477 " + nick + " "
-
-// 478: 채널의 금지 목록이 가득 참
-#define ERR_BANLISTFULL 						"478 " + nick + " "
-
-// 481: 사용자가 이 명령을 수행할 권한이 없음
-#define ERR_NOPRIVILEGES(user) 					"481 " + user + " :Permission Denied - You're not an operator"
+#define ERR_BADCHANMASK(nick,ch) 				"476 " + nick + " " + ch + " :Invalid channel mask"
 
 // 482: 채널 운영자 권한이 필요함
 #define ERR_CHANOPRIVSNEEDED(nick, ch) 			"482 " + nick + " " + ch + " :You're not channel operator"
@@ -170,12 +146,6 @@
 
 // 491: 해당 호스트에서 운영자 권한을 사용할 수 없음
 #define ERR_NOOPERHOST 							"491 " + nick + " "
-
-// 501: 알 수 없는 사용자 모드 플래그 사용
-#define ERR_UMODEUNKNOWNFLAG 					"501 " + nick + " "
-
-// 502: 사용자가 자신이 아닌 다른 사람의 모드를 변경하려 함
-#define ERR_nickSDONTMATCH 						"502 " + nick + " "
 
 /* Custom */
 
@@ -187,20 +157,21 @@
 /* 사용자 정의 */
 
 // 채널에 참여 완료시
-#define RPL_JOIN(servername, ch) ":" + servername + " JOIN :" + ch
+#define RPL_JOIN(ch)                            "JOIN " + ch
 
 // 채널에서 강퇴 완료시
-#define RPL_KICK(nick, username, hostname, ch, target, comment) nick + "!" + username + "@" + hostname + " KICK " + ch + " " + target + " :" + comment
+#define RPL_KICK(ch, target, comment)           "KICK " + ch + " " + target + " :" + comment
 
 // 채널에서 나가기 완료시
-#define RPL_PART(nick, ch) nick + " PART " + ch
+#define RPL_PART(ch)                            "PART " + ch
 
-//채널 초대 완료시 초대 당한 사용자에게 보내는 메세지
-#define RPL_INVITE(nick, target, ch) ":" + nick + " INVITE " + target + " " + ch
+// 채널 초대 완료시 초대 당한 사용자에게 보내는 메세지
+#define RPL_INVITE(target, ch)                  "INVITE " + target + " " + ch
+
+// PRIVMSG를 받는 클라이언트한테 보내는 메세지
+#define RPL_PRIVMSG(receiver, msg)              "PRIVMSG " + receiver + " :" + msg
 
 // 417: 메세지가 512자를 넘어가는 경우 (InspIRCd 기준)
 #define ERR_LINETOOLONG(nick)					"417 " + nick + " :Input Line too long"
 
-
 #define ERR_ERRUSERCMD "Error: "
-

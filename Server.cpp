@@ -308,10 +308,11 @@ const std::map<std::string, Channel*>& IrcServer::getChannels() const
 }
 
 void IrcServer::removeChannel(const std::string channelName) {
-	if (_channels.find(channelName) != _channels.end()) {
-		delete _channels[channelName];
-		_channels.erase(channelName);
-	}
+    std::map<std::string, Channel*>::iterator it = _channels.find(channelName);
+    if (it != _channels.end()) {
+        delete it->second;  // 채널 객체 먼저 할당 해제
+        _channels.erase(it);  // 채널 삭제 (참조 못하게 아예 채널 목록에서 삭제)
+    }
 }
 
 const std::map<std::string, Client*>& IrcServer::getNickNameClientMap() const

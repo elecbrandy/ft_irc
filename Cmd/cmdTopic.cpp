@@ -46,60 +46,42 @@ std::vector<std::string> Cmd::topicSplit() {
 
 void Cmd::cmdTopic() {
 	std::vector<std::string> params = topicSplit();
-	for (size_t i = 0; i < params.size(); i++) {
-		std::cout << "topic params[" << i << "] : " << params[i] << std::endl;
-	}
+	// for (size_t i = 0; i < params.size(); i++) {
+	// 	std::cout << "topic params[" << i << "] : " << params[i] << std::endl;
+	// }
 	std::string chName = params[0];
 	std::string topic = params[1];
+	std::string servPrefix = PREFIX_SERVER(client->getServername());
 
 	if (chName.empty())
-		server.castMsg(this->client_fd, server.makeMsg(ERR_NEEDMOREPARAMS(client->getNickname(), "TOPIC")));
-	
-	std::map<std::string, Channel *> channels = server.getChannels();
-	if (channels.find(chName) == channels.end()) {
-		throw Cmd::CmdException(ERR_NOSUCHCHANNEL(client->getNickname(), chName));
-		server.castMsg(this->client_fd, server.makeMsg(ERR_NOSUCHCHANNEL(client->getNickname(), chName)));
-	}
+		throw Cmd::CmdException(server.makeMsg(servPrefix, ERR_NEEDMOREPARAMS(client->getNickname(), "TOPIC")));
 
+	// 파라미터로 받은 채널명 형식이 잘못되었을 때
+	if (isValidChannelName(chName) == false)
+		throw Cmd::CmdException(server.makeMsg(servPrefix, ERR_BADCHANMASK(client->getNickname(), chName)));
+	
+	// 채널이 존재하지 않을 때
+	std::map<std::string, Channel *> channels = server.getChannels();
+	if (channels.find(chName) == channels.end())
+		throw Cmd::CmdException(server.makeMsg(servPrefix, ERR_NOSUCHCHANNEL(client->getNickname(), chName)));
+
+	// 채널에 참여한 클라이언트가 아닐 때
 	Channel *ch = channels[chName];
+	if (ch->getParticipant().find(client->getNickname()) == ch->getParticipant().end())
+		throw Cmd::CmdException(server.makeMsg(servPrefix, ERR_NOTONCHANNEL(client->getNickname(), chName)));
 
 	if (topic.empty()) { // 1: 토픽 파라미터가 없을 때
-
-		if (ch->getTopic().empty()) { // 1-1: 채널에 설정된 토픽이 없을 때
-			server.castMsg(this->client_fd, server.makeMsg(RPL_NOTOPIC(client->getNickname(), chName)));
-			throw Cmd::CmdException(RPL_NOTOPIC(client->getNickname(), chName));
-		}
-
-		if (ch->getParticipant().find(client->getNickname()) == ch->getParticipant().end()) { // 1-2: 채널에 참여한 클라이언트가 아닐 때
-			server.castMsg(this->client_fd, server.makeMsg(ERR_NOTONCHANNEL(client->getNickname(), chName)));
-			throw Cmd::CmdException(ERR_NOTONCHANNEL(client->getNickname(), chName));
-		}
-
-		server.broadcastMsg(server.makeMsg(RPL_TOPIC(client->getNickname(), chName, ch->getTopic())), ch, -1);
+		// 채널에 설정된 토픽이 없을 때
+		if (ch->getTopic().empty())
+			throw Cmd::CmdException(server.makeMsg(servPrefix, RPL_NOTOPIC(client->getNickname(), chName)));
+		// 토픽이 설정되어 있으면 토픽을 송출해준다.
+		server.castMsg(client_fd, server.makeMsg(servPrefix, RPL_TOPIC(client->getNickname(), chName, ch->getTopic())));
 	} else { // 2: 토픽 파라미터가 있을 때
-		if (ch->getParticipant().find(client->getNickname()) == ch->getParticipant().end()) { // 2-1: 채널에 참여한 클라이언트가 아닐 때
-			server.castMsg(this->client_fd, server.makeMsg(ERR_NOTONCHANNEL(client->getNickname(), chName)));
-			throw Cmd::CmdException(ERR_NOTONCHANNEL(client->getNickname(), chName));
-		}
-
-		bool tFlag = false; // 토픽 모드인지 확인하기 위한 플래그
-		if (ch->getMode().find(TOPIC_MODE) != ch->getMode().end())
-			tFlag = true;
-
-		if (tFlag == true) { // 2-1: topic모드일 때
-			{
-				if (ch->getOperator().find(client->getNickname()) == ch->getOperator().end()) {
-					// 2-1-1: topic모드인데 채널에 참여한 클라이언트가 operator가 아닐 때
-					server.castMsg(this->client_fd, server.makeMsg(ERR_CHANOPRIVSNEEDED(client->getNickname(), chName)));
-					throw Cmd::CmdException(ERR_CHANOPRIVSNEEDED(client->getNickname(), chName));
-				}
-				ch->setTopic(topic);
-				server.broadcastMsg(server.makeMsg(RPL_TOPIC(client->getNickname(), chName, ch->getTopic())), ch, -1);
-			}
-		} else { // 2-2: topic모드가 아닐 때 (일반 참여자도 토픽 변경 가능)
-			ch->setTopic(topic);
-			server.broadcastMsg(server.makeMsg(RPL_TOPIC(client->getNickname(), chName, ch->getTopic())), ch, -1);
-		}
-
+		// topic모드일 때 (오퍼레이터만 토픽 변경 가능)
+		if (ch->getMode().find(TOPIC_MODE) != ch->getMode().end() && ch->isOperator(client->getNickname()) == false)
+			throw Cmd::CmdException(server.makeMsg(servPrefix, ERR_CHANOPRIVSNEEDED(client->getNickname(),chName)));
+		// 토픽 변경, 채널 내 모든 클라이언트에게 토픽 변경을 알림
+		ch->setTopic(topic);
+		server.broadcastMsg(server.makeMsg(servPrefix, RPL_TOPIC(client->getNickname(), chName, ch->getTopic())), ch, -1);
 	}
 }
