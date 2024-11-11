@@ -32,7 +32,7 @@
 #define PASSWORD_MAX_LEN 10
 
 #define PATH_GOAT "./etc/goat.txt"
-#define PATH_MOTD "./etc/goat.motd"
+#define PATH_MOTD "./etc/motd.txt"
 #define SERVER_NAME "ircserv"
 
 #define CRLF "\r\n"

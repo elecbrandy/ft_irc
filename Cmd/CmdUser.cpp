@@ -142,4 +142,9 @@ void Cmd::cmdUser() {
 		++count;
 	}
 	client->setPrefix();
+	
+	// if (client->getPassStatus() && client->getNickStatus() && client->getUserStatus()) {
+	// 	client->setRegisteredStatus(true);
+	// 	printWelcome();
+	// }
 }

@@ -32,7 +32,7 @@ IrcServer::~IrcServer() {
 	/* Another Clean up */
 	nickNameClientMap.clear();
 
-	std::cout << LOG_SERVER_SHUTDOWN << std::endl;
+	// std::cout << LOG_SERVER_SHUTDOWN << std::endl;
 }
 
 /* getter */

@@ -63,6 +63,7 @@ public:
 	std::vector<std::string> joinSplit(std::string &cmdParams);
 	std::vector<std::string> privmsgSplit();
 	std::vector<std::string> split(char delim);
+	void printWelcome();
 
 	/* Setter & Getter */
 	std::string getCmdParams() const;

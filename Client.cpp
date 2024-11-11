@@ -19,7 +19,6 @@ Client:: ~Client() {
 void Client::setFd(int fd) {this->_fd = fd;}
 
 void Client::setNickname(const std::string& str) {
-	//this->_nickname = str;
 	size_t spacePos = str.find(' ');
     if (spacePos != std::string::npos) {
         this->_nickname = str.substr(0, spacePos);
@@ -33,8 +32,6 @@ void Client::setUsername(const std::string& str) {this->_username = str;}
 void Client::setHostname(const std::string& str) {this->_hostname = str;}
 
 void Client::setRealname(const std::string& str) {this->_realname = str;}
-
-void Client::setPassword(const std::string str) {this->_password = str;}
 
 void Client::setServername(const std::string& str) {this->_servername = str; std::cout << "servername: " << this->_servername << std::endl;}
 
@@ -59,8 +56,6 @@ std::string	Client::getUsername() const {return this->_username;}
 std::string	Client::getHostname() const {return this->_hostname;}
 
 std::string	Client::getRealname() const {return this->_realname;}
-
-std::string	Client::getPassword() const {return this->_password;}
 
 std::string	Client::getServername() const {return this->_servername;}
 

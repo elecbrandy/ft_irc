@@ -36,7 +36,7 @@ class Client {
 		void		setUsername(const std::string& str);
 		void		setHostname(const std::string& str);
 		void		setRealname(const std::string& str);
-		void		setPassword(const std::string str);
+		// void		setPassword(const std::string str);
 		void		setServername(const std::string& str);
 		void 		setlastActivityTime();
 		void		setIsRegistered(bool flag);

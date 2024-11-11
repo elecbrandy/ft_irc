@@ -28,13 +28,13 @@
 #define RPL_ENDOFNAMES(nick, ch)				"366 " + nick + " " + ch + " :End of /NAMES list"
 
 // 375: MOTD 메세지의 시작을 알림
-#define RPL_MOTDSTART(nick)                     "375 " + nick + " :==========start of /MOTD command"
+#define RPL_MOTDSTART(nick)                     "375 " + nick + " :start of MOTD command"
 
 // 372: MOTD 메세지의 본문
-#define RPL_MOTD(nick)                          "372 " + nick + " :========== Welcome to FT_IRC"
+#define RPL_MOTD(nick, msg)                          "372 " + nick + " :" + msg
 
 // 376: MOTD 메세지의 끝을 알림
-#define RPL_ENDOFMOTD(nick)                     "376 " + nick + " :==========end of /MOTD command"
+#define RPL_ENDOFMOTD(nick)                     "376 " + nick + " :end of MOTD command"
 
 // 401: 대상 닉네임을 가진 사용자가 존재하지 않음
 #define ERR_NOSUCHNICK(nick, target)			"401 " + nick + " " + target + " :No such nick/channel"
