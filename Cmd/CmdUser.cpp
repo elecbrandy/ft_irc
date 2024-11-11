@@ -79,15 +79,14 @@ void Cmd::checkRealname(const std::string& str) {
 }
 
 void Cmd::cmdUser() {
-	/* Register check */
-	if (this->client->getRegisteredStatus()) {
-		throw CmdException(ERR_ALREADYREGISTERED);
-	}
+	std::string servPrefix = PREFIX_SERVER(server.getName());
+	/* Register check : NOT REGISTERED */
+	if (client->getPassStatus() == false || client->getNickStatus() == false)
+		throw CmdException(server.makeMsg(servPrefix, ERR_NOTREGISTERED(client->getNickname())));
 
-	/* Pass check */
-	if (!this->client->getPassStatus()) {
-		throw CmdException(ERR_NEEDMOREPARAMS(client->getNickname(), "PASS"));
-	}
+	/* Register check : ALREADY REGISTRED */
+	if (client->getUserStatus() == true && client->getRegisteredStatus() == true)
+		throw CmdException(server.makeMsg(servPrefix, ERR_ALREADYREGISTRED(client->getNickname())));
 
 	std::stringstream ssArg(cmdParams);
 	std::string token;
@@ -143,4 +142,5 @@ void Cmd::cmdUser() {
 		++count;
 	}
 	client->setPrefix();
+	client->setUserStatus(true);
 }

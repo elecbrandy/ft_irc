@@ -29,35 +29,23 @@ std::string Cmd::extractCmdParams() {
 	}
 }
 
-void Cmd::authorizeClient() {
-	if (this->cmd == "CAP") {
-		cmdCap();
-	} else if (this->cmd == "PASS") {
-		cmdPass();
-		client->setPassStatus(true);
-	} else if (this->cmd == "NICK") {
-		cmdNick();
-		client->setNickStatus(true);
-	} else if (this->cmd == "USER") {
-		cmdUser();
-		client->setUserStatus(true);
-	}
-	if (client->getPassStatus() && client->getNickStatus() && client->getUserStatus()) {
-		client->setRegisteredStatus(true);
+// void Cmd::authorizeClient() {
+// 	if (client->getPassStatus() && client->getNickStatus() && client->getUserStatus()) {
+// 		client->setRegisteredStatus(true);
 
-		/* RPL */
-		server.castMsg(client_fd, server.makeMsg(RPL_WELCOME(client->getNickname(), client->getServername())));
-		server.castMsg(client_fd, server.makeMsg(RPL_YOURHOST(client->getNickname(), client->getServername())).c_str());
-		server.castMsg(client_fd, server.makeMsg(RPL_CREATED(client->getNickname(), server.formatDateToString(server.getStartTime()))).c_str());
-		server.castMsg(client_fd, server.makeMsg(RPL_MYINFO(client->getNickname())).c_str());
+// 		/* RPL */
+// 		server.castMsg(client_fd, server.makeMsg(RPL_WELCOME(client->getNickname(), client->getServername())));
+// 		server.castMsg(client_fd, server.makeMsg(RPL_YOURHOST(client->getNickname(), client->getServername())).c_str());
+// 		server.castMsg(client_fd, server.makeMsg(RPL_CREATED(client->getNickname(), server.formatDateToString(server.getStartTime()))).c_str());
+// 		server.castMsg(client_fd, server.makeMsg(RPL_MYINFO(client->getNickname())).c_str());
 
-		/* MOTD */
-		server.castMsg(client_fd, server.makeMsg(RPL_MOTDSTART(client->getNickname())).c_str());
-		server.castMsg(client_fd, server.makeMsg(RPL_MOTD(client->getNickname())).c_str());
-		server.castMsg(client_fd, server.makeMsg(RPL_ENDOFMOTD(client->getNickname())).c_str());
+// 		/* MOTD */
+// 		server.castMsg(client_fd, server.makeMsg(RPL_MOTDSTART(client->getNickname())).c_str());
+// 		server.castMsg(client_fd, server.makeMsg(RPL_MOTD(client->getNickname())).c_str());
+// 		server.castMsg(client_fd, server.makeMsg(RPL_ENDOFMOTD(client->getNickname())).c_str());
 
-	}
-}
+// 	}
+// }
 
 bool Cmd::handleClientCmd() {
 	try {
@@ -65,37 +53,33 @@ bool Cmd::handleClientCmd() {
 		this->cmd = extractCmd();
 		this->cmdParams = extractCmdParams();
 
-		if (!client->getRegisteredStatus()) {
-			authorizeClient();
-		} else {
-			if (this->cmd == "NICK") {
-				cmdNick();
-			} else if (this->cmd == "USER") {
-				cmdUser();
-			} else if (this->cmd == "PING") {
-				cmdPong();
-			} else if (this->cmd == "JOIN") {
-				cmdJoin();
-			} else if (cmd == "PART") {
-				cmdPart();
-			} else if (cmd == "PRIVMSG") {
-				cmdPrivmsg();
-			} else if (cmd == "KICK") {
-				cmdKick();
-			} else if (cmd == "INVITE") {
-				cmdInvite();
-			} else if (cmd == "MODE") {
-				cmdMode();
-			} else if (cmd == "TOPIC") {
-				cmdTopic();
-			} else if (cmd == "QUIT") {
-				cmdQuit();
-			} else {
-				return ;
-			}
-		}
-	}
-	catch (const CmdException& e) {
+		if (cmd == "NICK")
+			cmdNick();
+		else if (cmd == "PASS")
+			cmdPass();
+		else if (cmd == "USER")
+			cmdUser();
+		else if (cmd == "PING")
+			cmdPong();
+		else if (cmd == "JOIN")
+			cmdJoin();
+		else if (cmd == "PART")
+			cmdPart();
+		else if (cmd == "PRIVMSG")
+			cmdPrivmsg();
+		else if (cmd == "KICK")
+			cmdKick();
+		else if (cmd == "INVITE")
+			cmdInvite();
+		else if (cmd == "MODE")
+			cmdMode();
+		else if (cmd == "TOPIC")
+			cmdTopic();
+		else if (cmd == "QUIT")
+			cmdQuit();
+		else
+			return ;
+	} catch (const CmdException& e) {
 		if (!this->client->getPassStatus() || \
 			!this->client->getRegisteredStatus()) {	
 			server.castMsg(client_fd, e.what());
@@ -107,8 +91,5 @@ bool Cmd::handleClientCmd() {
 	return true;
 }
 
-const char* Cmd::CmdException::what() const throw() {
-	return msg.c_str();
-}
-
+const char* Cmd::CmdException::what() const throw() {return msg.c_str();}
 std::string Cmd::getCmdParams() const {return this->cmdParams;}

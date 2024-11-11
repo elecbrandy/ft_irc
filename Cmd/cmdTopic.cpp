@@ -45,13 +45,17 @@ std::vector<std::string> Cmd::topicSplit() {
 }
 
 void Cmd::cmdTopic() {
+	std::string servPrefix = PREFIX_SERVER(client->getServername());
+	// 명령어를 보낸 클라이언트가 register 되지 않은 경우
+    if (client->getRegisteredStatus() == false)
+        throw Cmd::CmdException(server.makeMsg(servPrefix, ERR_NOTREGISTERED(client->getNickname())));
+
 	std::vector<std::string> params = topicSplit();
+	std::string chName = params[0];
+	std::string topic = params[1];
 	// for (size_t i = 0; i < params.size(); i++) {
 	// 	std::cout << "topic params[" << i << "] : " << params[i] << std::endl;
 	// }
-	std::string chName = params[0];
-	std::string topic = params[1];
-	std::string servPrefix = PREFIX_SERVER(client->getServername());
 
 	if (chName.empty())
 		throw Cmd::CmdException(server.makeMsg(servPrefix, ERR_NEEDMOREPARAMS(client->getNickname(), "TOPIC")));

@@ -51,9 +51,12 @@ std::vector<std::string> Cmd::split(char delim) {
 
 
 void Cmd::cmdKick() {
-	std::vector<std::string> params = split(' ');
-
 	std::string servPrefix = PREFIX_SERVER(client->getServername());
+	// 명령어를 보낸 클라이언트가 register 되지 않은 경우
+    if (client->getRegisteredStatus() == false)
+        throw Cmd::CmdException(server.makeMsg(servPrefix, ERR_NOTREGISTERED(client->getNickname())));
+		
+	std::vector<std::string> params = split(' ');
 
 	// 파라미터 부족/과다 (최소 2개, 최대 3개)
 	if (params.size() < 2 || params.size() > 3)

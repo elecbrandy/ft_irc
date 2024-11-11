@@ -34,8 +34,6 @@ void Client::setHostname(const std::string& str) {this->_hostname = str;}
 
 void Client::setRealname(const std::string& str) {this->_realname = str;}
 
-void Client::setPassword(const std::string str) {this->_password = str;}
-
 void Client::setServername(const std::string& str) {this->_servername = str; std::cout << "servername: " << this->_servername << std::endl;}
 
 void Client::setlastActivityTime() {this->_lastActivityTime = time(NULL);}
@@ -59,8 +57,6 @@ std::string	Client::getUsername() const {return this->_username;}
 std::string	Client::getHostname() const {return this->_hostname;}
 
 std::string	Client::getRealname() const {return this->_realname;}
-
-std::string	Client::getPassword() const {return this->_password;}
 
 std::string	Client::getServername() const {return this->_servername;}
 
@@ -117,9 +113,7 @@ bool Client::hasDataToSend() const {
 	return true;
 }
 
-void Client::setPrefix() {
-	this->_prefix = PREFIX_USER(this->getNickname(), this->getUsername(), this->getHostname());
-}
+void Client::setPrefix() {_prefix = PREFIX_USER(_nickname, _username, _hostname);}
 
 void Client::printLog() {
 	std::cout << C_LOG << std::boolalpha

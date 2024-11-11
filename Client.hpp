@@ -20,7 +20,6 @@ class Client {
 		std::string	_username;
 		std::string	_hostname;
 		std::string	_realname;
-		std::string _password;
 		std::string _servername;
 		time_t		_lastActivityTime;
 		t_regitser	_registerStatus;

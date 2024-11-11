@@ -103,19 +103,19 @@
 #define ERR_SUMMONDISABLED 						"445 " + nick + " "
 
 // 451: 클라이언트가 등록되지 않음 (USER/NICK 명령을 사용하지 않음)
-#define ERR_NOTREGISTERED 						"451 " + nick + " "
+#define ERR_NOTREGISTERED(nick) 				"451 " + nick + " :You have not registered"
 
 // 461: 명령에 필요한 파라미터가 부족함
 #define ERR_NEEDMOREPARAMS(nick, cmd) 		    "461 " + nick + " " + cmd + " :Not enough parameters"
 
 // 462: 클라이언트가 이미 등록된 상태에서 다시 등록 시도
-#define ERR_ALREADYREGISTERED 					"462 :You may not reregister"
+#define ERR_ALREADYREGISTRED(nick) 				"462 " + nick + " :You may not reregister"
                         
 // 463: 호스트에 대한 권한이 부족함
 #define ERR_NOPERMFORHOST 						"463 " + nick + " "
 
 // 464: 비밀번호가 틀림
-#define ERR_PASSWDMISMATCH 						"464 " + nick + " "
+#define ERR_PASSWDMISMATCH(nick) 						"464 " + nick + " :Password incorrect"
 
 // 467: 채널의 키가 이미 설정되어 있음
 #define ERR_KEYSET 								"467 " + nick + " "
@@ -138,6 +138,7 @@
 // 476: 잘못된 채널 이름 형식을 사용함
 #define ERR_BADCHANMASK(nick,ch) 				"476 " + nick + " " + ch + " :Invalid channel mask"
 
+
 // 482: 채널 운영자 권한이 필요함
 #define ERR_CHANOPRIVSNEEDED(nick, ch) 			"482 " + nick + " " + ch + " :You're not channel operator"
 
@@ -147,6 +148,12 @@
 // 491: 해당 호스트에서 운영자 권한을 사용할 수 없음
 #define ERR_NOOPERHOST 							"491 " + nick + " "
 
+// 501: 알 수 없는 사용자 모드 플래그 사용
+#define ERR_UMODEUNKNOWNFLAG 					"501 " + nick + " "
+
+// 502: 사용자가 자신이 아닌 다른 사람의 모드를 변경하려 함
+#define ERR_nickSDONTMATCH 						"502 " + nick + " "
+
 /* Custom */
 
 // PASS 시 Password 오류
@@ -155,6 +162,9 @@
 #define ERR_INVALIDPARAM                        "Error: invalid parameter"
 
 /* 사용자 정의 */
+
+// 닉네임 변경 완료시
+#define RPL_NICK( newNick)                 "NICK " + newNick
 
 // 채널에 참여 완료시
 #define RPL_JOIN(ch)                            "JOIN " + ch
@@ -172,6 +182,6 @@
 #define RPL_PRIVMSG(receiver, msg)              "PRIVMSG " + receiver + " :" + msg
 
 // 417: 메세지가 512자를 넘어가는 경우 (InspIRCd 기준)
-#define ERR_LINETOOLONG(nick)					"417 " + nick + " :Input Line too long"
+// #define ERR_LINETOOLONG(nick)					"417 " + nick + " :Input Line too long"
 
 #define ERR_ERRUSERCMD "Error: "

@@ -9,36 +9,23 @@
 	Numeric 응답 코드
 	ERR_NEEDMOREPARAMS: 비밀번호가 제공되지 않았을 때 발생
 	ERR_ALREADYREGISTRED: 이미 서버에 등록된 상태에서 PASS 명령어를 다시 보낼 때 발생
-	ERR_PASS_PASSWORD: 첫 PASS 시도에서 비번이 틀렸을 경우 응답코드는 rfc 상 딱히 없음.
-	그래서 그냥 이걸로 해보면 어떨까?라는 생각
+	ERR_PASSWDMISMATCH: 첫 PASS 시도에서 비번이 틀렸을 경우.
 */
 
-void Cmd::checkPassword(const std::string& str) {
-	/* EMPTY check */
-	if (str.empty()) {
-		throw CmdException(ERR_NEEDMOREPARAMS(client->getNickname(), "PASS"));
-	}
-
-	/* SIZE check */
-	if (str.size() >= PASSWORD_MAX_LEN) {
-		throw CmdException(ERR_PASS_PASSWORD);
-	}
-
-	/* ALNUM check */
-	for (std::string::const_iterator it = str.begin(); it != str.end(); ++it) {
-		if (!std::isalnum(static_cast<unsigned char>(*it))) {
-			throw CmdException(ERR_PASS_PASSWORD);
-		}
-	}
-
-	if (this->cmdParams == server.getPassword()) {
-		client->setPassStatus(true);
-	} else {
-		throw CmdException(ERR_PASS_PASSWORD);
-	}
-}
-
 void Cmd::cmdPass() {
-	checkPassword(this->cmdParams);
-	client->setPassword(this->cmdParams);
+	std::string servPrefix = PREFIX_SERVER(client->getServername());
+
+	// 비밀번호 파라미터가 없는 경우
+	if (cmdParams.empty())
+		throw CmdException(server.makeMsg(servPrefix, ERR_NEEDMOREPARAMS(client->getNickname(), "PASS")));
+
+	// 이미 등록된 상태에서 PASS 명령어를 다시 보낸 경우
+	if (client->getPassStatus())
+		throw CmdException(server.makeMsg(servPrefix, ERR_ALREADYREGISTRED(client->getNickname())));
+
+	// 비밀번호가 틀린 경우
+	if (this->cmdParams != server.getPassword())
+		throw CmdException(server.makeMsg(servPrefix, ERR_PASSWDMISMATCH(client->getNickname())));
+	
+	client->setPassStatus(true);
 }

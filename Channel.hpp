@@ -25,7 +25,7 @@ class Channel {
 
 		unsigned int						_limit; //채널 참여자 제한 수
 		std::vector<std::string> _invited; //초대된 사용자 목록
-		std::vector<std::string> _banned; //차단된 사용자 목록
+
 	public:
 		Channel(std::string name);
 		~Channel();

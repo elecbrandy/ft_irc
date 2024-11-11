@@ -93,6 +93,10 @@ public:
 	void handleSocketWrite(int client_fd);
 	void removeClinetFromServer(Client* client);
 
+	void updateClients(Client* client);
+
+	void updateNickNameClientMap(const std::string& oldNick, const std::string& newNick, Client* client);
+
 	/* exception */
 	class ServerException : public std::exception {
 	private:

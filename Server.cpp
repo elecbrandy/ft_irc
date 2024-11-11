@@ -332,7 +332,7 @@ void IrcServer::setChannels(const std::string& channelName, const std::string& k
 	if (mode != '\0')
 		_channels[channelName]->setMode(mode);
 }
-																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																									
+
 void IrcServer::checkConnections() {
 	// ScopedTimer("checkConnections");
 	std::map<int, Client*>::iterator it = _clients.begin();
@@ -396,4 +396,14 @@ const char* IrcServer::ServerException::what() const throw() {
 
 std::string IrcServer::makeMsg(const std::string& prefix, const std::string& msg) {
 	return (prefix + " " + msg + CRLF);
+}
+
+void IrcServer::updateClients(Client* client) {
+	_clients.erase(client->getFd());
+	_clients[client->getFd()] = client;
+}
+
+void IrcServer::updateNickNameClientMap(const std::string& oldNick, const std::string& newNick, Client* client) {
+	nickNameClientMap.erase(oldNick);
+	nickNameClientMap[newNick] = client;
 }

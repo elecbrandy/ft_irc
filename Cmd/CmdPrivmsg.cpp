@@ -86,6 +86,10 @@ bool Cmd::isDupReceiver(std::vector<std::string> &receivers) {
 
 void Cmd::cmdPrivmsg() {
 	std::string servPrefix = PREFIX_SERVER(client->getServername());
+	// 명령어를 보낸 클라이언트가 register 되지 않은 경우
+    if (client->getRegisteredStatus() == false)
+        throw Cmd::CmdException(server.makeMsg(servPrefix, ERR_NOTREGISTERED(client->getNickname())));
+		
 	std::vector<std::string> params = privmsgSplit();
 	// for (size_t i = 0; i < params.size(); i++) {
 	// 	std::cout << "params[" << i << "] : " << params[i] << std::endl;
