@@ -4,9 +4,36 @@
 IrcServer::IrcServer() {}
 
 IrcServer::IrcServer(int port, const std::string& password)
-: _servername(SERVER_NAME), port(port), password(password) {}
+:	_servername(SERVER_NAME),
+	port(port),
+	password(password),
+	_startTime(time(NULL)) {}
 
-IrcServer::~IrcServer() {}
+IrcServer::~IrcServer() {
+	/* Close server socket */
+	if (_fd != -1) {
+		close(_fd);
+	}
+
+	/* Close & Delete Client resource */
+	for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
+
+		if (it->first != -1) {
+			close(it->first);
+		}
+
+		delete it->second;
+	}
+	_clients.clear();
+
+	/* Close poll struct */
+	fds.clear();
+
+	/* Another Clean up */
+	nickNameClientMap.clear();
+
+	std::cout << LOG_SERVER_SHUTDOWN << std::endl;
+}
 
 /* getter */
 
@@ -17,10 +44,10 @@ const std::string IrcServer::getName() const {return this->_servername;}
 time_t IrcServer::getStartTime() const {return this->_startTime;}
 
 std::string IrcServer::formatDateToString(time_t time) {
-	struct tm *timeInfo = std::localtime(&time);
-	char buffer[11];
-	std::strftime(buffer, sizeof(buffer), "%Y-%m-%d", timeInfo);
-	return std::string(buffer);
+    struct tm *timeInfo = std::localtime(&time);
+    char buffer[20];
+    std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", timeInfo);
+    return std::string(buffer);
 }
 
 void IrcServer::init() {
@@ -87,24 +114,6 @@ void IrcServer::acceptClient() {
 	std::cout << LOG_NEW_CONNECTED << C_LOG << client_fd << C_RESET << std::endl;
 }
 
-void IrcServer::removeClient(int client_fd) {
-	// ScopedTimer("removeClient");
-	// new로 클라이언트 할당한 것에 대해서 객체 메모리 해제 추가!
-	if (_clients.find(client_fd) != _clients.end()) {
-		delete _clients[client_fd];
-		_clients.erase(client_fd);
-	}
-
-	for (size_t i = 0; i < fds.size(); ++i) {
-		if (fds[i].fd == client_fd) {
-			fds.erase(fds.begin() + i);
-			break;
-		}
-	}
-	close(client_fd);
-	std::cout << LOG_END_CONNECTED << C_LOG << client_fd << C_RESET << std::endl;
-}
-
 void IrcServer::run() {
 	time_t lastCheckTime = time(NULL);
 
@@ -137,7 +146,7 @@ void IrcServer::run() {
 
 				// 해당 소켓에 오류 플래그가 설정되어 있는 경우
 				if (fds[i].revents & (POLLERR | POLLHUP | POLLNVAL)) {
-					removeClient(fds[i].fd); // quit
+					removeClinetFromServer(getClient(fds[i].fd));
 				}
 			}
 		} catch (const ServerException& e) {
@@ -158,7 +167,6 @@ void IrcServer::handleSocketRead(int fd) {
 }
 
 void IrcServer::handleClientMessage(int client_fd) {
-	// ScopedTimer("handleClientMessage");
 	Client * client = getClient(client_fd);
 	if (client) {
 		client->setlastActivityTime();
@@ -190,7 +198,6 @@ void IrcServer::handleClientMessage(int client_fd) {
 }
 
 void IrcServer::castMsg(int client_fd, const std::string msg) {
-	// ScopedTimer("castMsg");
 	Client* client = getClient(client_fd);
 	if (!client) {
 		throw ServerException(ERR_SEND);
@@ -208,8 +215,7 @@ void IrcServer::castMsg(int client_fd, const std::string msg) {
 			modifyPollEvent(client_fd, POLLIN | POLLOUT);
 		} else if (errno == EPIPE || errno == ECONNRESET || errno == ENOTCONN) {
 			// 다른 에러 발생 시 클라이언트 리소스 정리 / 제거 
-			// removeClientFormServer(getClient(client_fd));
-			removeClient(client_fd);
+			removeClinetFromServer(getClient(client_fd));
 		}
 
 	// 송신해야하는 데이터 중 일부만 송신한 경우
@@ -249,7 +255,7 @@ void IrcServer::handleSocketWrite(int client_fd) {
 				return ;
 			} else {
 				// 심각한 에러 발생 시 클라이언트 제거
-				removeClient(client_fd);	// quit
+				removeClinetFromServer(getClient(client_fd));
 			}
 		} else {
 			client->clearSendBuffer(bytesSent);
@@ -265,21 +271,21 @@ void IrcServer::handleSocketWrite(int client_fd) {
 }
 
 void IrcServer::broadcastMsg(const std::string& message, Channel* channel, int senderFd) {
-    if (channel != NULL) { 		// 채널이 지정된 경우, 해당 채널의 모든 참가자에게 메시지 전송
-        std::map<std::string, Client*>::iterator it = channel->getParticipant().begin();
-        for (; it != channel->getParticipant().end(); ++it) {
-            Client* receiver = it->second;
+	if (channel != NULL) { 		// 채널이 지정된 경우, 해당 채널의 모든 참가자에게 메시지 전송
+		std::map<std::string, Client*>::iterator it = channel->getParticipant().begin();
+		for (; it != channel->getParticipant().end(); ++it) {
+			Client* receiver = it->second;
 			if (senderFd != -1 && receiver->getFd() == senderFd)
 				continue;
-            castMsg(receiver->getFd(), message);
-        }
-    } else {		// 채널이 지정되지 않은 경우, 서버에 접속한 모든 클라이언트에게 메시지 전송
-        std::map<int, Client*>::iterator it = this->_clients.begin();
-        for (; it != _clients.end(); ++it) {
-            int receiverFd = it->first;
-            castMsg(receiverFd, message);
-        }
-    }
+			castMsg(receiver->getFd(), message);
+		}
+	} else {		// 채널이 지정되지 않은 경우, 서버에 접속한 모든 클라이언트에게 메시지 전송
+		std::map<int, Client*>::iterator it = this->_clients.begin();
+		for (; it != _clients.end(); ++it) {
+			int receiverFd = it->first;
+			castMsg(receiverFd, message);
+		}
+	}
 }
 
 Client* IrcServer::getClient(int client_fd) {

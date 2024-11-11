@@ -47,6 +47,10 @@ public:
 	void		cmdPart();
 	void		cmdInvite();
 
+	/* Bots */
+	void		cmdBotMe();
+	void		cmdBotTime();
+
 	/* Utils */
 	void checkNick(const std::string& str);
 	void checkPassword(const std::string& str);

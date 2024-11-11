@@ -60,7 +60,6 @@ void Cmd::authorizeClient() {
 
 bool Cmd::handleClientCmd() {
 	try {
-		// ScopedTimer("Cmd");
 		this->cmd = extractCmd();
 		this->cmdParams = extractCmdParams();
 
@@ -89,6 +88,12 @@ bool Cmd::handleClientCmd() {
 				// cmdTopic();
 			} else if (cmd == "QUIT") {
 				cmdQuit();
+			} else if (cmd == "!me") {
+				cmdBotMe();
+			} else if (cmd == "!time") {
+				cmdBotTime();
+			} else if (cmd == "!wise") {
+				cmdBotWise();
 			} else {
 				server.castMsg(client_fd, server.makeMsg(PREFIX_SERVER(server.getName()), ERR_UNKNOWNCOMMAND(client->getNickname())));
 			}
@@ -96,8 +101,8 @@ bool Cmd::handleClientCmd() {
 	}
 	catch (const CmdException& e) {
 		if (!this->client->getPassStatus() || !this->client->getRegisteredStatus()) {	
+			server.removeClinetFromServer(client);
 			server.castMsg(client_fd, e.what());
-			server.removeClient(client_fd);
 			return false;
 		}
 		server.castMsg(client_fd, e.what());

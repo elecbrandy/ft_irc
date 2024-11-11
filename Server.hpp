@@ -13,6 +13,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <poll.h>
+#include <signal.h>
 #include <fcntl.h>
 #include <sstream>
 #include <errno.h>
@@ -60,11 +61,10 @@ public:
 
 	void	init();
 	void	acceptClient();
-	void	removeClient(int fd);
 	void	handleSocketRead(int fd);
 	void	handleClientMessage(int fd);
 	void	broadcastMsg(const std::string& message, Channel* channel, int senderFd);
-	void	castMsg(int client_fd, const std::string message); //프라이빗 메세지 등 다양한 모드로 메세지를 전송할 수 있기 때문에 castMsg라는 이름으로 변경
+	void	castMsg(int client_fd, const std::string message);
 	void	run();
 	
 	/* setter & getter */
