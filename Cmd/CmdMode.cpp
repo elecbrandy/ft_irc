@@ -45,14 +45,14 @@ void Cmd::validationNickName(std::string nickname, Channel* channel, int option_
     if (option_flag == 1)
     {
         if (channel->isParticipant(nickname) == false)
-            throw CmdException(ERR_NICKNOTINCHANNEL(nickname, channel->getName()));
+            throw CmdException(ERR_USERNOTINCHANNEL(this->client->getNickname(), nickname, channel->getName()));
     }
     else
     // option_flag == 0, 채널의 운영자에 nickname이 포함되어 있는지 검증
     {
         if (channel->isOperator(nickname) == false)
         {
-            throw CmdException(ERR_NOSUCHNICK(this->client->getUsername(), nickname));
+            throw CmdException(ERR_NOSUCHNICK(this->client->getNickname(), nickname));
         }
     }
 }
@@ -109,7 +109,7 @@ void Cmd::addChannelOperator(std::string nickname, Channel* channel)
 
     std::map<std::string, Client*> participant = channel->getParticipant();
     channel->removeParticipant(nickname);
-    channel->setParticipant("@" + nickname, client->second);
+    channel->addParticipant("@" + nickname, client->second);
 }
 
 // #ch -o user
@@ -124,7 +124,7 @@ void Cmd::removeChannelOperator(std::string nickname, Channel* channel)
 
     std::map<std::string, Client*> participant = channel->getParticipant();
     channel->removeParticipant(nickname);
-    channel->setParticipant(nickname, client->second);
+    channel->addParticipant(nickname, client->second);
 }
 
 void Cmd::setChannelKey(std::string key, Channel* channel)
@@ -334,5 +334,5 @@ void Cmd::cmdMode()
     for(size_t i = 0; i < modeParse.size() - 1; i++)
         str += " " + modeParse[i];
     str += " :" + modeParse[modeParse.size() - 1];
-    server.broadcastMsg(server.makeMsg(USER_PREFIX(this->client->getNickname(), this->client->getUsername(), this->client->getHostname()), str), channel->second, this->client->getFd());
+    server.broadcastMsg(server.makeMsg(PREFIX_USER(this->client->getNickname(), this->client->getUsername(), this->client->getHostname()), str), channel->second, this->client->getFd());
 }

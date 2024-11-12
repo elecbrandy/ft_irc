@@ -25,7 +25,7 @@ class Channel {
 
 		unsigned int						_limit; //채널 참여자 제한 수
 		std::vector<std::string> _invited; //초대된 사용자 목록
-		std::vector<std::string> _banned; //차단된 사용자 목록
+
 	public:
 		Channel(std::string name);
 		~Channel();
@@ -33,21 +33,20 @@ class Channel {
 		void setKey(std::string key);
 		void setTopic(std::string topic);
 		void setMode(char mode);
-
-		void addParticipantname(std::string participantName);
-		void removeOperator(Client* client);
-		void removeKey();
-		void removeMode(char mode);
-
-		const std::string isOperatorNickname(std::string nickanme) const;
-		void setParticipant(std::string participantName,Client* client);
 		void setLimit(unsigned int limit);
-		void setInvited(std::string nickname);
-		void addOperator(std::string nick, Client* client);
-
-		void setBanned(std::string nickname);
 
 		void addInvited(std::string nickname);
+		void addOperator(std::string nick, Client* client);
+		void addParticipant(std::string participantName,Client* client);
+		void addParticipantname(std::string participantName);
+
+		void removeKey();
+		void removeOperator(Client* client);
+		void removeInvited(std::string nickname);
+		void removeMode(char mode);
+		void removeParticipant(std::string target);
+
+		const std::string isOperatorNickname(std::string nickanme) const;
 
 		std::string getName();
 		std::string getKey();
@@ -64,8 +63,6 @@ class Channel {
 		std::vector<std::string> getInvited();
 		std::vector<std::string> getBanned();
 
-		void removeParticipant(std::string target);
-		void updateInviteList(std::string nickname);
 };
 
 

@@ -19,7 +19,6 @@ Client:: ~Client() {
 void Client::setFd(int fd) {this->_fd = fd;}
 
 void Client::setNickname(const std::string& str) {
-	//this->_nickname = str;
 	size_t spacePos = str.find(' ');
     if (spacePos != std::string::npos) {
         this->_nickname = str.substr(0, spacePos);
@@ -33,8 +32,6 @@ void Client::setUsername(const std::string& str) {this->_username = str;}
 void Client::setHostname(const std::string& str) {this->_hostname = str;}
 
 void Client::setRealname(const std::string& str) {this->_realname = str;}
-
-void Client::setPassword(const std::string str) {this->_password = str;}
 
 void Client::setServername(const std::string& str) {this->_servername = str; std::cout << "servername: " << this->_servername << std::endl;}
 
@@ -60,8 +57,6 @@ std::string	Client::getHostname() const {return this->_hostname;}
 
 std::string	Client::getRealname() const {return this->_realname;}
 
-std::string	Client::getPassword() const {return this->_password;}
-
 std::string	Client::getServername() const {return this->_servername;}
 
 time_t	Client::getLastActivityTime() const {return this->_lastActivityTime;}
@@ -73,6 +68,8 @@ bool Client::getNickStatus() const {return this->_registerStatus.nick;}
 bool Client::getUserStatus() const {return this->_registerStatus.user;}
 
 bool Client::getRegisteredStatus() const {return this->_registerStatus.registered;}
+
+std::string Client::getPrefix() const {return this->_prefix;}
 
 /* other */
 void Client::appendToRecvBuffer(const std::string& str) {
@@ -115,14 +112,16 @@ bool Client::hasDataToSend() const {
 	return true;
 }
 
+void Client::setPrefix() {_prefix = PREFIX_USER(_nickname, _username, _hostname);}
+
 void Client::printLog() {
-	std::cout << C_LOG << std::boolalpha
+	std::cout << C_WARN << std::boolalpha
 	<< ">>>>> client log <<<<<\n"
 	<< "nickname: " << this->getNickname() << "\n"
 	<< "username: " << this->getUsername() << "\n"
 	<< "hostname: " << this->getHostname() << "\n"
 	<< "realname: " << this->getRealname() << "\n"
-	<< "servername: " << this->getServername() << "\n"
+	// << "servername: " << this->getServername() << "\n"
 	<< "registerStatus: " << this->getRegisteredStatus() << "\n"
 	<< C_RESET << std::endl;
 }

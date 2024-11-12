@@ -2,3 +2,4 @@
 /mode -t -> /topic
 /mode -k -> 재입장 시 비밀번호 초기화 되었는지
 /mode +o user1 -> /part 후 재입장 했을 때 일반 사용자인지
+errocode -> username 추가
