@@ -58,6 +58,7 @@ private:
 	std::map<int, Client*>				_clients;
 	std::map<std::string, Channel *>	_channels;
 	std::map<std::string, Client*>		nickNameClientMap;
+	std::vector<int>					_fdsToRemove;
 
 public:
 	IrcServer();
@@ -95,12 +96,13 @@ public:
 
 	void modifyPollEvent(int client_fd, short events);
 	void handleSocketWrite(int client_fd);
-	void removeClinetFromServer(Client* client);
+	void removeClientFromServer(Client* client);
 
 	void updateClients(Client* client);
 	void updateNickNameClientMap(const std::string& oldNick, const std::string& newNick, Client* client);
 
 	void serverLog(int fd, int log_type, std::string log_color, std::string msg);
+	void removePollFds();
 
 	/* exception */
 	class ServerException : public std::exception {

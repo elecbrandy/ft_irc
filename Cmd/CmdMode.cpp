@@ -107,6 +107,7 @@ void Cmd::addChannelOperator(std::string nickname, Channel* channel)
 
     std::map<std::string, Client*> participant = channel->getParticipant();
     channel->removeParticipant(nickname);
+
     channel->addParticipant("@" + nickname, client->second);
 }
 

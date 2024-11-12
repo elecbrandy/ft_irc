@@ -30,7 +30,7 @@ public:
 	std::string	extractCmd();
 	std::string extractCmdParams();
 	void		authorizeClient();
-	void		handleClientCmd();
+	bool		handleClientCmd();
 
 	/* Commands */
 	void		cmdCap();
