@@ -45,7 +45,7 @@ void Cmd::validationNickName(std::string nickname, Channel* channel, int option_
     if (option_flag == 1)
     {
         if (channel->isParticipant(nickname) == false)
-            throw CmdException(ERR_NOSUCHNICK(this->client->getUsername(), nickname));
+            throw CmdException(ERR_NICKNOTINCHANNEL(nickname, channel->getName()));
     }
     else
     // option_flag == 0, 채널의 운영자에 nickname이 포함되어 있는지 검증
@@ -60,7 +60,7 @@ void Cmd::validationNickName(std::string nickname, Channel* channel, int option_
 //option : +k (채널에 password 설정)
 void Cmd::validationKey(std::string key, Channel* channel)
 {
-    if (channel->isSetKey() == false)
+    if (channel->isSetKey() == true)
         throw CmdException(ERR_KEYSET(channel->getName()));
 
     if (key.empty()) {
@@ -308,20 +308,10 @@ void Cmd::cmdMode()
     if (participaciant.find(channel->second->isOperatorNickname(this->client->getNickname())) == participaciant.end())
         throw CmdException(ERR_NOTONCHANNEL(this->client->getNickname(), channelName));
 
-    // /mode #ch -> #ch의 옵션 정보 출력
+    // /mode #ch -> #ch의 옵션 정보 출력 (구현 범위 x)
     if (modeParse.size() == 1)
-    {
-        // std::set<char> s = channel->second->getMode();
-        // std::string mode;
-        // for(std::set<char>::iterator it = s.begin(); it != s.end(); it++)
-        //     mode += *it;
-        // if (s.size() == 0)
-        //     mode = ":";
-        // else
-        //     mode = "+" + mode;
-        // server.broadcastMsg(server.makeMsg(RPL_CHANNELMODEIS(modeParse[0], params)), channel->second);
         return;
-    }
+
     //채널의 운영자가 현재 호출 클라이언트인가
     if ((channel->second)->isOperator(this->client->getNickname()) == false)
         throw CmdException(ERR_CHANOPRIVSNEEDED(this->client->getUsername(), modeParse[0]));

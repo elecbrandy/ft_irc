@@ -97,7 +97,7 @@
 #define ERR_NICKCOLLISION 						"436 " + nick + " "
 
 // 441: 사용자가 해당 채널에 있지 않음
-#define ERR_nickNOTINCHANNEL 					"441 " + nick + " "
+#define ERR_NICKNOTINCHANNEL(nick, ch) 			"441 " + nick + " " + ch + " :They aren't on that channel"
 
 // 442: 사용자가 해당 채널에 속해 있지 않음
 #define ERR_NOTONCHANNEL(nick, ch) 				"442 " + nick + " " + ch + " :You're not on that channel"
