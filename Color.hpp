@@ -14,6 +14,7 @@
 #define C_ERR	RED
 #define C_WARN	ORANGE
 #define C_KEY   YELLOW
+#define C_CHECK GREEN
 #define C_RESET	"\033[0m"
 
 #endif

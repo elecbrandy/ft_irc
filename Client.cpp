@@ -2,7 +2,7 @@
 #include "Server.hpp"
 
 Client::Client(in_addr addr)
-:	_hostname(inet_ntoa(addr)), 
+:	_hostname(inet_ntoa(addr)),
 	_lastActivityTime(time(NULL)) {
 	_registerStatus.pass = false;
 	_registerStatus.nick = false;

@@ -102,6 +102,7 @@ public:
 	void updateNickNameClientMap(const std::string& oldNick, const std::string& newNick, Client* client);
 
 	void serverLog(int fd, int log_type, std::string log_color, std::string msg);
+	void removePollFds();
 
 	/* exception */
 	class ServerException : public std::exception {

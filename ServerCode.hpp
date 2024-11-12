@@ -7,7 +7,7 @@
 #define MSG_END_CONNECTED			"client connection closed: fd:"
 #define MSG_CLINET_INPUT			"client input received:"
 #define MSG_CONNECTION_TIMEOUT		"client connection timed out: fd:"
-#define MSG_CHECK_CONNECTION_START	"checking client connection..."
+#define MSG_CHECK_CONNECTION_START	"checking client connection"
 
 #define MSG_SERVER_SHUTDOWN			"server closed"
 
@@ -29,6 +29,7 @@
 #define	ERR_CLIENT_NONBLOCKING	"failed to set client socket to non-blocking mode."
 #define	ERR_DATA_RECEIVE		"data reception error."
 #define	ERR_SEND				"send() error."
+#define ERR_CLIENT_FD           "client fd error."
 #define	ERR_POLL				"poll() error."
 #define	ERR_ETC					"unknown error occurred."
 #define ERR_RECV				"recv() error."
