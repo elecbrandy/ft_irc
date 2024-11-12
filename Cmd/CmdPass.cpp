@@ -13,19 +13,17 @@
 */
 
 void Cmd::cmdPass() {
-	std::string servPrefix = PREFIX_SERVER(client->getServername());
-
 	// 비밀번호 파라미터가 없는 경우
 	if (cmdParams.empty())
-		throw CmdException(server.makeMsg(servPrefix, ERR_NEEDMOREPARAMS(client->getNickname(), "PASS")));
+		throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_NEEDMOREPARAMS(client->getNickname(), "PASS")));
 
 	// 이미 등록된 상태에서 PASS 명령어를 다시 보낸 경우
 	if (client->getPassStatus())
-		throw CmdException(server.makeMsg(servPrefix, ERR_ALREADYREGISTRED(client->getNickname())));
+		throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_ALREADYREGISTRED(client->getNickname())));
 
 	// 비밀번호가 틀린 경우
 	if (this->cmdParams != server.getPassword())
-		throw CmdException(server.makeMsg(servPrefix, ERR_PASSWDMISMATCH(client->getNickname())));
+		throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_PASSWDMISMATCH(client->getNickname())));
 	
 	client->setPassStatus(true);
 }

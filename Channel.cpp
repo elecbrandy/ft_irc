@@ -61,11 +61,6 @@ void Channel::addOperator(std::string nick, Client* client)
 	this->_operator[nick] = client;
 }
 
-void Channel::addInvited(std::string nickname)
-{
-	this->_invited.push_back(nickname);
-}
-
 void Channel::removeOperator(Client* client)
 {
 	this->_operator.erase(client->getNickname());
@@ -153,5 +148,3 @@ std::map<std::string, Client*> Channel::getOperator() {return this->_operator;}
 unsigned int Channel::getLimit() const {return this->_limit;} 
 
 std::vector<std::string> Channel::getInvited() {return this->_invited;}
-
-std::vector<std::string> Channel::getBanned() {return this->_banned;}

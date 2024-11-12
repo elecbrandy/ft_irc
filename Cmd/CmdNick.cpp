@@ -52,25 +52,23 @@ void Cmd::checkNick(const std::string& str) {
 
 	/* SIZE check */
 	if (str.size() > NICK_MAX_LEN)
-		throw CmdException(server.makeMsg(PREFIX_SERVER(server.getName()), ERR_ERRONEUSNICKNAME(tmp)));
+		throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_ERRONEUSNICKNAME(tmp)));
 
 	/* ALNUM check */
 	for (std::string::const_iterator it = str.begin(); it != str.end(); ++it) {
 		if (!std::isalnum(static_cast<unsigned char>(*it)))
-			throw CmdException(server.makeMsg(PREFIX_SERVER(server.getName()), ERR_ERRONEUSNICKNAME(tmp)));
+			throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_ERRONEUSNICKNAME(tmp)));
 	}
 
 	/* INUSE check */
 	if (server.getClient(str) != NULL)
-		throw CmdException(server.makeMsg(PREFIX_SERVER(server.getName()), ERR_NICKNAMEINUSE(tmp)));
+		throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_NICKNAMEINUSE(tmp)));
 }
 
 void Cmd::cmdNick() {
-	std::string servPrefix = PREFIX_SERVER(client->getServername());
-	
 	// nick 명령어를 처리하기 전에 PASS 명령어를 먼저 처리했어야 정상적인 작동!
 	if (client->getPassStatus() == false)
-		throw CmdException(server.makeMsg(servPrefix, ERR_NOTREGISTERED(client->getNickname())));
+		throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_NOTREGISTERED(client->getNickname())));
 		
 	checkNick(this->cmdParams);
 
@@ -91,8 +89,8 @@ void Cmd::cmdNick() {
 		server.updateNickNameClientMap(oldNick, newNick, client);
 
 		// 3. channel->participant, channel->operator 업데이트
-		std::map<std::string, Channel *>::iterator it;
-		for (it == server.getChannels().begin(); it != server.getChannels().end(); ++it) {
+		std::map<std::string, Channel *>::iterator it = server.getChannels().begin();
+		for (; it != server.getChannels().end(); ++it) {
 			Channel* ch = it->second;
 			
 			if (ch->isParticipant(oldNick)) {

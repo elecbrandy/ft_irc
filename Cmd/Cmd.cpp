@@ -29,7 +29,7 @@ std::string Cmd::extractCmdParams() {
 	}
 }
 
-bool Cmd::handleClientCmd() {
+void Cmd::handleClientCmd() {
 	try {
 		this->cmd = extractCmd();
 		this->cmdParams = extractCmdParams();
@@ -52,23 +52,21 @@ bool Cmd::handleClientCmd() {
 			cmdKick();
 		else if (cmd == "INVITE")
 			cmdInvite();
-		else if (cmd == "MODE")
-			cmdMode();
+		else if (cmd == "MODE") {
+			return ;
+			// cmdMode();
+		}
 		else if (cmd == "TOPIC")
 			cmdTopic();
 		else if (cmd == "QUIT")
 			cmdQuit();
-		else
+		else if (cmd == "WHOIS")
 			return ;
+		else
+			throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_UNKNOWNCOMMAND(client->getNickname(), cmd)));
 	} catch (const CmdException& e) {
-		if (!this->client->getPassStatus() || \
-			!this->client->getRegisteredStatus()) {	
-			server.castMsg(client_fd, e.what());
-			return false;
-		}
 		server.castMsg(client_fd, e.what());
 	}
-	return true;
 }
 
 const char* Cmd::CmdException::what() const throw() {return msg.c_str();}
@@ -76,21 +74,21 @@ std::string Cmd::getCmdParams() const {return this->cmdParams;}
 
 void Cmd::printWelcome() {
 	/* RPL */
-	server.castMsg(client_fd, server.makeMsg(PREFIX_SERVER(server.getName()), RPL_WELCOME(client->getNickname(), client->getServername())));
-	server.castMsg(client_fd, server.makeMsg(PREFIX_SERVER(server.getName()), RPL_YOURHOST(client->getNickname(), client->getServername())));
-	server.castMsg(client_fd, server.makeMsg(PREFIX_SERVER(server.getName()), RPL_CREATED(client->getNickname(), server.formatDateToString(server.getStartTime()))));
-	server.castMsg(client_fd, server.makeMsg(PREFIX_SERVER(server.getName()), RPL_MYINFO(client->getNickname())));
+	server.castMsg(client_fd, server.makeMsg(PREFIX_SERVER, RPL_WELCOME(client->getNickname(), client->getServername())));
+	server.castMsg(client_fd, server.makeMsg(PREFIX_SERVER, RPL_YOURHOST(client->getNickname(), client->getServername())));
+	server.castMsg(client_fd, server.makeMsg(PREFIX_SERVER, RPL_CREATED(client->getNickname(), server.formatDateToString(server.getStartTime()))));
+	server.castMsg(client_fd, server.makeMsg(PREFIX_SERVER, RPL_MYINFO(client->getNickname())));
 	
 	/* MOTD */
-	server.castMsg(client_fd, server.makeMsg(PREFIX_SERVER(server.getName()), RPL_MOTDSTART(client->getNickname())));
+	server.castMsg(client_fd, server.makeMsg(PREFIX_SERVER, RPL_MOTDSTART(client->getNickname())));
 	std::ifstream goatFile(PATH_MOTD);
 	if (goatFile.is_open()) {
 
 		std::string line;
 		while (getline(goatFile, line)) {
-			server.castMsg(client_fd, server.makeMsg(PREFIX_SERVER(server.getName()), RPL_MOTD(client->getNickname(), line)));
+			server.castMsg(client_fd, server.makeMsg(PREFIX_SERVER, RPL_MOTD(client->getNickname(), line)));
 		}
 		goatFile.close();
 	}
-	server.castMsg(client_fd, server.makeMsg(PREFIX_SERVER(server.getName()), RPL_ENDOFMOTD(client->getNickname())));
+	server.castMsg(client_fd, server.makeMsg(PREFIX_SERVER, RPL_ENDOFMOTD(client->getNickname())));
 }

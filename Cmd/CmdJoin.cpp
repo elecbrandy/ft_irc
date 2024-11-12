@@ -65,10 +65,9 @@ bool Cmd::isValidChannelName(const std::string &channel) {
 }
 
 void Cmd::cmdJoin() {
-	std::string servPrefix = PREFIX_SERVER(client->getServername());
 	// 명령어를 보낸 클라이언트가 register 되지 않은 경우
     if (client->getRegisteredStatus() == false)
-        throw Cmd::CmdException(server.makeMsg(servPrefix, ERR_NOTREGISTERED(client->getNickname())));
+        throw Cmd::CmdException(server.makeMsg(PREFIX_SERVER, ERR_NOTREGISTERED(client->getNickname())));
 		
 	std::vector<std::string> joinTokens = joinSplit(cmdParams);
 	std::vector<std::string> channel;
@@ -84,12 +83,12 @@ void Cmd::cmdJoin() {
 
 	// 비밀번호가 더 많을 때 에러
 	if (channel.size() < key.size())
-		throw Cmd::CmdException(server.makeMsg(servPrefix, ERR_NEEDMOREPARAMS(client->getNickname(), "JOIN")));
+		throw Cmd::CmdException(server.makeMsg(PREFIX_SERVER, ERR_NEEDMOREPARAMS(client->getNickname(), "JOIN")));
 
 	// 채널이름 형식이 잘못됐을 때
 	for (size_t i = 0; i < channel.size(); i++) {
 		if (isValidChannelName(channel[i]) == false)
-			throw Cmd::CmdException(server.makeMsg(servPrefix, ERR_BADCHANMASK(client->getNickname(), channel[i])));
+			throw Cmd::CmdException(server.makeMsg(PREFIX_SERVER, ERR_BADCHANMASK(client->getNickname(), channel[i])));
 	}
 
 	for (std::vector<std::string>::size_type i = 0; i < channel.size(); ++i) {
@@ -115,17 +114,17 @@ void Cmd::cmdJoin() {
 			isInvitedMode = true;
 			std::vector<std::string> inviteList = ch->getInvited();
 			if (std::find(inviteList.begin(), inviteList.end(), client->getNickname()) == inviteList.end())
-				throw Cmd::CmdException(server.makeMsg(servPrefix, ERR_INVITEONLYCHAN(client->getNickname(), chName)));
+				throw Cmd::CmdException(server.makeMsg(PREFIX_SERVER, ERR_INVITEONLYCHAN(client->getNickname(), chName)));
 		}
 
 		// 비밀번호 필요 시 확인
 		if (ch->getMode().find(KEY_MODE) != ch->getMode().end() && (chKey.empty() || chKey != ch->getKey()))
-				throw Cmd::CmdException(server.makeMsg(servPrefix, ERR_BADCHANNELKEY(client->getNickname(), chName)));
+				throw Cmd::CmdException(server.makeMsg(PREFIX_SERVER, ERR_BADCHANNELKEY(client->getNickname(), chName)));
 
 		// 인원 초과 시 에러
 		if (ch->getMode().find(LIMIT_MODE) != ch->getMode().end() &&
 		    static_cast<unsigned int>(ch->getParticipant().size()) >= ch->getLimit())
-			throw Cmd::CmdException(server.makeMsg(servPrefix, ERR_CHANNELISFULL(client->getNickname(), chName)));
+			throw Cmd::CmdException(server.makeMsg(PREFIX_SERVER, ERR_CHANNELISFULL(client->getNickname(), chName)));
 
 		// 참여자 추가
 		 std::map<std::string, Client*> participant = ch->getParticipant();
@@ -133,17 +132,17 @@ void Cmd::cmdJoin() {
 		 ch->addParticipant(participantName, client);
 
 		// 참여자 목록 전송
-		server.castMsg(client_fd, server.makeMsg(servPrefix, RPL_NAMREPLY(client->getNickname(), "=", ch->getName(), ch->getParticipantNameStr())));
-		server.castMsg(client_fd, server.makeMsg(servPrefix, RPL_ENDOFNAMES(client->getNickname(), ch->getName())));
+		server.castMsg(client_fd, server.makeMsg(PREFIX_SERVER, RPL_NAMREPLY(client->getNickname(), "=", ch->getName(), ch->getParticipantNameStr())));
+		server.castMsg(client_fd, server.makeMsg(PREFIX_SERVER, RPL_ENDOFNAMES(client->getNickname(), ch->getName())));
 
 		// JOIN 알림
 		server.broadcastMsg(server.makeMsg(client->getPrefix(), RPL_JOIN(chName)), ch, -1);
 		
 		// 토픽 전송
 		if (ch->getTopic().empty())
-			server.castMsg(client_fd, server.makeMsg(servPrefix, RPL_NOTOPIC(client->getNickname(), ch->getName())));
+			server.castMsg(client_fd, server.makeMsg(PREFIX_SERVER, RPL_NOTOPIC(client->getNickname(), ch->getName())));
 		else
-			server.castMsg(client_fd, server.makeMsg(servPrefix, RPL_TOPIC(client->getNickname(), ch->getName(), ch->getTopic())));
+			server.castMsg(client_fd, server.makeMsg(PREFIX_SERVER, RPL_TOPIC(client->getNickname(), ch->getName(), ch->getTopic())));
 		
 		if (isInvitedMode == true)
 			ch->removeInvited(client->getNickname());

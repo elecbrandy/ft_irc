@@ -188,9 +188,7 @@ void IrcServer::handleClientMessage(int client_fd) {
 			while (client->extractMessage(tmp)) {
 				Cmd cmdHandler(*this, tmp, client_fd);
 				serverLog(client_fd, LOG_INPUT, C_MSG, tmp);
-				if (!cmdHandler.handleClientCmd()) {
-					return ;
-				}
+				cmdHandler.handleClientCmd();
 			}
 		}
 	}
@@ -304,7 +302,7 @@ Client* IrcServer::getClient(const std::string& nickname) {
 	return NULL;
 }
 
-const std::map<std::string, Channel*>& IrcServer::getChannels() const
+std::map<std::string, Channel*>& IrcServer::getChannels()
 {
 	return (this->_channels);
 }

@@ -121,7 +121,7 @@ void Client::printLog() {
 	<< "username: " << this->getUsername() << "\n"
 	<< "hostname: " << this->getHostname() << "\n"
 	<< "realname: " << this->getRealname() << "\n"
-	<< "servername: " << this->getServername() << "\n"
+	// << "servername: " << this->getServername() << "\n"
 	<< "registerStatus: " << this->getRegisteredStatus() << "\n"
 	<< C_RESET << std::endl;
 }

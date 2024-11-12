@@ -1,4 +1,4 @@
-// #include "Cmd.hpp"
+#include "Cmd.hpp"
 
 // /*
 // 명령어 : PART <channel>{,<channel>}
@@ -17,10 +17,9 @@
 // */
 
 void Cmd::cmdPart() {
-    std::string servPrefix = PREFIX_SERVER(client->getServername());
     // 명령어를 보낸 클라이언트가 register 되지 않은 경우
     if (client->getRegisteredStatus() == false)
-        throw Cmd::CmdException(server.makeMsg(servPrefix, ERR_NOTREGISTERED(client->getNickname())));
+        throw Cmd::CmdException(server.makeMsg(PREFIX_SERVER, ERR_NOTREGISTERED(client->getNickname())));
         
     std::vector<std::string> params = split(',');
 
@@ -29,28 +28,28 @@ void Cmd::cmdPart() {
     // }
     
     if (params.empty())
-        throw Cmd::CmdException(server.makeMsg(servPrefix, ERR_NEEDMOREPARAMS(client->getNickname(), cmd)));
+        throw Cmd::CmdException(server.makeMsg(PREFIX_SERVER, ERR_NEEDMOREPARAMS(client->getNickname(), cmd)));
 
     for (size_t i = 0; i < params.size(); i++) {
         std::string chName = params[i];
 
         // 파라미터로 들어온 채널이름 형식이 잘못된 경우
         if (isValidChannelName(chName) == false) {
-            throw Cmd::CmdException(server.makeMsg(servPrefix, ERR_BADCHANMASK(client->getNickname(), chName)));
+            throw Cmd::CmdException(server.makeMsg(PREFIX_SERVER, ERR_BADCHANMASK(client->getNickname(), chName)));
             continue;
         }
 
         // 채널이 존재하지 않는 경우
         std::map<std::string, Channel*> chs = server.getChannels();
         if (chs.find(chName) == chs.end()) {
-            throw Cmd::CmdException(server.makeMsg(servPrefix, ERR_NOSUCHCHANNEL(client->getNickname(), chName)));
+            throw Cmd::CmdException(server.makeMsg(PREFIX_SERVER, ERR_NOSUCHCHANNEL(client->getNickname(), chName)));
             continue;
         }
 
         // 채널은 존재하지만 사용자가 해당 채널에 참여하지 않은 경우
         Channel* ch = chs[chName];
         if (ch->getParticipant().find(client->getNickname()) == ch->getParticipant().end()) {
-            throw Cmd::CmdException(server.makeMsg(servPrefix, ERR_NOTONCHANNEL(client->getNickname(), chName)));
+            throw Cmd::CmdException(server.makeMsg(PREFIX_SERVER, ERR_NOTONCHANNEL(client->getNickname(), chName)));
             continue;
         }
 

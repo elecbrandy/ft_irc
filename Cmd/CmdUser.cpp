@@ -40,19 +40,19 @@ void Cmd::checkUsername(const std::string& str) {
 	/* EMPTY check */
 	if (str.empty()) {
 		if (this->client->getNickname().empty()) {
-			throw CmdException(server.makeMsg(PREFIX_SERVER(server.getName()), ERR_ERRUSERCMD));
+			throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_ERRUSERCMD));
 		}
 	}
 
 	/* SIZE check */
 	if (str.size() > USERNAME_MAX_LEN) {
-		throw CmdException(server.makeMsg(PREFIX_SERVER(server.getName()), ERR_ERRUSERCMD));
+		throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_ERRUSERCMD));
 	}
 	
 	/* ALNUM check */
 	for (std::string::const_iterator it = str.begin(); it != str.end(); ++it) {
 		if (!std::isalnum(static_cast<unsigned char>(*it))) {
-			throw CmdException(server.makeMsg(PREFIX_SERVER(server.getName()), ERR_ERRUSERCMD));
+			throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_ERRUSERCMD));
 		}
 	}
 }
@@ -61,32 +61,32 @@ void Cmd::checkRealname(const std::string& str) {
 	/* EMPTY check */
 	if (str.empty()) {
 		if (this->client->getNickname().empty()) {
-			throw CmdException(server.makeMsg(PREFIX_SERVER(server.getName()), ERR_ERRUSERCMD));
+			throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_ERRUSERCMD));
 		}
 	}
 
 	/* SIZE check */
 	if (str.size() > REALNAME_MAX_LEN) {
-		throw CmdException(server.makeMsg(PREFIX_SERVER(server.getName()), ERR_ERRUSERCMD));
+		throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_ERRUSERCMD));
 	}
 
 	/* ALPHA or SPACE check */
 	for (std::string::const_iterator it = str.begin(); it != str.end(); ++it) {
 		if (!(std::isalpha(static_cast<unsigned char>(*it)) || std::isspace(static_cast<unsigned char>(*it)))) {
-			throw CmdException(server.makeMsg(PREFIX_SERVER(server.getName()), ERR_ERRUSERCMD));
+			throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_ERRUSERCMD));
 		}
 	}
 }
 
 void Cmd::cmdUser() {
-	/* Register check */
+	// 이미 등록된 상태인 경우
 	if (this->client->getRegisteredStatus()) {
-		throw CmdException(ERR_ALREADYREGISTERED);
+		throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_ALREADYREGISTRED(client->getNickname())));
 	}
 
-	/* Pass check */
+	// PASS 명령어가 먼저 수신되지 않은 경우
 	if (!this->client->getPassStatus()) {
-		throw CmdException(ERR_NEEDMOREPARAMS(client->getNickname(), "PASS"));
+		throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_NEEDMOREPARAMS(client->getNickname(), "PASS")));
 	}
 
 	std::stringstream ssArg(cmdParams);
@@ -98,14 +98,14 @@ void Cmd::cmdUser() {
 		++count;
 	}
 	if (count < 4) {
-		throw CmdException(server.makeMsg(PREFIX_SERVER(server.getName()), ERR_NEEDMOREPARAMS(client->getNickname(), "USER")));
+		throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_NEEDMOREPARAMS(client->getNickname(), "USER")));
 	}
 
 	std::stringstream ssUser(cmdParams);
 	count = 0;
 	while (ssUser >> token) {
 		if (token.empty()) {
-			throw CmdException(server.makeMsg(PREFIX_SERVER(server.getName()), ERR_NEEDMOREPARAMS(client->getNickname(), "USER")));
+			throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_NEEDMOREPARAMS(client->getNickname(), "USER")));
 		}
 		switch (count) {
 		case 0:
@@ -135,11 +135,17 @@ void Cmd::cmdUser() {
 				checkRealname(realname);
 				client->setRealname(realname);
 			} else {
-				throw CmdException(server.makeMsg(PREFIX_SERVER(server.getName()), ERR_NEEDMOREPARAMS(client->getNickname(), "USER")));
+				throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_NEEDMOREPARAMS(client->getNickname(), "USER")));
 			}
 			break;
 		}
-
 		++count;
+	}
+	client->setPrefix();
+	client->setUserStatus(true);
+
+	if (client->getPassStatus() && client->getNickStatus() && client->getUserStatus()) {
+		client->setRegisteredStatus(true);
+		printWelcome();
 	}
 }

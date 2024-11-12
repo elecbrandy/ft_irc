@@ -36,7 +36,7 @@
 #define SERVER_NAME "ircserv"
 
 #define CRLF "\r\n"
-#define PREFIX_SERVER(servername) 					":" + servername
+#define PREFIX_SERVER					":ircserv"
 #define PREFIX_USER(nickname, username, hostname) 	":" + nickname + "!" + username + "@" + hostname
 
 #define TIME_OUT 60
@@ -81,7 +81,7 @@ public:
 	const std::string getName() const;
 	time_t getStartTime() const;
 
-	const std::map<std::string, Channel*>& getChannels() const;
+	std::map<std::string, Channel*>& getChannels();
 	void removeChannel(const std::string channelName);
 	
 	const std::map<std::string, Client*>& getNickNameClientMap() const;
