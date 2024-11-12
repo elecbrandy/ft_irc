@@ -29,7 +29,7 @@ std::string Cmd::extractCmdParams() {
 	}
 }
 
-void Cmd::handleClientCmd() {
+bool Cmd::handleClientCmd() {
 	try {
 		this->cmd = extractCmd();
 		this->cmdParams = extractCmdParams();
@@ -53,20 +53,23 @@ void Cmd::handleClientCmd() {
 		else if (cmd == "INVITE")
 			cmdInvite();
 		else if (cmd == "MODE") {
-			return ;
-			// cmdMode();
+			// return ;
+			cmdMode();
 		}
 		else if (cmd == "TOPIC")
 			cmdTopic();
 		else if (cmd == "QUIT")
 			cmdQuit();
 		else if (cmd == "WHOIS")
-			return ;
+			return true;
 		else
-			throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_UNKNOWNCOMMAND(client->getNickname(), cmd)));
+			return false;
+			// throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_UNKNOWNCOMMAND(client->getNickname(), cmd)));
 	} catch (const CmdException& e) {
 		server.castMsg(client_fd, e.what());
+		return false;
 	}
+	return true;
 }
 
 const char* Cmd::CmdException::what() const throw() {return msg.c_str();}
