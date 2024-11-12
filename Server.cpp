@@ -132,8 +132,6 @@ void IrcServer::run() {
 				throw ServerException(ERR_POLL);
 			}
 
-			std::vector<int> fdsToRemove;
-
 			for (int i = fds.size() - 1; i>= 0; --i) {
 				// 해당 소켓에 읽기 플래그가 설정되어 있는 경우
 				if (fds[i].revents & POLLIN) {
@@ -153,9 +151,10 @@ void IrcServer::run() {
 			}
 
 			// 루프가 끝난 후, fds 벡터에서 삭제할 fd를 제거
-			for (size_t i = 0; i < fdsToRemove.size(); ++i) {
+			// removeClientFds();
+			for (size_t i = 0; i < _fdsToRemove.size(); ++i) {
 				for (std::vector<struct pollfd>::iterator it = fds.begin(); it != fds.end(); ++it) {
-					if (it->fd == fdsToRemove[i]) {
+					if (it->fd == _fdsToRemove[i]) {
 						fds.erase(it);
 						break;
 					}
@@ -354,18 +353,17 @@ void IrcServer::setChannels(const std::string& channelName, const std::string& k
 }
 
 void IrcServer::checkConnections() {
-	std::map<int, Client*>::iterator it = _clients.begin();
-	serverLog(-1, LOG_SERVER, C_MSG, MSG_CHECK_CONNECTION_START);
-	while (it != _clients.end()) {
-		if (it->second->isConnectionTimedOut(TIME_OUT)) {
-			serverLog(-1, LOG_SERVER, C_MSG, MSG_CONNECTION_TIMEOUT);
-			removeClientFromServer(it->second); // Client 제거
-			it = _clients.erase(it);            // 지운 후 다음 iterator 반환
-		} else {
-			++it;
-		}
-	}
+    serverLog(-1, LOG_SERVER, C_MSG, MSG_CHECK_CONNECTION_START);
+
+    for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
+        Client* client = it->second;
+        if (client && client->isConnectionTimedOut(TIME_OUT)) {
+            serverLog(-1, LOG_SERVER, C_MSG, MSG_CONNECTION_TIMEOUT);
+            _fdsToRemove.push_back(it->first);  // 삭제할 fd 기록
+        }
+    }
 }
+
 
 void IrcServer::printGoat() {
 	std::ifstream goatFile(PATH_GOAT);

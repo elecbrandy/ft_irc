@@ -52,10 +52,8 @@ bool Cmd::handleClientCmd() {
 			cmdKick();
 		else if (cmd == "INVITE")
 			cmdInvite();
-		else if (cmd == "MODE") {
-			// return ;
+		else if (cmd == "MODE")
 			cmdMode();
-		}
 		else if (cmd == "TOPIC")
 			cmdTopic();
 		else if (cmd == "QUIT")
@@ -64,7 +62,6 @@ bool Cmd::handleClientCmd() {
 			return true;
 		else
 			return false;
-			// throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_UNKNOWNCOMMAND(client->getNickname(), cmd)));
 	} catch (const CmdException& e) {
 		server.castMsg(client_fd, e.what());
 		return false;
