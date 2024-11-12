@@ -1,20 +1,20 @@
-#include "Cmd.hpp"
+// #include "Cmd.hpp"
 
-/*
-명령어 : PART <channel>{,<channel>}
+// /*
+// 명령어 : PART <channel>{,<channel>}
 
-ERR_NEEDMOREPARAMS
-ERR_NOSUCHCHANNEL
-ERR_NOTONCHANNEL
+// ERR_NEEDMOREPARAMS
+// ERR_NOSUCHCHANNEL
+// ERR_NOTONCHANNEL
 
-- 채널에서 나가는 명령어
-- 여러 채널을 나가려면 채널 이름을 콤마로 구분하여 나열
+// - 채널에서 나가는 명령어
+// - 여러 채널을 나가려면 채널 이름을 콤마로 구분하여 나열
 
-경우의 수
-1. 파라미터 부족 : 파라미터가 없는 경우 (최소 1개 있어야함)
-2. 해당 채널이 존재하지 않는 경우(#으로 시작하지 않는 경우와 그냥 존재하지 않는 경우)
-3. 채널은 존재하지만 사용자가 해당 채널에 참여하지 않은 경우
-*/
+// 경우의 수
+// 1. 파라미터 부족 : 파라미터가 없는 경우 (최소 1개 있어야함)
+// 2. 해당 채널이 존재하지 않는 경우(#으로 시작하지 않는 경우와 그냥 존재하지 않는 경우)
+// 3. 채널은 존재하지만 사용자가 해당 채널에 참여하지 않은 경우
+// */
 
 void Cmd::cmdPart() {
     std::string servPrefix = PREFIX_SERVER(client->getServername());

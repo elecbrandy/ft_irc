@@ -13,6 +13,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <poll.h>
+#include <signal.h>
 #include <fcntl.h>
 #include <sstream>
 #include <errno.h>
@@ -21,7 +22,6 @@
 #include "ServerCode.hpp"
 #include "ReplyCode.hpp"
 #include "Cmd/Cmd.hpp"
-#include "ScopedTimer.hpp"
 
 #define MAX_CLIENTS 42
 #define BUFFER_SIZE 512
@@ -32,7 +32,7 @@
 #define PASSWORD_MAX_LEN 10
 
 #define PATH_GOAT "./etc/goat.txt"
-#define PATH_MOTD "./etc/goat.motd"
+#define PATH_MOTD "./etc/motd.txt"
 #define SERVER_NAME "ircserv"
 
 #define CRLF "\r\n"
@@ -42,9 +42,14 @@
 #define TIME_OUT 60
 #define TIME_CHECK_INTERVAL 180
 
+#define LOG_ERR -1
+#define LOG_SERVER 0
+#define LOG_INPUT 1
+#define LOG_OUTPUT 2
+
 class IrcServer {
 private:
-	const std::string					_name;
+	const std::string					_servername;
 	int									_fd;
 	int									port;
 	std::string							password;
@@ -61,11 +66,10 @@ public:
 
 	void	init();
 	void	acceptClient();
-	void	removeClient(int fd);
 	void	handleSocketRead(int fd);
 	void	handleClientMessage(int fd);
 	void	broadcastMsg(const std::string& message, Channel* channel, int senderFd);
-	void	castMsg(int client_fd, const std::string message); //프라이빗 메세지 등 다양한 모드로 메세지를 전송할 수 있기 때문에 castMsg라는 이름으로 변경
+	void	castMsg(int client_fd, const std::string message);
 	void	run();
 	
 	/* setter & getter */
@@ -94,8 +98,9 @@ public:
 	void removeClinetFromServer(Client* client);
 
 	void updateClients(Client* client);
-
 	void updateNickNameClientMap(const std::string& oldNick, const std::string& newNick, Client* client);
+
+	void serverLog(int fd, int log_type, std::string log_color, std::string msg);
 
 	/* exception */
 	class ServerException : public std::exception {

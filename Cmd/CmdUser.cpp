@@ -39,20 +39,20 @@
 void Cmd::checkUsername(const std::string& str) {
 	/* EMPTY check */
 	if (str.empty()) {
-		if (this->client->getNickname().empty() == 1) {
-			throw CmdException(ERR_ERRUSERCMD);
+		if (this->client->getNickname().empty()) {
+			throw CmdException(server.makeMsg(PREFIX_SERVER(server.getName()), ERR_ERRUSERCMD));
 		}
 	}
 
 	/* SIZE check */
 	if (str.size() > USERNAME_MAX_LEN) {
-		throw CmdException(ERR_ERRUSERCMD);
+		throw CmdException(server.makeMsg(PREFIX_SERVER(server.getName()), ERR_ERRUSERCMD));
 	}
 	
 	/* ALNUM check */
 	for (std::string::const_iterator it = str.begin(); it != str.end(); ++it) {
 		if (!std::isalnum(static_cast<unsigned char>(*it))) {
-			throw CmdException(ERR_ERRUSERCMD);
+			throw CmdException(server.makeMsg(PREFIX_SERVER(server.getName()), ERR_ERRUSERCMD));
 		}
 	}
 }
@@ -60,33 +60,34 @@ void Cmd::checkUsername(const std::string& str) {
 void Cmd::checkRealname(const std::string& str) {
 	/* EMPTY check */
 	if (str.empty()) {
-		if (this->client->getNickname().empty() == 1) {
-			throw CmdException(ERR_ERRUSERCMD);
+		if (this->client->getNickname().empty()) {
+			throw CmdException(server.makeMsg(PREFIX_SERVER(server.getName()), ERR_ERRUSERCMD));
 		}
 	}
 
 	/* SIZE check */
 	if (str.size() > REALNAME_MAX_LEN) {
-		throw CmdException(ERR_ERRUSERCMD);
+		throw CmdException(server.makeMsg(PREFIX_SERVER(server.getName()), ERR_ERRUSERCMD));
 	}
 
 	/* ALPHA or SPACE check */
 	for (std::string::const_iterator it = str.begin(); it != str.end(); ++it) {
 		if (!(std::isalpha(static_cast<unsigned char>(*it)) || std::isspace(static_cast<unsigned char>(*it)))) {
-			throw CmdException(ERR_ERRUSERCMD);
+			throw CmdException(server.makeMsg(PREFIX_SERVER(server.getName()), ERR_ERRUSERCMD));
 		}
 	}
 }
 
 void Cmd::cmdUser() {
-	std::string servPrefix = PREFIX_SERVER(server.getName());
-	/* Register check : NOT REGISTERED */
-	if (client->getPassStatus() == false || client->getNickStatus() == false)
-		throw CmdException(server.makeMsg(servPrefix, ERR_NOTREGISTERED(client->getNickname())));
+	/* Register check */
+	if (this->client->getRegisteredStatus()) {
+		throw CmdException(ERR_ALREADYREGISTERED);
+	}
 
-	/* Register check : ALREADY REGISTRED */
-	if (client->getUserStatus() == true && client->getRegisteredStatus() == true)
-		throw CmdException(server.makeMsg(servPrefix, ERR_ALREADYREGISTRED(client->getNickname())));
+	/* Pass check */
+	if (!this->client->getPassStatus()) {
+		throw CmdException(ERR_NEEDMOREPARAMS(client->getNickname(), "PASS"));
+	}
 
 	std::stringstream ssArg(cmdParams);
 	std::string token;
@@ -97,14 +98,14 @@ void Cmd::cmdUser() {
 		++count;
 	}
 	if (count < 4) {
-		throw CmdException(ERR_NEEDMOREPARAMS(client->getNickname(), "USER"));
+		throw CmdException(server.makeMsg(PREFIX_SERVER(server.getName()), ERR_NEEDMOREPARAMS(client->getNickname(), "USER")));
 	}
 
 	std::stringstream ssUser(cmdParams);
 	count = 0;
 	while (ssUser >> token) {
 		if (token.empty()) {
-			throw CmdException(ERR_NEEDMOREPARAMS(client->getNickname(), "USER"));
+			throw CmdException(server.makeMsg(PREFIX_SERVER(server.getName()), ERR_NEEDMOREPARAMS(client->getNickname(), "USER")));
 		}
 		switch (count) {
 		case 0:
@@ -134,13 +135,11 @@ void Cmd::cmdUser() {
 				checkRealname(realname);
 				client->setRealname(realname);
 			} else {
-				throw CmdException(ERR_NEEDMOREPARAMS(client->getNickname(), "USER"));
+				throw CmdException(server.makeMsg(PREFIX_SERVER(server.getName()), ERR_NEEDMOREPARAMS(client->getNickname(), "USER")));
 			}
 			break;
 		}
 
 		++count;
 	}
-	client->setPrefix();
-	client->setUserStatus(true);
 }

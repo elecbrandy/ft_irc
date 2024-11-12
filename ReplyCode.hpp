@@ -1,5 +1,5 @@
 // 001: 서버에 연결됨
-#define RPL_WELCOME(nick, servername) 			":" + servername + " 001 " + nick + " :Welcome to the Internet Relay Network, " + nick + "!"
+#define RPL_WELCOME(nick, servername) 			"001 " + nick + " :Welcome to the Internet Relay Network, " + nick + "!"
 
 // 002: 서버의 호스트 정보와 버전을 알림
 #define RPL_YOURHOST(nick, servername)          "002 " + nick + " :Your host is " + servername
@@ -28,13 +28,13 @@
 #define RPL_ENDOFNAMES(nick, ch)				"366 " + nick + " " + ch + " :End of /NAMES list"
 
 // 375: MOTD 메세지의 시작을 알림
-#define RPL_MOTDSTART(nick)                     "375 " + nick + " :==========start of /MOTD command"
+#define RPL_MOTDSTART(nick)                     "375 " + nick + " :start of MOTD command"
 
 // 372: MOTD 메세지의 본문
-#define RPL_MOTD(nick)                          "372 " + nick + " :========== Welcome to FT_IRC"
+#define RPL_MOTD(nick, msg)                          "372 " + nick + " :" + msg
 
 // 376: MOTD 메세지의 끝을 알림
-#define RPL_ENDOFMOTD(nick)                     "376 " + nick + " :==========end of /MOTD command"
+#define RPL_ENDOFMOTD(nick)                     "376 " + nick + " :end of MOTD command"
 
 // 401: 대상 닉네임을 가진 사용자가 존재하지 않음
 #define ERR_NOSUCHNICK(nick, target)			"401 " + nick + " " + target + " :No such nick/channel"
@@ -184,4 +184,6 @@
 // 417: 메세지가 512자를 넘어가는 경우 (InspIRCd 기준)
 // #define ERR_LINETOOLONG(nick)					"417 " + nick + " :Input Line too long"
 
-#define ERR_ERRUSERCMD "Error: "
+#define ERR_ERRUSERCMD "Error: in Usercmd"
+
+#define RPL_CAP "CAP * LS :"

@@ -1,53 +1,53 @@
-#include "Cmd.hpp"
+// #include "Cmd.hpp"
 
-/*
-명령어: KICK <channel> <nickname> [<comment>]
+// /*
+// 명령어: KICK <channel> <nickname> [<comment>]
 
-Numeric Replies:
-ERR_NEEDMOREPARAMS - 파라미터 부족
-ERR_BADCHANMASK - 주어진 채널이름의 형식이 잘못됨. (채널이름이 규칙에 맞지 않는 경우, #으로 시작하지 않는 등..)
-ERR_NOSUCHCHANNEL - 채널이 채널 목록에 존재하지 않음
-ERR_NOTONCHANNEL - 강퇴시킬 사용자가 채널에 참여자가 아님
-ERR_CHANOPRIVSNEEDED - 채널 오퍼레이터 권한이 없음
+// Numeric Replies:
+// ERR_NEEDMOREPARAMS - 파라미터 부족
+// ERR_BADCHANMASK - 주어진 채널이름의 형식이 잘못됨. (채널이름이 규칙에 맞지 않는 경우, #으로 시작하지 않는 등..)
+// ERR_NOSUCHCHANNEL - 채널이 채널 목록에 존재하지 않음
+// ERR_NOTONCHANNEL - 강퇴시킬 사용자가 채널에 참여자가 아님
+// ERR_CHANOPRIVSNEEDED - 채널 오퍼레이터 권한이 없음
 
-- 채널에서 사용자를 강제로 퇴장시킬 때 사용하는 명령어 (강제 part)
-- <channel>은 사용자를 강제로 퇴장시킬 채널 이름
-- <nickname>은 강제로 퇴장시킬 사용자의 닉네임
-- <comment>는 선택사항으로, 사용자를 강제로 퇴장시킬 때 이유를 명시
+// - 채널에서 사용자를 강제로 퇴장시킬 때 사용하는 명령어 (강제 part)
+// - <channel>은 사용자를 강제로 퇴장시킬 채널 이름
+// - <nickname>은 강제로 퇴장시킬 사용자의 닉네임
+// - <comment>는 선택사항으로, 사용자를 강제로 퇴장시킬 때 이유를 명시
 
-경우의 수
-1. 파라미터 부족/과다 : 최소 채널이름과 닉네임이 필요 (총 2개, 최대 3개)
-2. 채널 파라미터 잘못된 경우
-	2.1 채널이름의 형식이 잘못된 경우
-	2.2 채널이 존재하지 않는 경우
-3. 강퇴시킬 사용자가 채널의 참여자가 아닌 경우
-4. 채널 오퍼레이터 권한이 없는 경우
-*/
+// 경우의 수
+// 1. 파라미터 부족/과다 : 최소 채널이름과 닉네임이 필요 (총 2개, 최대 3개)
+// 2. 채널 파라미터 잘못된 경우
+// 	2.1 채널이름의 형식이 잘못된 경우
+// 	2.2 채널이 존재하지 않는 경우
+// 3. 강퇴시킬 사용자가 채널의 참여자가 아닌 경우
+// 4. 채널 오퍼레이터 권한이 없는 경우
+// */
 
-std::vector<std::string> Cmd::split(char delim) {
-    std::vector<std::string> res;
-    std::string paramCopy = getCmdParams();
-    size_t start = 0, pos;
+// std::vector<std::string> Cmd::split(char delim) {
+//     std::vector<std::string> res;
+//     std::string paramCopy = getCmdParams();
+//     size_t start = 0, pos;
 
-    // ':'가 나올 때까지 delim을 기준으로 나누기
-    while ((pos = paramCopy.find(delim, start)) != std::string::npos) {
-        // ':'를 만나면 루프를 종료하고 이후 문자열을 결과에 추가
-        if (paramCopy[start] == ':') {
-            res.push_back(paramCopy.substr(start + 1));
-            return res;
-        }
+//     // ':'가 나올 때까지 delim을 기준으로 나누기
+//     while ((pos = paramCopy.find(delim, start)) != std::string::npos) {
+//         // ':'를 만나면 루프를 종료하고 이후 문자열을 결과에 추가
+//         if (paramCopy[start] == ':') {
+//             res.push_back(paramCopy.substr(start + 1));
+//             return res;
+//         }
 
-        res.push_back(paramCopy.substr(start, pos - start));
-        start = pos + 1;
-    }
+//         res.push_back(paramCopy.substr(start, pos - start));
+//         start = pos + 1;
+//     }
 
-    // 마지막 남은 부분 확인 및 ':' 처리
-    if (start < paramCopy.size())
-        res.push_back(paramCopy.substr(start));
+//     // 마지막 남은 부분 확인 및 ':' 처리
+//     if (start < paramCopy.size())
+//         res.push_back(paramCopy.substr(start));
 	
 
-    return res;
-}
+//     return res;
+// }
 
 
 void Cmd::cmdKick() {
@@ -62,16 +62,16 @@ void Cmd::cmdKick() {
 	if (params.size() < 2 || params.size() > 3)
 		throw Cmd::CmdException(server.makeMsg(servPrefix, ERR_NEEDMOREPARAMS(client->getNickname(), cmd)));
 
-	std::string chName = params[0];
-	std::string target = params[1];
-	std::string comment = "";
+// 	std::string chName = params[0];
+// 	std::string target = params[1];
+// 	std::string comment = "";
 
-	for (size_t i = 0; i < params.size(); i++) {
-		std::cout << "params[" << i << "]: |" << params[i] << "|" << std::endl;
-	}
+// 	for (size_t i = 0; i < params.size(); i++) {
+// 		std::cout << "params[" << i << "]: |" << params[i] << "|" << std::endl;
+// 	}
 
-	if (params.size() == 3)
-		std::string comment = params[2];
+// 	if (params.size() == 3)
+// 		std::string comment = params[2];
 	
 
 	// 채널 이름의 형식이 잘못된 경우

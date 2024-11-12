@@ -47,6 +47,10 @@ public:
 	void		cmdPart();
 	void		cmdInvite();
 
+	/* Bots */
+	void		cmdBotMe();
+	void		cmdBotTime();
+
 	/* Utils */
 	void checkNick(const std::string& str);
 	void checkPassword(const std::string& str);
@@ -59,6 +63,7 @@ public:
 	std::vector<std::string> joinSplit(std::string &cmdParams);
 	std::vector<std::string> privmsgSplit();
 	std::vector<std::string> split(char delim);
+	void printWelcome();
 
 	/* Setter & Getter */
 	std::string getCmdParams() const;

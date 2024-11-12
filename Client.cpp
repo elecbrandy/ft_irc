@@ -19,7 +19,6 @@ Client:: ~Client() {
 void Client::setFd(int fd) {this->_fd = fd;}
 
 void Client::setNickname(const std::string& str) {
-	//this->_nickname = str;
 	size_t spacePos = str.find(' ');
     if (spacePos != std::string::npos) {
         this->_nickname = str.substr(0, spacePos);
@@ -116,7 +115,7 @@ bool Client::hasDataToSend() const {
 void Client::setPrefix() {_prefix = PREFIX_USER(_nickname, _username, _hostname);}
 
 void Client::printLog() {
-	std::cout << C_LOG << std::boolalpha
+	std::cout << C_WARN << std::boolalpha
 	<< ">>>>> client log <<<<<\n"
 	<< "nickname: " << this->getNickname() << "\n"
 	<< "username: " << this->getUsername() << "\n"

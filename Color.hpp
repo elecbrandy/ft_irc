@@ -13,7 +13,7 @@
 #define C_MSG	WHITE
 #define C_ERR	RED
 #define C_WARN	ORANGE
-#define C_LOG   YELLOW
+#define C_KEY   YELLOW
 #define C_RESET	"\033[0m"
 
 #endif

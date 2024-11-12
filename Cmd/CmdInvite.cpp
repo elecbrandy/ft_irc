@@ -81,59 +81,59 @@ void Cmd::cmdInvite() {
 
 
 
-//     Author : sejkim2
-//     Description : /Invite
+// //     Author : sejkim2
+// //     Description : /Invite
 
-//     client -> /invite nickname #channel
-//     server <- /invite nickname #channel
+// //     client -> /invite nickname #channel
+// //     server <- /invite nickname #channel
 
 
-//     1. nickname 검증
-//     2. 채널 검증 
-//         1) 존재하는 채널인지
-//         2) +i 모드인지
-//         3) 호출한 유저가 채널의 운영자인지
+// //     1. nickname 검증
+// //     2. 채널 검증 
+// //         1) 존재하는 채널인지
+// //         2) +i 모드인지
+// //         3) 호출한 유저가 채널의 운영자인지
     
-// */
+// // */
 
-// void    Cmd::cmdInvite()
-// {
-//     std::vector<std::string> inviteParse;
-//     std::istringstream stream(this->cmdParams);
-//     std::string token;
-//     std::map<std::string, Client*> map = this->server.getNickNameClientMap();
-//     std::map<std::string, Channel*> _channels = this->server.getChannels();
+// // void    Cmd::cmdInvite()
+// // {
+// //     std::vector<std::string> inviteParse;
+// //     std::istringstream stream(this->cmdParams);
+// //     std::string token;
+// //     std::map<std::string, Client*> map = this->server.getNickNameClientMap();
+// //     std::map<std::string, Channel*> _channels = this->server.getChannels();
 
-//     while (stream >> token)
-//         inviteParse.push_back(token);
+// //     while (stream >> token)
+// //         inviteParse.push_back(token);
     
-//     //param 2개인지 
-//     if (inviteParse.size() != 2)
-//         throw CmdException(ERR_NEEDMOREPARAMS(this->client->getNickname(), this->cmdParams));
+// //     //param 2개인지 
+// //     if (inviteParse.size() != 2)
+// //         throw CmdException(ERR_NEEDMOREPARAMS(this->client->getNickname(), this->cmdParams));
     
-//     //서버에 존재하는 유저인지
-//     std::map<std::string, Client*>::iterator user = map.find(inviteParse[0]);
-//     if (user == map.end())
-//         throw CmdException(ERR_NOSUCHNICK(this->client->getNickname(), inviteParse[0]));
+// //     //서버에 존재하는 유저인지
+// //     std::map<std::string, Client*>::iterator user = map.find(inviteParse[0]);
+// //     if (user == map.end())
+// //         throw CmdException(ERR_NOSUCHNICK(this->client->getNickname(), inviteParse[0]));
     
-//     //서버에 존재하는 채널인지
-//     std::map<std::string, Channel*>::iterator channel = _channels.find(inviteParse[1]);
-//     // if (channel == _channels.end())
-//     //     std::cout << "channel not exist";
+// //     //서버에 존재하는 채널인지
+// //     std::map<std::string, Channel*>::iterator channel = _channels.find(inviteParse[1]);
+// //     // if (channel == _channels.end())
+// //     //     std::cout << "channel not exist";
 
-//     //초대 하려는 유저가 이미 존재하는 유저인지
-//     std::map<std::string, Client*> participant = channel->second->getParticipant();
-//     if (participant.find(inviteParse[0]) == participant.end())
-//         throw CmdException(ERR_USERONCHANNEL(inviteParse[0], inviteParse[1]));
+// //     //초대 하려는 유저가 이미 존재하는 유저인지
+// //     std::map<std::string, Client*> participant = channel->second->getParticipant();
+// //     if (participant.find(inviteParse[0]) == participant.end())
+// //         throw CmdException(ERR_USERONCHANNEL(inviteParse[0], inviteParse[1]));
 
-//     //명령 호출자가 채널에 참여중인 유저인가
-//     if (participant.find(this->client->getNickname()) == participant.end())
-//         throw CmdException(ERR_NOTONCHANNEL(this->client->getNickname(), inviteParse[1]));
+// //     //명령 호출자가 채널에 참여중인 유저인가
+// //     if (participant.find(this->client->getNickname()) == participant.end())
+// //         throw CmdException(ERR_NOTONCHANNEL(this->client->getNickname(), inviteParse[1]));
 
-//     //채널 모드가 +i일 때 명령 호출자가 채널의 운영자인지
-//     std::set<char> mode = channel->second->getMode();
-//     if (mode.find('i') == mode.end() && channel->second->isOperator(this->client) == false)
-//         throw CmdException(ERR_CHANOPRIVSNEEDED(this->client->getNickname(), inviteParse[0]));
+// //     //채널 모드가 +i일 때 명령 호출자가 채널의 운영자인지
+// //     std::set<char> mode = channel->second->getMode();
+// //     if (mode.find('i') == mode.end() && channel->second->isOperator(this->client) == false)
+// //         throw CmdException(ERR_CHANOPRIVSNEEDED(this->client->getNickname(), inviteParse[0]));
     
-//     channel->second->addInvited(inviteParse[0]);
-// }
+// //     channel->second->addInvited(inviteParse[0]);
+// // }

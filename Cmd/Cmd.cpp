@@ -29,27 +29,8 @@ std::string Cmd::extractCmdParams() {
 	}
 }
 
-// void Cmd::authorizeClient() {
-// 	if (client->getPassStatus() && client->getNickStatus() && client->getUserStatus()) {
-// 		client->setRegisteredStatus(true);
-
-// 		/* RPL */
-// 		server.castMsg(client_fd, server.makeMsg(RPL_WELCOME(client->getNickname(), client->getServername())));
-// 		server.castMsg(client_fd, server.makeMsg(RPL_YOURHOST(client->getNickname(), client->getServername())).c_str());
-// 		server.castMsg(client_fd, server.makeMsg(RPL_CREATED(client->getNickname(), server.formatDateToString(server.getStartTime()))).c_str());
-// 		server.castMsg(client_fd, server.makeMsg(RPL_MYINFO(client->getNickname())).c_str());
-
-// 		/* MOTD */
-// 		server.castMsg(client_fd, server.makeMsg(RPL_MOTDSTART(client->getNickname())).c_str());
-// 		server.castMsg(client_fd, server.makeMsg(RPL_MOTD(client->getNickname())).c_str());
-// 		server.castMsg(client_fd, server.makeMsg(RPL_ENDOFMOTD(client->getNickname())).c_str());
-
-// 	}
-// }
-
 bool Cmd::handleClientCmd() {
 	try {
-		// ScopedTimer("Cmd");
 		this->cmd = extractCmd();
 		this->cmdParams = extractCmdParams();
 
@@ -83,7 +64,6 @@ bool Cmd::handleClientCmd() {
 		if (!this->client->getPassStatus() || \
 			!this->client->getRegisteredStatus()) {	
 			server.castMsg(client_fd, e.what());
-			server.removeClient(client_fd);
 			return false;
 		}
 		server.castMsg(client_fd, e.what());
@@ -93,3 +73,24 @@ bool Cmd::handleClientCmd() {
 
 const char* Cmd::CmdException::what() const throw() {return msg.c_str();}
 std::string Cmd::getCmdParams() const {return this->cmdParams;}
+
+void Cmd::printWelcome() {
+	/* RPL */
+	server.castMsg(client_fd, server.makeMsg(PREFIX_SERVER(server.getName()), RPL_WELCOME(client->getNickname(), client->getServername())));
+	server.castMsg(client_fd, server.makeMsg(PREFIX_SERVER(server.getName()), RPL_YOURHOST(client->getNickname(), client->getServername())));
+	server.castMsg(client_fd, server.makeMsg(PREFIX_SERVER(server.getName()), RPL_CREATED(client->getNickname(), server.formatDateToString(server.getStartTime()))));
+	server.castMsg(client_fd, server.makeMsg(PREFIX_SERVER(server.getName()), RPL_MYINFO(client->getNickname())));
+	
+	/* MOTD */
+	server.castMsg(client_fd, server.makeMsg(PREFIX_SERVER(server.getName()), RPL_MOTDSTART(client->getNickname())));
+	std::ifstream goatFile(PATH_MOTD);
+	if (goatFile.is_open()) {
+
+		std::string line;
+		while (getline(goatFile, line)) {
+			server.castMsg(client_fd, server.makeMsg(PREFIX_SERVER(server.getName()), RPL_MOTD(client->getNickname(), line)));
+		}
+		goatFile.close();
+	}
+	server.castMsg(client_fd, server.makeMsg(PREFIX_SERVER(server.getName()), RPL_ENDOFMOTD(client->getNickname())));
+}
