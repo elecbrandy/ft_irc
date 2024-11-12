@@ -52,10 +52,8 @@ void Cmd::handleClientCmd() {
 			cmdKick();
 		else if (cmd == "INVITE")
 			cmdInvite();
-		else if (cmd == "MODE") {
-			return ;
-			// cmdMode();
-		}
+		else if (cmd == "MODE")
+			cmdMode();
 		else if (cmd == "TOPIC")
 			cmdTopic();
 		else if (cmd == "QUIT")

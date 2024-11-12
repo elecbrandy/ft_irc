@@ -44,16 +44,14 @@ void Cmd::validationNickName(std::string nickname, Channel* channel, int option_
     //해당 클라이언트가 채널에 없음
     if (option_flag == 1)
     {
-        if (channel->isParticipant(nickname) == false)
+        if (channel->isParticipant(channel->isOperatorNickname(nickname)) == false)
             throw CmdException(ERR_USERNOTINCHANNEL(this->client->getNickname(), nickname, channel->getName()));
     }
     else
     // option_flag == 0, 채널의 운영자에 nickname이 포함되어 있는지 검증
     {
         if (channel->isOperator(nickname) == false)
-        {
             throw CmdException(ERR_NOSUCHNICK(this->client->getNickname(), nickname));
-        }
     }
 }
 
@@ -331,8 +329,16 @@ void Cmd::cmdMode()
         handlePlusFlagOption(modeParse, channel, option_flag);
 
     std::string str = "MODE";
-    for(size_t i = 0; i < modeParse.size() - 1; i++)
+    size_t i = 0;
+    for(i = 0; i < modeParse.size() - 1; i++)
         str += " " + modeParse[i];
-    str += " :" + modeParse[modeParse.size() - 1];
-    server.broadcastMsg(server.makeMsg(PREFIX_USER(this->client->getNickname(), this->client->getUsername(), this->client->getHostname()), str), channel->second, this->client->getFd());
+    str += " :" + modeParse[i];
+    std::string msg = server.makeMsg(this->client->getPrefix(), str);
+    
+    server.broadcastMsg(msg, channel->second, -1);
 }
+
+// /connect -nocap localhost 6667 1111
+// Tue Nov 12 2024 11:55:24 USERINPUT: C[811AAAAAA] I MODE #ch +o sej
+// Tue Nov 12 2024 11:55:24 USEROUTPUT: C[811AAAAAA] O :sejkim2!root@127.0.0.1 MODE #ch +o :sej
+// Tue Nov 12 2024 11:55:24 USEROUTPUT: C[811AAAAAB] O :sejkim2!root@127.0.0.1 MODE #ch +o :sej

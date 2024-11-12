@@ -101,7 +101,6 @@ const std::set<char>& Channel::getMode() const {return this->_mode;}
 
 std::map<std::string, Client*>& Channel::getParticipant() {return this->_participant;}
 
-#include <iostream>
 std::string Channel::getParticipantNameStr() {
     std::string names = "";
     std::map<std::string, Client*>::iterator it = _participant.begin();
@@ -118,7 +117,6 @@ std::string Channel::getParticipantNameStr() {
             names += " ";
         }
     }
-    std::cout << "names: |" << names << "|" << std::endl;
     return names;
 }
 

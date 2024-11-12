@@ -65,6 +65,9 @@ void Cmd::checkNick(const std::string& str) {
 		throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_NICKNAMEINUSE(tmp)));
 }
 
+
+// std::map<std::string, Client*>		nickNameClientMap;
+
 void Cmd::cmdNick() {
 	// nick 명령어를 처리하기 전에 PASS 명령어를 먼저 처리했어야 정상적인 작동!
 	if (client->getPassStatus() == false)
@@ -109,5 +112,7 @@ void Cmd::cmdNick() {
 			}
 		}
 	}
+	else
+		this->server.addClientByNickname(this->cmdParams, this->client);
 	client->setNickStatus(true);
 }

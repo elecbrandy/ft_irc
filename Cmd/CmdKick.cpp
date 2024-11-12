@@ -86,7 +86,7 @@ void Cmd::cmdKick() {
 	Channel* ch = it->second;
 
 	// 명령어를 호출한 클라이언트가 채널에 참여한 클라이언트가 아닌 경우
-	if (ch->getParticipant().find(client->getNickname()) == ch->getParticipant().end())
+	if (ch->getParticipant().find(ch->isOperatorNickname(client->getNickname())) == ch->getParticipant().end())
 		throw Cmd::CmdException(server.makeMsg(PREFIX_SERVER, ERR_NOTONCHANNEL(client->getNickname(), chName)));
 
 	// 채널 오퍼레이터 권한이 없는 경우
