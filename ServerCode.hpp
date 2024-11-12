@@ -2,14 +2,14 @@
 #define SERVERCODE_HPP
 
 /* COUT LOG */
-#define LOG_SERVER_INIT			" SERV_LOG: IRC Server INIT!: port:"
-#define LOG_NEW_CONNECTED		" SERV_LOG: new client connected: fd:"
-#define LOG_END_CONNECTED		" SERV_LOG: client connection closed: fd:"
-#define LOG_CLINET_INPUT		" SERV_LOG: client input received:"
-#define LOG_CONNECTION_TIMEOUT	" SERV_LOG: client connection timed out: fd:"
-#define LOG_CHECK_CONNECTION_START    " SERV_LOG: checking client connection..."
-#define LOG_CHECK_CONNECTION_END    " SERV_LOG: checking client connection end!"
-#define LOG_SERVER_SHUTDOWN		" SERV_LOG: server closed"
+#define MSG_SERVER_INIT				"IRC Server INIT!: port:"
+#define MSG_NEW_CONNECTED			"new client connected: fd:"
+#define MSG_END_CONNECTED			"client connection closed: fd:"
+#define MSG_CLINET_INPUT			"client input received:"
+#define MSG_CONNECTION_TIMEOUT		"client connection timed out: fd:"
+#define MSG_CHECK_CONNECTION_START	"checking client connection..."
+
+#define MSG_SERVER_SHUTDOWN			"server closed"
 
 /* !ERROR! */
 #define	ERR_ARG_COUNT			"invalid argument count. (only 3)"
@@ -30,7 +30,8 @@
 #define	ERR_DATA_RECEIVE		"data reception error."
 #define	ERR_SEND				"send() error."
 #define	ERR_POLL				"poll() error."
-#define ERR_RECV				"recv() error."
 #define	ERR_ETC					"unknown error occurred."
+#define ERR_RECV				"recv() error."
+#define ERR_OPEN_FILE           "cannot open file."
 
 #endif

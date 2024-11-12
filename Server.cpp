@@ -44,10 +44,10 @@ const std::string IrcServer::getName() const {return this->_servername;}
 time_t IrcServer::getStartTime() const {return this->_startTime;}
 
 std::string IrcServer::formatDateToString(time_t time) {
-    struct tm *timeInfo = std::localtime(&time);
-    char buffer[20];
-    std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", timeInfo);
-    return std::string(buffer);
+	struct tm *timeInfo = std::localtime(&time);
+	char buffer[20];
+	std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", timeInfo);
+	return std::string(buffer);
 }
 
 void IrcServer::init() {
@@ -80,7 +80,7 @@ void IrcServer::init() {
 
 	std::system("clear");
 	printGoat(); // goat
-	std::cout << LOG_SERVER_INIT << C_LOG << port << C_RESET << std::endl;
+	serverLog(-1, LOG_SERVER, C_MSG, MSG_SERVER_INIT);
 }
 
 void IrcServer::acceptClient() {
@@ -110,8 +110,7 @@ void IrcServer::acceptClient() {
 	Client* newClient = new Client(client_addr.sin_addr);
 	newClient->setFd(client_fd);
 	_clients[client_fd] = newClient;
-
-	std::cout << LOG_NEW_CONNECTED << C_LOG << client_fd << C_RESET << std::endl;
+	serverLog(-1, LOG_SERVER, C_MSG, MSG_NEW_CONNECTED);
 }
 
 void IrcServer::run() {
@@ -150,7 +149,7 @@ void IrcServer::run() {
 				}
 			}
 		} catch (const ServerException& e) {
-			std::cerr << C_ERR << "Error: server.run(): " << e.what() << C_RESET << std::endl;
+			serverLog(-1, LOG_ERR, C_ERR, e.what());
 			if (exitFlag) {
 				exit(EXIT_FAILURE);
 			}
@@ -188,7 +187,7 @@ void IrcServer::handleClientMessage(int client_fd) {
 			std::string tmp;
 			while (client->extractMessage(tmp)) {
 				Cmd cmdHandler(*this, tmp, client_fd);
-				std::cout << " INPUT[" << C_LOG << client_fd << C_RESET << "]: " << tmp << std::endl;
+				serverLog(client_fd, LOG_INPUT, C_MSG, tmp);
 				if (!cmdHandler.handleClientCmd()) {
 					return ;
 				}
@@ -228,7 +227,7 @@ void IrcServer::castMsg(int client_fd, const std::string msg) {
 		// 이어서 POLLOUT 이벤트를 모니터링 하도록 설정
 		modifyPollEvent(client_fd, POLLIN | POLLOUT);
 	}
-	std::cout << "OUTPUT[" << C_LOG << client_fd << C_RESET << "]: " << msg.substr(0, msg.length());
+	serverLog(client_fd, LOG_OUTPUT, C_MSG, msg.substr(0, msg.length()));
 }
 
 void IrcServer::modifyPollEvent(int fd, short events) {
@@ -337,10 +336,10 @@ void IrcServer::setChannels(const std::string& channelName, const std::string& k
 																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																									
 void IrcServer::checkConnections() {
 	std::map<int, Client*>::iterator it = _clients.begin();
-	std::cout << GREEN << LOG_CHECK_CONNECTION_START << C_RESET << std::endl;
+	serverLog(-1, LOG_SERVER, C_MSG, MSG_CHECK_CONNECTION_START);
 	while (it != _clients.end()) {
 		if (it->second->isConnectionTimedOut(TIME_OUT)) {
-			std::cout << LOG_CONNECTION_TIMEOUT << C_LOG << it->first << C_RESET << std::endl;
+			serverLog(-1, LOG_SERVER, C_MSG, MSG_CONNECTION_TIMEOUT);
 			removeClinetFromServer(it->second); // Client 제거
 			it = _clients.erase(it);            // 지운 후 다음 iterator 반환
 		} else {
@@ -358,7 +357,7 @@ void IrcServer::printGoat() {
 		}
 		goatFile.close();
 	} else {
-		std::cerr << C_ERR << "Unable to open GOAT art file: " << C_RESET << PATH_GOAT << std::endl;
+		serverLog(-1, LOG_ERR, C_ERR, ERR_OPEN_FILE);
 	}
 }
 
@@ -399,3 +398,20 @@ std::string IrcServer::makeMsg(const std::string& prefix, const std::string& msg
 	}
 	return (prefix + " " + msg + CRLF);
 }
+
+void IrcServer::serverLog(int fd, int log_type, std::string log_color, std::string msg) {
+	if (msg.empty() || msg.back() != '\n') {
+		msg += '\n';
+	}
+
+	if (log_type == LOG_OUTPUT) {
+		std::cout << "OUTPUT[" << C_KEY << fd << C_RESET << "]: " << log_color << msg << C_RESET;
+	} else if (log_type == LOG_INPUT) {
+		std::cout << "INPUT[" << C_KEY << fd << C_RESET << "]: " << log_color << msg << C_RESET;
+	} else if (log_type == LOG_SERVER) {
+		std::cout << "SERV_LOG: " << log_color << msg << C_RESET;
+	} else if (log_type == LOG_ERR) {
+		std::cerr << "SERV_LOG: " << log_color << msg << C_RESET;
+	}
+}
+

@@ -42,6 +42,11 @@
 #define TIME_OUT 60
 #define TIME_CHECK_INTERVAL 180
 
+#define LOG_ERR -1
+#define LOG_SERVER 0
+#define LOG_INPUT 1
+#define LOG_OUTPUT 2
+
 class IrcServer {
 private:
 	const std::string					_servername;
@@ -91,6 +96,8 @@ public:
 	void modifyPollEvent(int client_fd, short events);
 	void handleSocketWrite(int client_fd);
 	void removeClinetFromServer(Client* client);
+
+	void serverLog(int fd, int log_type, std::string log_color, std::string msg);
 
 	/* exception */
 	class ServerException : public std::exception {

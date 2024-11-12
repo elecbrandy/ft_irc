@@ -117,7 +117,7 @@ void Client::setPrefix() {
 }
 
 void Client::printLog() {
-	std::cout << C_LOG << std::boolalpha
+	std::cout << C_WARN << std::boolalpha
 	<< ">>>>> client log <<<<<\n"
 	<< "nickname: " << this->getNickname() << "\n"
 	<< "username: " << this->getUsername() << "\n"
