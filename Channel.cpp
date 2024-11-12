@@ -143,6 +143,15 @@ bool Channel::isParticipant(std::string nickname) const
 		return true;
 }
 
+bool Channel::isSetKey() const
+{
+	if (this->_key == "")
+		return (false);
+	else
+		return true;
+}
+
+
 void Channel::updateInviteList(std::string nickname) {
 	if (std::find(_invited.begin(), _invited.end(), nickname) != _invited.end())
 		_invited.erase(std::remove(_invited.begin(), _invited.end(), nickname), _invited.end());

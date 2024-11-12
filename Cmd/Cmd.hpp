@@ -63,7 +63,7 @@ public:
 	/* Setter & Getter */
 	std::string getCmdParams() const;
 
-	void validationKey(std::string key);
+	void validationKey(std::string key, Channel* channel);
 	void validationInt(std::string _size);
 	void addChannelOperator(std::string nickname, Channel* channel);
 	void setChannelKey(std::string key, Channel* channel);

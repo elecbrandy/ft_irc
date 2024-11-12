@@ -58,8 +58,11 @@ void Cmd::validationNickName(std::string nickname, Channel* channel, int option_
 }
 
 //option : +k (채널에 password 설정)
-void Cmd::validationKey(std::string key)
+void Cmd::validationKey(std::string key, Channel* channel)
 {
+    if (channel->isSetKey() == false)
+        throw CmdException(ERR_KEYSET(channel->getName()));
+
     if (key.empty()) {
 		throw CmdException(ERR_NEEDMOREPARAMS(client->getNickname(), "PASS"));
 	}
@@ -185,7 +188,7 @@ void Cmd::handleMinusFlagOption(std::vector<std::string> modeParse, std::map<std
             if (_option[option_index] == 'o')
                 validationNickName(param[param_index], channel->second, option_flag);
             else if (_option[option_index] == 'k')
-                validationKey(param[param_index]);
+                validationKey(param[param_index], channel->second);
             //(_option[option_index] == 'l')
             else
                 validationInt(param[param_index]);

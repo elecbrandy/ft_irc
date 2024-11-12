@@ -59,6 +59,7 @@ class Channel {
 
 		bool isOperator(std::string nickname) const;
 		bool isParticipant(std::string nickname) const;
+		bool isSetKey() const;
 		unsigned int getLimit() const;
 		std::vector<std::string> getInvited();
 		std::vector<std::string> getBanned();

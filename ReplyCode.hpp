@@ -133,7 +133,7 @@
 #define ERR_YOUREBANNEDCREEP 					"465 " + nick + " "
 
 // 467: 채널의 키가 이미 설정되어 있음
-#define ERR_KEYSET 								"467 " + nick + " "
+#define ERR_KEYSET(ch)						"467 " + ch + " :Channel key already set"
 
 // 471: 채널이 가득 차서 더 이상 사용자가 들어올 수 없음
 #define ERR_CHANNELISFULL(nick, ch) 						"471 " + nick + " " + ch + " :Cannot join channel (+l)"
