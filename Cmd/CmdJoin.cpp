@@ -66,9 +66,11 @@ bool Cmd::isValidChannelName(const std::string &channel) {
 
 void Cmd::cmdJoin() {
 	// 명령어를 보낸 클라이언트가 register 되지 않은 경우
-    if (client->getRegisteredStatus() == false)
-        throw Cmd::CmdException(server.makeMsg(PREFIX_SERVER, ERR_NOTREGISTERED(client->getNickname())));
-		
+    if (client->getRegisteredStatus() == false) {
+		server.castMsg(client_fd, server.makeMsg(PREFIX_SERVER, ERR_NOTREGISTERED(client->getNickname())));
+		return ;
+	}
+
 	std::vector<std::string> joinTokens = joinSplit(cmdParams);
 	std::vector<std::string> channel;
 	std::vector<std::string> key;

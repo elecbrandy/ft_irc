@@ -65,7 +65,6 @@ void Cmd::checkNick(const std::string& str) {
 		throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_NICKNAMEINUSE(tmp)));
 }
 
-
 // std::map<std::string, Client*>		nickNameClientMap;
 
 void Cmd::cmdNick() {
