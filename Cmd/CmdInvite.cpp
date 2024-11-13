@@ -25,12 +25,7 @@ void Cmd::cmdInvite() {
         throw Cmd::CmdException(server.makeMsg(PREFIX_SERVER, ERR_NOTREGISTERED(client->getNickname())));
         
     std::vector<std::string> params = split(' ');
-
-    // for(size_t i = 0; i < params.size(); i++) {
-    //     std::cout << "params[" << i << "]: |" << params[i] << "|" << std::endl;
-    // }
-
-
+    
     // 파라미터 부족/과다
     if (params.size() != 2)
         throw Cmd::CmdException(server.makeMsg(PREFIX_SERVER, ERR_NEEDMOREPARAMS(client->getNickname(), cmd)));
