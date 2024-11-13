@@ -90,9 +90,6 @@ void Cmd::cmdPrivmsg() {
         throw Cmd::CmdException(server.makeMsg(PREFIX_SERVER, ERR_NOTREGISTERED(client->getNickname())));
 		
 	std::vector<std::string> params = privmsgSplit();
-	// for (size_t i = 0; i < params.size(); i++) {
-	// 	std::cout << "params[" << i << "] : " << params[i] << std::endl;
-	// }
 
 	std::vector<std::string> receivers;
 	std::string msg;

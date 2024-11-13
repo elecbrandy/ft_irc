@@ -131,12 +131,12 @@ void Cmd::cmdJoin() {
 		 std::string participantName = (participant.empty()) ? '@' + client->getNickname() : client->getNickname();
 		 ch->addParticipant(participantName, client);
 
+		// JOIN 알림
+		server.broadcastMsg(server.makeMsg(client->getPrefix(), RPL_JOIN(chName)), ch, -1);
+
 		// 참여자 목록 전송
 		server.castMsg(client_fd, server.makeMsg(PREFIX_SERVER, RPL_NAMREPLY(client->getNickname(), "=", ch->getName(), ch->getParticipantNameStr())));
 		server.castMsg(client_fd, server.makeMsg(PREFIX_SERVER, RPL_ENDOFNAMES(client->getNickname(), ch->getName())));
-
-		// JOIN 알림
-		server.broadcastMsg(server.makeMsg(client->getPrefix(), RPL_JOIN(chName)), ch, -1);
 		
 		// 토픽 전송
 		if (ch->getTopic().empty())

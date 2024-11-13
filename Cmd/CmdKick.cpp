@@ -65,9 +65,9 @@ void Cmd::cmdKick() {
 	std::string target = params[1];
 	std::string comment = "";
 
-// 	for (size_t i = 0; i < params.size(); i++) {
-// 		std::cout << "params[" << i << "]: |" << params[i] << "|" << std::endl;
-// 	}
+	for (size_t i = 0; i < params.size(); i++) {
+		std::cout << "params[" << i << "]: |" << params[i] << "|" << std::endl;
+	}
 
 	if (params.size() == 3)
 		std::string comment = params[2];

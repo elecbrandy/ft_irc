@@ -179,7 +179,7 @@
 #define RPL_INVITE(target, ch)                  "INVITE " + target + " " + ch
 
 // PRIVMSG를 받는 클라이언트한테 보내는 메세지
-#define RPL_PRIVMSG(receiver, msg)              "PRIVMSG " + receiver + " :" + msg
+#define RPL_PRIVMSG(receiver, msg)              "PRIVMSG " + receiver + " " + msg
 
 // 417: 메세지가 512자를 넘어가는 경우 (InspIRCd 기준)
 // #define ERR_LINETOOLONG(nick)					"417 " + nick + " :Input Line too long"
