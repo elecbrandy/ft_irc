@@ -33,7 +33,7 @@ void Client::setHostname(const std::string& str) {this->_hostname = str;}
 
 void Client::setRealname(const std::string& str) {this->_realname = str;}
 
-void Client::setServername(const std::string& str) {this->_servername = str; std::cout << "servername: " << this->_servername << std::endl;}
+void Client::setServername(const std::string& str) {this->_servername = str;}
 
 void Client::setlastActivityTime() {this->_lastActivityTime = time(NULL);}
 
@@ -44,7 +44,6 @@ void Client::setNickStatus(bool status) {this->_registerStatus.nick = status;}
 void Client::setUserStatus(bool status) {this->_registerStatus.user = status;}
 
 void Client::setRegisteredStatus(bool status) {this->_registerStatus.registered = status;}
-
 
 /* getter */
 int	Client::getFd() const {return this->_fd;}
