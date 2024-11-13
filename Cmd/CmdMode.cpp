@@ -3,31 +3,6 @@
 /*
     Author : sejkim2
     Description : /MODE
-
-    처음 /connect 하면 client -> /mode nickname +i <- server
-
-    client -> /mode #test +i +t +o alice +k password +l 10
-    server <- MODE #test +itokl alice password 10
-
-    구현해야 할 옵션 : i, t, k, o, l
-    -> i, t는 추가 파라미터가 없으므로 계속 추가 가능
-    -> k, o, 
-    l은 추가 파라미터가 있으므로 3개 제한 (3개 넘기면 다음 메시지 프로토콜로 넘어감)
-
-    #channel option param
-    1. 채널 검증
-        1) #으로 시작하는가
-        2) 존재하는 채널인가
-        3) 채널의 운영자가 현재 호출 클라이언트인가
-    2. 옵션 검증
-        1) +로 시작하는가
-        2) {i, t, k, o, l} 인가
-    3. 파라미터 검증
-        1) k, o, l의 개수와 동일한가
-        2) 3개를 넘지 않는가
-    4. 옵션 처리
-        1) option - param 비교하며 처리
-
 */
 
 void printParam(std::vector<std::string> param)
@@ -102,13 +77,12 @@ void Cmd::addChannelOperator(std::string nickname, Channel* channel)
     std::map<std::string, Client*>::iterator client = map.find(nickname);
     
     //client->option_o (flag = 1)
+    std::string nick = "@" + nickname;
+    channel->removeParticipant(nickname);
+    channel->addParticipant(nick, client->second);
+
     channel->addOperator(nickname, client->second);
     channel->setMode('o');
-
-    std::map<std::string, Client*> participant = channel->getParticipant();
-    channel->removeParticipant(nickname);
-
-    channel->addParticipant("@" + nickname, client->second);
 }
 
 // #ch -o user
@@ -118,12 +92,12 @@ void Cmd::removeChannelOperator(std::string nickname, Channel* channel)
     std::map<std::string, Client*>::iterator client = map.find(nickname);
     
     //client->option_o (flag = 0)
+    std::string nick = "@" + nickname;
+    channel->removeParticipant(nick);
+    channel->addParticipant(nickname, client->second);
+
     channel->removeOperator(client->second);
     channel->removeMode('o');
-
-    std::map<std::string, Client*> participant = channel->getParticipant();
-    channel->removeParticipant(nickname);
-    channel->addParticipant(nickname, client->second);
 }
 
 void Cmd::setChannelKey(std::string key, Channel* channel)
@@ -340,6 +314,3 @@ void Cmd::cmdMode()
 }
 
 // /connect -nocap localhost 6667 1111
-// Tue Nov 12 2024 11:55:24 USERINPUT: C[811AAAAAA] I MODE #ch +o sej
-// Tue Nov 12 2024 11:55:24 USEROUTPUT: C[811AAAAAA] O :sejkim2!root@127.0.0.1 MODE #ch +o :sej
-// Tue Nov 12 2024 11:55:24 USEROUTPUT: C[811AAAAAB] O :sejkim2!root@127.0.0.1 MODE #ch +o :sej
