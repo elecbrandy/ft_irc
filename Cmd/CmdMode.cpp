@@ -44,13 +44,6 @@ void Cmd::validationKey(std::string key, Channel* channel)
 	if (key.size() >= PASSWORD_MAX_LEN) {
 		throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_PASS_PASSWORD));
 	}
-
-	/* ALNUM check */
-	for (std::string::const_iterator it = key.begin(); it != key.end(); ++it) {
-		if (!std::isalnum(static_cast<unsigned char>(*it))) {
-			throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_PASS_PASSWORD));
-		}
-	}
 }
 
 //option : +l (채널 제한 인원 설정)
