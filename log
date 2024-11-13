@@ -1,0 +1,108 @@
+476
+
+[client]
+mode +i (운영자 아님)
+07:32 -!- #ch You must be a channel op or higher to set channel mode i (inviteonly).
+[server]
+Wed Nov 13 2024 07:32:31 USERINPUT: C[811AAAAAB] I MODE #ch +i
+Wed Nov 13 2024 07:32:31 USEROUTPUT: C[811AAAAAB] O :irc.local 482 sej #ch :You must be a channel op or higher to set channel mode i (inviteonly).
+
+
+[client]
+/mode +t (운영자 아님)
+07:34 -!- #ch You must be a channel op or higher to set channel mode t (topiclock).
+[server]
+Wed Nov 13 2024 07:34:28 USERINPUT: C[811AAAAAB] I MODE #ch +t
+Wed Nov 13 2024 07:34:28 USEROUTPUT: C[811AAAAAB] O :irc.local 482 sej #ch :You must be a channel op or higher to set channel mode t (topiclock).
+
+[client]
+/mode #ch +i (채널 밖에서)
+[server]
+Wed Nov 13 2024 07:36:05 USERINPUT: C[811AAAAAA] I MODE #ch +i
+Wed Nov 13 2024 07:36:05 USEROUTPUT: C[811AAAAAA] O :irc.local 403 sejkim2 #ch :No such channel
+
+[client]
+/mode #ch +z (이상한 옵션)
+[server]
+Wed Nov 13 2024 07:45:32 USERINPUT: C[811AAAAAA] I MODE #ch +z
+Wed Nov 13 2024 07:45:32 USEROUTPUT: C[811AAAAAA] O :irc.local 472 sejkim2 z :is not a recognised channel mode.
+
+[client]
+/mode #ch *o nick (+나 -가 아닌 플래그)
+[server]
+Wed Nov 13 2024 07:46:34 USERINPUT: C[811AAAAAA] I MODE #ch +*o nick
+Wed Nov 13 2024 07:46:34 USEROUTPUT: C[811AAAAAA] O :irc.local 472 sejkim2 * :is not a recognised channel mode.
+Wed Nov 13 2024 07:46:34 USEROUTPUT: C[811AAAAAA] O :irc.local 401 sejkim2 nick :No such nick
+
+[client]
+/mode #ch +o zzz (zzz라는 유저가 채널에 없음)
+[server]
+Wed Nov 13 2024 07:50:06 USERINPUT: C[811AAAAAA] I MODE #ch +o zzz
+Wed Nov 13 2024 07:50:06 USEROUTPUT: C[811AAAAAA] O :irc.local 401 sejkim2 zzz :No such nick
+
+[client]
+/mode #ch -o zzz (zzz라는 유저가 채널에 없음)
+[server]
+Wed Nov 13 2024 07:50:44 USERINPUT: C[811AAAAAA] I MODE #ch -o zzz
+Wed Nov 13 2024 07:50:44 USEROUTPUT: C[811AAAAAA] O :irc.local 401 sejkim2 zzz :No such nick
+
+[client]
+/mode #ch +o sejkim2 (운영자가 아닐때)
+07:56 -!- #ch You must be a channel op or higher to set channel mode o (op).
+[server]
+Wed Nov 13 2024 07:56:14 USERINPUT: C[811AAAAAB] I MODE #ch +o sejkim2
+Wed Nov 13 2024 07:56:14 USEROUTPUT: C[811AAAAAB] O :irc.local 482 sej #ch :You must be a channel op or higher to set channel mode o (op).
+
+[client]
+/mode #ch -o sejkim2 (운영자가 아닐때)
+07:57 -!- #ch You must be a channel op or higher to unset channel mode o (op).
+[server]
+Wed Nov 13 2024 07:57:05 USERINPUT: C[811AAAAAB] I MODE #ch -o sejkim2
+Wed Nov 13 2024 07:57:05 USEROUTPUT: C[811AAAAAB] O :irc.local 482 sej #ch :You must be a channel op or higher to unset channel mode o (op).
+
+[client]
+/mode #ch +o sejkim2 (sejkim2가 없을 때)
+[server]
+Wed Nov 13 2024 07:58:30 USEROUTPUT: C[811AAAAAB] O :irc.local 401 sej sejkim22 :No such nick
+
+[client]
+/mode #ch +k (pass 입력 안했을 때)
+[server]
+Wed Nov 13 2024 07:59:29 USERINPUT: C[811AAAAAB] I MODE #ch +k
+Wed Nov 13 2024 07:59:29 USEROUTPUT: C[811AAAAAB] O :irc.local 696 sej #ch k * :You must specify a parameter for the key mode. Syntax: <key>.
+
+[client]
+/mode #ch +k pass
+08:11 -!- mode/#ch [+k pass] by sejkim2
+[server]
+Wed Nov 13 2024 08:11:55 USERINPUT: C[811AAAAAA] I MODE #ch +k pass
+Wed Nov 13 2024 08:11:55 USEROUTPUT: C[811AAAAAA] O :sejkim2!root@127.0.0.1 MODE #ch +k :pass
+
+[client]
+/mode #ch +l (size 입력 없음)
+[server]
+Wed Nov 13 2024 08:32:43 USERINPUT: C[811AAAAAA] I MODE #ch +l
+Wed Nov 13 2024 08:32:43 USEROUTPUT: C[811AAAAAA] O :irc.local 696 sejkim2 #ch l * :You must specify a parameter for the limit mode. Syntax: <limit>.
+
+[client]
+/mode #ch +l -1 (음수 입력)
+[server]
+Wed Nov 13 2024 08:37:06 USERINPUT: C[811AAAAAA] I MODE #ch +l -1
+Wed Nov 13 2024 08:37:06 USEROUTPUT: C[811AAAAAA] O :irc.local 696 sejkim2 #ch l -1 :Invalid limit mode parameter. Syntax: <limit>.
+
++l 0 가능함
++l alpha : 0으로 들어감
+
+[client]
+/mode +o sej
+08:44 -!- mode/#ch [+o sej] by sejkim2
+[server]
+Wed Nov 13 2024 08:41:17 USERINPUT: C[811AAAAAA] I MODE #ch +o sej
+Wed Nov 13 2024 08:41:17 USEROUTPUT: C[811AAAAAA] O :sejkim2!root@127.0.0.1 MODE #ch +o :sej
+Wed Nov 13 2024 08:41:17 USEROUTPUT: C[811AAAAAB] O :sejkim2!root@127.0.0.1 MODE #ch +o :sej
+
+[client]
+/mode +o sej
+08:44 -!- mode/#ch [+o sej] by sejkim2
+[server]
+Wed Nov 13 2024 08:43:03 USERINPUT: C[811AAAAAA] I MODE #ch +o sej
