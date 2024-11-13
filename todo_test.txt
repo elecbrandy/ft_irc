@@ -3,3 +3,12 @@
 /mode -k -> 재입장 시 비밀번호 초기화 되었는지
 /mode +o user1 -> /part 후 재입장 했을 때 일반 사용자인지
 errocode -> username 추가
+
+privMSG
+-> 자신의 채팅에서 화면에 :가 안붙어있음
+
+mode ERR
+-> 버퍼를 지워야 함
+
+kick 
+-> mode +o user1 후에 kick user2 하면 user2 화면 이상

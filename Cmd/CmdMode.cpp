@@ -144,13 +144,13 @@ void Cmd::handleMinusFlagOption(std::vector<std::string> modeParse, std::map<std
         }
         //o, k, l은 혼합하여 3개까지 가능
         if (mode_kol.size() > 3)
-            throw CmdException(ERR_NEEDMOREPARAMS(this->client->getUsername(), this->cmdParams));
+            throw CmdException(ERR_NEEDMOREPARAMS(this->client->getNickname(), this->cmdParams));
 
         // k, o, l의 개수와 파라미터 개수가 동일한가
         // 3개를 넘지 않는가
         std::vector<std::string> param(modeParse.begin() + 2, modeParse.end());
         if (param.size() != mode_kol.size() || param.size() > 3)
-            throw CmdException(ERR_NEEDMOREPARAMS(this->client->getUsername(), this->cmdParams));
+            throw CmdException(ERR_NEEDMOREPARAMS(this->client->getNickname(), this->cmdParams));
 
         // param validation
         size_t option_index = 0;
@@ -216,13 +216,13 @@ void Cmd::handlePlusFlagOption(std::vector<std::string> modeParse, std::map<std:
                 throw CmdException(ERR_UNKNOWNMODE(std::string(1, _option[i])));
         }
         if (mode_kol.size() > 3)
-            throw CmdException(ERR_NEEDMOREPARAMS(this->client->getUsername(), this->cmdParams));
+            throw CmdException(ERR_NEEDMOREPARAMS(this->client->getNickname(), this->cmdParams));
 
         // o의 개수와 파라미터 개수가 동일한가
         // 3개를 넘지 않는가
         std::vector<std::string> param(modeParse.begin() + 2, modeParse.end());
         if (param.size() != mode_kol.size() || param.size() > 3)
-            throw CmdException(ERR_NEEDMOREPARAMS(this->client->getUsername(), this->cmdParams));
+            throw CmdException(ERR_NEEDMOREPARAMS(this->client->getNickname(), this->cmdParams));
 
         // param validation
         size_t option_index = 0;
@@ -275,7 +275,7 @@ void Cmd::cmdMode()
 
     //존재하는 채널인가
     if (channel == _channels.end())
-        throw CmdException(ERR_NOSUCHCHANNEL(this->client->getUsername(), modeParse[0]));
+        throw CmdException(ERR_NOSUCHCHANNEL(this->client->getNickname(), modeParse[0]));
     //호출자가 현재 채널에 참여하고 있는가
     std::map<std::string, Client*> participaciant = channel->second->getParticipant();
     if (participaciant.find(channel->second->isOperatorNickname(this->client->getNickname())) == participaciant.end())
@@ -287,7 +287,7 @@ void Cmd::cmdMode()
 
     //채널의 운영자가 현재 호출 클라이언트인가
     if ((channel->second)->isOperator(this->client->getNickname()) == false)
-        throw CmdException(ERR_CHANOPRIVSNEEDED(this->client->getUsername(), modeParse[0]));
+        throw CmdException(ERR_CHANOPRIVSNEEDED(this->client->getNickname(), modeParse[0]));
 
     // option validation // 옵션이 +나 -로 시작하는가
     if (modeParse[1].at(0) == '+')
