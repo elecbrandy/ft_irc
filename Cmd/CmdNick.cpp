@@ -96,12 +96,30 @@ void Cmd::cmdNick() {
 		for (; it != server.getChannels().end(); ++it) {
 			Channel* ch = it->second;
 			
-			if (ch->isParticipant(oldNick)) {
+			// if (ch->isParticipant(oldNick)) {
+			// 	// 3.1. 채널 참여자 목록 업데이트
+			// 	// 3.2. 채널 운영자 목록 업데이트 (운영자인 경우)
+			// 	if (ch->isOperator(oldNick)) {
+			// 		ch->removeParticipant(oldNick);
+			// 		ch->addParticipant(newNick, client);
+			// 		ch->addOperator(newNick, client);
+			// 	} else {
+			// 		ch->removeParticipant(oldNick);
+			// 		ch->addParticipant(newNick, client);
+			// 	}
+			// 	// 닉네임 변경 메세지 채널 내 전송
+			// 	server.broadcastMsg(server.makeMsg(':' + client->getNickname(), RPL_NICK(newNick)), ch, -1);
+			// }
+
+			// fix : sejkim2 (운영자일 경우 participant 넣을 때 이름에 @ 붙이기) + operator 목록 갱신
+			if (ch->isParticipant(ch->isOperatorNickname(oldNick))) {
 				// 3.1. 채널 참여자 목록 업데이트
 				// 3.2. 채널 운영자 목록 업데이트 (운영자인 경우)
 				if (ch->isOperator(oldNick)) {
-					ch->removeParticipant(oldNick);
-					ch->addParticipant(newNick, client);
+					ch->removeParticipant(ch->isOperatorNickname(oldNick));
+					ch->addParticipant("@" + newNick, client);
+
+					ch->removeOperator(client);
 					ch->addOperator(newNick, client);
 				} else {
 					ch->removeParticipant(oldNick);

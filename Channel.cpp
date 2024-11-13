@@ -85,8 +85,6 @@ const std::string Channel::isOperatorNickname(std::string nickname) const
 }
 
 void Channel::removeParticipant(std::string target){
-	// if (isOperator(target) == true)
-	// 	_operator.erase(target);
 	_participant.erase(target);
 }
 

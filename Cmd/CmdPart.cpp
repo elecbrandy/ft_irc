@@ -56,7 +56,11 @@ void Cmd::cmdPart() {
 
         // 채널에서 나간다고 채널의 모든 참여자에게 알람 후 채널에서 사용자를 제거
         server.broadcastMsg(server.makeMsg(client->getPrefix(), RPL_PART(chName)), ch, -1);
-        ch->removeParticipant(client->getNickname());
+        ch->removeParticipant(ch->isOperatorNickname(client->getNickname()));
+
+        // add : sejkim2 (participant 목록 갱신 후 operator 목록도 갱신)
+        if (ch->isOperator(client->getNickname()) == true)
+            ch->removeOperator(client);
         
         // 참여자가 나간 뒤, 채널에 참여자가 없으면 채널을 삭제한다.
         if (ch->getParticipant().empty())

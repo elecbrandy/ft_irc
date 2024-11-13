@@ -101,5 +101,9 @@ void Cmd::cmdKick() {
 	server.broadcastMsg(server.makeMsg(client->getPrefix(), RPL_KICK(chName, target, comment)), ch, -1);
 	
 	// 알림 발송 됐으면 강퇴
-	ch->removeParticipant(target);
+	ch->removeParticipant(ch->isOperatorNickname(target));
+
+	// add : sejkim2 (운영자일 경우 운영자 목록에서도 삭제)
+	if (ch->isOperator(client->getNickname()) == true)
+        ch->removeOperator(client);
 }
