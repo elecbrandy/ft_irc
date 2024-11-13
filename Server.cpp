@@ -164,6 +164,34 @@ void IrcServer::handleSocketRead(int fd) {
 	}
 }
 
+// void IrcServer::handleSocketRead(int fd) {
+// 		Client * client = getClient(fd);
+// 		if (client) {
+// 			client->setlastActivityTime();
+// 			char buffer[BUFFER_SIZE];
+// 			int bytes_received = recv(fd, buffer, BUFFER_SIZE - 1, 0);
+
+// 			if (bytes_received < 0) {
+// 				if (errno != EWOULDBLOCK || errno != EAGAIN) {
+// 					removeClientFromServer(client);
+// 					throw ServerException(ERR_RECV);
+// 				}
+// 			} else if (bytes_received == 0) {
+// 				removeClientFromServer(client);
+// 			} else {
+// 				buffer[bytes_received] = '\0';
+// 				client->appendToRecvBuffer(buffer);
+// 				std::string tmp;
+// 				while (getClient(fd) && client->extractMessage(tmp)) {
+// 					Cmd cmdHandler(*this, tmp, fd);
+// 					serverLog(fd, LOG_INPUT, C_MSG, tmp);
+// 					if (!cmdHandler.handleClientCmd())
+// 						return ;
+// 				}
+// 			}
+// 		}
+// }
+
 void IrcServer::castMsg(int client_fd, const std::string msg) {
 	Client* client = getClient(client_fd);
 	if (!client) {
@@ -326,19 +354,19 @@ void IrcServer::printGoat() {
 }
 
 void IrcServer::removeClientFromServer(Client* client) {
-	if (client == NULL) {
-		return;
-	}
+    if (client == NULL) {
+        return;
+    }
 
-	for (std::map<std::string, Channel*>::iterator chs = _channels.begin(); chs != _channels.end(); ++chs) {
-		Channel* ch = chs->second;
-		if (ch->isOperator(client->getNickname())) {
-			ch->removeOperator(client);
-		}
-		if (ch->isParticipant(ch->isOperatorNickname(client->getNickname()))) {
-			ch->removeParticipant(ch->isOperatorNickname(client->getNickname()));
-		}
-	}
+    for (std::map<std::string, Channel*>::iterator chs = _channels.begin(); chs != _channels.end(); ++chs) {
+        Channel* ch = chs->second;
+        if (ch->isParticipant(ch->isOperatorNickname(client->getNickname()))) {
+            ch->removeParticipant(ch->isOperatorNickname(client->getNickname()));
+        }
+        if (ch->isOperator(client->getNickname())) {
+            ch->removeOperator(client);
+        }
+    }
 
 	_clients.erase(client->getFd());
 	nickNameClientMap.erase(client->getNickname());
@@ -350,7 +378,7 @@ void IrcServer::removeClientFromServer(Client* client) {
 		}
 	}
 
-	close(client->getFd());
+	// close(client->getFd());
 	delete client;
 }
 
