@@ -7,8 +7,8 @@ errocode -> username 추가
 privMSG
 -> 자신의 채팅에서 화면에 :가 안붙어있음
 
-mode ERR
--> 버퍼를 지워야 함
 
 kick 
 -> mode +o user1 후에 kick user2 하면 user2 화면 이상
+
+3명 들어온 뒤 kick으로 내쫒고 마지막에 스스로 /part 하면 터짐

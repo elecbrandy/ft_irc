@@ -20,13 +20,13 @@ void Cmd::validationNickName(std::string nickname, Channel* channel, int option_
     if (option_flag == 1)
     {
         if (channel->isParticipant(channel->isOperatorNickname(nickname)) == false)
-            throw CmdException(ERR_USERNOTINCHANNEL(this->client->getNickname(), nickname, channel->getName()));
+            throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_USERNOTINCHANNEL(this->client->getNickname(), nickname, channel->getName())));
     }
     else
     // option_flag == 0, 채널의 운영자에 nickname이 포함되어 있는지 검증
     {
         if (channel->isOperator(nickname) == false)
-            throw CmdException(ERR_NOSUCHNICK(this->client->getNickname(), nickname));
+            throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_NOSUCHNICK(this->client->getNickname(), nickname)));
     }
 }
 
@@ -34,21 +34,21 @@ void Cmd::validationNickName(std::string nickname, Channel* channel, int option_
 void Cmd::validationKey(std::string key, Channel* channel)
 {
     if (channel->isSetKey() == true)
-        throw CmdException(ERR_KEYSET(channel->getName()));
+        throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_KEYSET(channel->getName())));
 
     if (key.empty()) {
-		throw CmdException(ERR_NEEDMOREPARAMS(client->getNickname(), "PASS"));
+		throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_NEEDMOREPARAMS(client->getNickname(), "PASS")));
 	}
 
 	/* SIZE check */
 	if (key.size() >= PASSWORD_MAX_LEN) {
-		throw CmdException(ERR_PASS_PASSWORD);
+		throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_PASS_PASSWORD));
 	}
 
 	/* ALNUM check */
 	for (std::string::const_iterator it = key.begin(); it != key.end(); ++it) {
 		if (!std::isalnum(static_cast<unsigned char>(*it))) {
-			throw CmdException(ERR_PASS_PASSWORD);
+			throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_PASS_PASSWORD));
 		}
 	}
 }
@@ -58,15 +58,12 @@ void Cmd::validationInt(std::string _size)
 {
     size_t _len = _size.length();
 
-    if (_size[0] == '0' && _len == 1) 
-        throw CmdException(ERR_INVALIDPARAM);
-
     if (_size[0] == '0' && _len > 1) 
-        throw CmdException(ERR_INVALIDPARAM);
+        throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_INVALIDPARAM));
     
     for (size_t i = 0; i < _len; ++i) {
         if (!std::isdigit(_size[i])) {
-            throw CmdException(ERR_INVALIDPARAM);
+            throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_INVALIDPARAM));
         }
     }
 }
@@ -140,17 +137,17 @@ void Cmd::handleMinusFlagOption(std::vector<std::string> modeParse, std::map<std
             else if (_option[i] == 't')
                 flag_t = 1;
             else
-                throw CmdException(ERR_UNKNOWNMODE(std::string(1, _option[i])));
+                throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_UNKNOWNMODE(std::string(1, _option[i]))));
         }
         //o, k, l은 혼합하여 3개까지 가능
         if (mode_kol.size() > 3)
-            throw CmdException(ERR_NEEDMOREPARAMS(this->client->getNickname(), this->cmdParams));
+            throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_NEEDMOREPARAMS(this->client->getNickname(), this->cmdParams)));
 
         // k, o, l의 개수와 파라미터 개수가 동일한가
         // 3개를 넘지 않는가
         std::vector<std::string> param(modeParse.begin() + 2, modeParse.end());
         if (param.size() != mode_kol.size() || param.size() > 3)
-            throw CmdException(ERR_NEEDMOREPARAMS(this->client->getNickname(), this->cmdParams));
+            throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_NEEDMOREPARAMS(this->client->getNickname(), this->cmdParams)));
 
         // param validation
         size_t option_index = 0;
@@ -213,16 +210,16 @@ void Cmd::handlePlusFlagOption(std::vector<std::string> modeParse, std::map<std:
             else if (_option[i] == 'k')
                 flag_k = 0;
             else
-                throw CmdException(ERR_UNKNOWNMODE(std::string(1, _option[i])));
+                throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_UNKNOWNMODE(std::string(1, _option[i]))));
         }
         if (mode_kol.size() > 3)
-            throw CmdException(ERR_NEEDMOREPARAMS(this->client->getNickname(), this->cmdParams));
+            throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_NEEDMOREPARAMS(this->client->getNickname(), this->cmdParams)));
 
         // o의 개수와 파라미터 개수가 동일한가
         // 3개를 넘지 않는가
         std::vector<std::string> param(modeParse.begin() + 2, modeParse.end());
         if (param.size() != mode_kol.size() || param.size() > 3)
-            throw CmdException(ERR_NEEDMOREPARAMS(this->client->getNickname(), this->cmdParams));
+            throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_NEEDMOREPARAMS(this->client->getNickname(), this->cmdParams)));
 
         // param validation
         size_t option_index = 0;
@@ -275,11 +272,11 @@ void Cmd::cmdMode()
 
     //존재하는 채널인가
     if (channel == _channels.end())
-        throw CmdException(ERR_NOSUCHCHANNEL(this->client->getNickname(), modeParse[0]));
+        throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_NOSUCHCHANNEL(this->client->getNickname(), modeParse[0])));
     //호출자가 현재 채널에 참여하고 있는가
     std::map<std::string, Client*> participaciant = channel->second->getParticipant();
     if (participaciant.find(channel->second->isOperatorNickname(this->client->getNickname())) == participaciant.end())
-        throw CmdException(ERR_NOTONCHANNEL(this->client->getNickname(), channelName));
+        throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_NOTONCHANNEL(this->client->getNickname(), channelName)));
 
     // /mode #ch -> #ch의 옵션 정보 출력 (구현 범위 x)
     if (modeParse.size() == 1)
@@ -287,7 +284,7 @@ void Cmd::cmdMode()
 
     //채널의 운영자가 현재 호출 클라이언트인가
     if ((channel->second)->isOperator(this->client->getNickname()) == false)
-        throw CmdException(ERR_CHANOPRIVSNEEDED(this->client->getNickname(), modeParse[0]));
+        throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_CHANOPRIVSNEEDED(this->client->getNickname(), modeParse[0])));
 
     // option validation // 옵션이 +나 -로 시작하는가
     if (modeParse[1].at(0) == '+')
@@ -295,7 +292,7 @@ void Cmd::cmdMode()
     else if (modeParse[1].at(0) == '-')
         option_flag = 0;
     else
-        throw CmdException(ERR_UNKNOWNMODE(std::string(1, modeParse[1].at(0))));
+        throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_UNKNOWNMODE(std::string(1, modeParse[1].at(0)))));
 
     //excute
     if (option_flag == 1)
