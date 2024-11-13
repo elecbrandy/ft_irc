@@ -321,6 +321,8 @@ void IrcServer::addClientByNickname(const std::string& nickname, Client* client)
 }
 
 void IrcServer::setChannels(const std::string& channelName, const std::string& key, const char& mode) {
+	std::cout << "mode :" << mode << std::endl;
+	std::cout << "key :" << key << std::endl;
 	_channels[channelName] = new Channel(channelName);
 	if (key != "")
 		_channels[channelName]->setKey(key);

@@ -77,6 +77,7 @@ void Cmd::cmdJoin() {
 
 	// 채널과 키 분리
 	for (std::vector<std::string>::size_type i = 0; i < joinTokens.size(); ++i) {
+		std::cout << "params [" << i << "]" << joinTokens[i] << std::endl;
 		if (joinTokens[i][0] == '#')
 			channel.push_back(joinTokens[i]);
 		else
@@ -101,8 +102,8 @@ void Cmd::cmdJoin() {
 
 		// 채널이 없을 때 생성 및 설정
 		if (chs.find(channel[i]) == chs.end()) {
-			//chKey가 비어있으면 setChannels 함수는 빈 문자열 ""과 널 문자 '\0'을 받고 아니라면 chKey와 KEY_MODE가 전달
-			server.setChannels(chName, chKey.empty() ? "" : chKey, chKey.empty() ? '\0' : KEY_MODE);
+			//chKey가 "x"또는 빈문자열이라면 setChannels 함수는 빈 문자열 ""과 널 문자 '\0'을 받고 아니라면 chKey와 KEY_MODE가 전달
+			server.setChannels(chName, (chKey == "x" || chKey.empty()) ? "" : chKey, (chKey == "x" || chKey.empty()) ? '\0' : KEY_MODE);
 			chs = server.getChannels();
 			chs.find(chName)->second->addOperator(this->client->getNickname(), this->client);
 		}
