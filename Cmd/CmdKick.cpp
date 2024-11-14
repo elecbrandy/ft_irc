@@ -104,6 +104,7 @@ void Cmd::cmdKick() {
 	ch->removeParticipant(ch->isOperatorNickname(target));
 
 	// add : sejkim2 (운영자일 경우 운영자 목록에서도 삭제)
-	if (ch->isOperator(client->getNickname()) == true)
-        ch->removeOperator(client);
+	// fix : sejkim2 (client->getNickname이 아니라 target이 나가아 함)
+	if (ch->isOperator(target) == true)
+        ch->removeOperator(target);
 }

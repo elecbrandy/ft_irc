@@ -34,7 +34,9 @@ bool Cmd::handleClientCmd() {
 		this->cmd = extractCmd();
 		this->cmdParams = extractCmdParams();
 
-		if (cmd == "NICK")
+		if (cmd == "CAP")
+			cmdCap();
+		else if (cmd == "NICK")
 			cmdNick();
 		else if (cmd == "PASS")
 			cmdPass();

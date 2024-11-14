@@ -61,9 +61,9 @@ void Channel::addOperator(std::string nick, Client* client)
 	this->_operator[nick] = client;
 }
 
-void Channel::removeOperator(Client* client)
+void Channel::removeOperator(std::string nickname)
 {
-	this->_operator.erase(client->getNickname());
+	this->_operator.erase(nickname);
 }
 
 void Channel::removeKey()

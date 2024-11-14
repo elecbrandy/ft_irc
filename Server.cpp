@@ -364,7 +364,7 @@ void IrcServer::removeClientFromServer(Client* client) {
             ch->removeParticipant(ch->isOperatorNickname(client->getNickname()));
         }
         if (ch->isOperator(client->getNickname())) {
-            ch->removeOperator(client);
+            ch->removeOperator(client->getNickname());
         }
     }
 

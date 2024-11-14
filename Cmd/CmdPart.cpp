@@ -60,7 +60,7 @@ void Cmd::cmdPart() {
 
         // add : sejkim2 (participant 목록 갱신 후 operator 목록도 갱신)
         if (ch->isOperator(client->getNickname()) == true)
-            ch->removeOperator(client);
+            ch->removeOperator(client->getNickname());
         
         // 참여자가 나간 뒤, 채널에 참여자가 없으면 채널을 삭제한다.
         if (ch->getParticipant().empty())

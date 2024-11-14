@@ -41,7 +41,7 @@ class Channel {
 		void addParticipantname(std::string participantName);
 
 		void removeKey();
-		void removeOperator(Client* client);
+		void removeOperator(std::string nickname);
 		void removeInvited(std::string nickname);
 		void removeMode(char mode);
 		void removeParticipant(std::string target);

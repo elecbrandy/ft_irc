@@ -74,14 +74,14 @@ public:
 	void setChannelKey(std::string key, Channel* channel);
 	void setChannelUserLimit(std::string _size, Channel* channel);
 
-	void validationNickName(std::string nickname, Channel* channel, int option_flag);
+	void validationNickName(std::string nickname, Channel* channel, int plus_flag);
 	void removeChannelOperator(std::string nickname, Channel* channel);
 	void removeChannelKey(Channel* channel);
 	void removeChannelUserLimit(Channel* channel);
 	void removeParticipant(std::string target);
 
-	void handleMinusFlagOption(std::vector<std::string> modeParse, std::map<std::string, Channel*>::iterator channel, int option_flag);
-	void handlePlusFlagOption(std::vector<std::string> modeParse, std::map<std::string, Channel*>::iterator channel, int option_flag);
+	void handleMinusFlagOption(std::vector<std::string> modeParse, std::map<std::string, Channel*>::iterator channel, int plus_flag);
+	void handlePlusFlagOption(std::vector<std::string> modeParse, std::map<std::string, Channel*>::iterator channel, int plus_flag);
 
 
 	/* Exception */

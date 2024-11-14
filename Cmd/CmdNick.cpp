@@ -118,7 +118,7 @@ void Cmd::cmdNick() {
 					ch->removeParticipant(ch->isOperatorNickname(oldNick));
 					ch->addParticipant("@" + newNick, client);
 
-					ch->removeOperator(client);
+					ch->removeOperator(oldNick);
 					ch->addOperator(newNick, client);
 				} else {
 					ch->removeParticipant(oldNick);

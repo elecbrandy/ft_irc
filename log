@@ -12,25 +12,6 @@ Wed Nov 13 2024 07:36:05 USEROUTPUT: C[811AAAAAA] O :irc.local 403 sejkim2 #ch :
 ______________________________________________________________________________
 
 [client]
-/mode #ch +z (이상한 옵션)
-[server]
-Wed Nov 13 2024 07:45:32 USERINPUT: C[811AAAAAA] I MODE #ch +z
-Wed Nov 13 2024 07:45:32 USEROUTPUT: C[811AAAAAA] O :irc.local 472 sejkim2 z :is not a recognised channel mode.
-
-되긴 하는데 왜 되는지 모르겟음
-______________________________________________________________________________
-
-[client]
-/mode #ch *o nick (+나 -가 아닌 플래그)
-[server]
-Wed Nov 13 2024 07:46:34 USERINPUT: C[811AAAAAA] I MODE #ch +*o nick
-Wed Nov 13 2024 07:46:34 USEROUTPUT: C[811AAAAAA] O :irc.local 472 sejkim2 * :is not a recognised channel mode.
-Wed Nov 13 2024 07:46:34 USEROUTPUT: C[811AAAAAA] O :irc.local 401 sejkim2 nick :No such nick
-
-되긴 하는데 왜 되는지 모르겟음
-______________________________________________________________________________
-
-[client]
 /mode #ch +o zzz (zzz라는 유저가 채널에 없음)
 [server]
 Wed Nov 13 2024 07:50:06 USERINPUT: C[811AAAAAA] I MODE #ch +o zzz
@@ -38,20 +19,6 @@ Wed Nov 13 2024 07:50:06 USEROUTPUT: C[811AAAAAA] O :irc.local 401 sejkim2 zzz :
 
 441
 ____________________________________________
-
-[client]
-/mode #ch +o sejkim2 (운영자가 아닐때)
-07:56 -!- #ch You must be a channel op or higher to set channel mode o (op).
-[server]
-Wed Nov 13 2024 07:56:14 USERINPUT: C[811AAAAAB] I MODE #ch +o sejkim2
-Wed Nov 13 2024 07:56:14 USEROUTPUT: C[811AAAAAB] O :irc.local 482 sej #ch :You must be a channel op or higher to set channel mode o (op).
-
-[client]
-/mode #ch -o sejkim2 (운영자가 아닐때)
-07:57 -!- #ch You must be a channel op or higher to unset channel mode o (op).
-[server]
-Wed Nov 13 2024 07:57:05 USERINPUT: C[811AAAAAB] I MODE #ch -o sejkim2
-Wed Nov 13 2024 07:57:05 USEROUTPUT: C[811AAAAAB] O :irc.local 482 sej #ch :You must be a channel op or higher to unset channel mode o (op).
 
 [client]
 /mode #ch +k (pass 입력 안했을 때)

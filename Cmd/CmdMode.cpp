@@ -14,16 +14,16 @@ void printParam(std::vector<std::string> param)
 }
 
 // option +-o
-void Cmd::validationNickName(std::string nickname, Channel* channel, int option_flag)
+void Cmd::validationNickName(std::string nickname, Channel* channel, int plus_flag)
 {
     //해당 클라이언트가 채널에 없음
-    if (option_flag == 1)
+    if (plus_flag == 1)
     {
         if (channel->isParticipant(channel->isOperatorNickname(nickname)) == false)
             throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_USERNOTINCHANNEL(this->client->getNickname(), nickname, channel->getName())));
     }
     else
-    // option_flag == 0, 채널의 운영자에 nickname이 포함되어 있는지 검증
+    // plus_flag == 0, 채널의 운영자에 nickname이 포함되어 있는지 검증
     {
         if (channel->isOperator(nickname) == false)
             throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_NOSUCHNICK(this->client->getNickname(), nickname)));
@@ -86,7 +86,7 @@ void Cmd::removeChannelOperator(std::string nickname, Channel* channel)
     channel->removeParticipant(nick);
     channel->addParticipant(nickname, client->second);
 
-    channel->removeOperator(client->second);
+    channel->removeOperator(nickname);
     channel->removeMode('o');
 }
 
@@ -114,7 +114,7 @@ void Cmd::removeChannelUserLimit(Channel* channel)
     channel->removeMode('l');
 }
 
-void Cmd::handleMinusFlagOption(std::vector<std::string> modeParse, std::map<std::string, Channel*>::iterator channel, int option_flag)
+void Cmd::handlePlusFlagOption(std::vector<std::string> modeParse, std::map<std::string, Channel*>::iterator channel, int plus_flag)
 {
     //{i, t, k, o, l} 인가
         std::string _option = modeParse[1].substr(1);
@@ -149,7 +149,7 @@ void Cmd::handleMinusFlagOption(std::vector<std::string> modeParse, std::map<std
         while (option_index < _size)
         {
             if (_option[option_index] == 'o')
-                validationNickName(param[param_index], channel->second, option_flag);
+                validationNickName(param[param_index], channel->second, plus_flag);
             else if (_option[option_index] == 'k')
                 validationKey(param[param_index], channel->second);
             //(_option[option_index] == 'l')
@@ -181,7 +181,7 @@ void Cmd::handleMinusFlagOption(std::vector<std::string> modeParse, std::map<std
         }
 }
 
-void Cmd::handlePlusFlagOption(std::vector<std::string> modeParse, std::map<std::string, Channel*>::iterator channel, int option_flag)
+void Cmd::handleMinusFlagOption(std::vector<std::string> modeParse, std::map<std::string, Channel*>::iterator channel, int plus_flag)
 {
     //{i, t, k, o, l} 인가
         std::string _option = modeParse[1].substr(1);
@@ -221,7 +221,7 @@ void Cmd::handlePlusFlagOption(std::vector<std::string> modeParse, std::map<std:
         while (option_index < _size)
         {
             if (_option[option_index] == 'o')
-                validationNickName(param[param_index], channel->second, option_flag);
+                validationNickName(param[param_index], channel->second, plus_flag);
             option_index++;
             param_index++;
         }
@@ -253,7 +253,7 @@ void Cmd::cmdMode()
     std::istringstream stream(this->cmdParams);
     std::string token;
     std::map<std::string, Channel*> _channels = this->server.getChannels();
-    int option_flag = 0;
+    int plus_flag = 0;
     
     while (stream >> token)
         modeParse.push_back(token);
@@ -281,17 +281,17 @@ void Cmd::cmdMode()
 
     // option validation // 옵션이 +나 -로 시작하는가
     if (modeParse[1].at(0) == '+')
-        option_flag = 1;
+        plus_flag = 1;
     else if (modeParse[1].at(0) == '-')
-        option_flag = 0;
+        plus_flag = 0;
     else
         throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_UNKNOWNMODE(std::string(1, modeParse[1].at(0)))));
 
     //excute
-    if (option_flag == 1)
-        handleMinusFlagOption(modeParse, channel, option_flag);
+    if (plus_flag == 1)
+        handlePlusFlagOption(modeParse, channel, plus_flag);
     else
-        handlePlusFlagOption(modeParse, channel, option_flag);
+        handleMinusFlagOption(modeParse, channel, plus_flag);
 
     std::string str = "MODE";
     size_t i = 0;
