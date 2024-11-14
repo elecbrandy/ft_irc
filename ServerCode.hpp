@@ -2,14 +2,12 @@
 #define SERVERCODE_HPP
 
 /* COUT LOG */
-#define MSG_SERVER_INIT				"IRC Server INIT!: port:"
-#define MSG_NEW_CONNECTED			"new client connected: fd:"
-#define MSG_END_CONNECTED			"client connection closed: fd:"
-#define MSG_CLINET_INPUT			"client input received:"
-#define MSG_CONNECTION_TIMEOUT		"client connection timed out: fd:"
-#define MSG_CHECK_CONNECTION_START	"checking client connection"
-
-#define MSG_SERVER_SHUTDOWN			"server closed"
+#define MSG_SERVER_INIT(port)			"IRC Server INIT!: port: " + port
+#define MSG_NEW_CONNECTED(fd)			"new client connected: fd: " + fd
+#define MSG_END_CONNECTED(fd)			"client connection closed: fd: " + fd
+#define MSG_CONNECTION_TIMEOUT(fd)		"client connection timed out: fd: " + fd
+#define MSG_CHECK_CONNECTION_START		"checking client connection"
+#define MSG_SERVER_SHUTDOWN				"server closed"
 
 /* !ERROR! */
 #define	ERR_ARG_COUNT			"invalid argument count. (only 3)"
