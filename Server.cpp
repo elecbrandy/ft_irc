@@ -43,25 +43,16 @@ IrcServer::~IrcServer() {
 	/* Close server socket */
 	close(this->_fd);
 
-
 	/* Close & Delete Client resource */
 	for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
-
 		if (it->first != -1) {
 			close(it->first);
 		}
-
 		delete it->second;
 	}
 	_clients.clear();
-
-	/* Close poll struct */
 	fds.clear();
-
-	/* Another Clean up */
 	nickNameClientMap.clear();
-
-	// std::cout << LOG_SERVER_SHUTDOWN << std::endl;
 }
 
 /* getter */
@@ -212,15 +203,12 @@ void IrcServer::castMsg(int client_fd, const std::string msg) {
 			// 다른 에러 발생 시 클라이언트 리소스 정리 / 제거 
 			removeClientFromServer(getClient(client_fd));
 		}
-
 	// 송신해야하는 데이터 중 일부만 송신한 경우
 	} else if (bytesSent < static_cast<ssize_t>(msg.length())) {
 		// 이 경우 또한 임시 저장한 테이터를 언젠가 소켓 버퍼에 써야하므로 남은 데이터를 Client의 _sendbuffer에 임시저장
 		std::string tmp = msg.substr(bytesSent);
 		client->appendToSendBuffer(tmp);
 
-		// // 이어서 POLLOUT 이벤트를 모니터링 하도록 설정
-		// modifyPollEvent(client_fd, POLLIN | POLLOUT);
 	}
 	serverLog(client_fd, LOG_OUTPUT, C_MSG, msg.substr(0, msg.length()));
 }

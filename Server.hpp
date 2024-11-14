@@ -49,11 +49,12 @@
 
 class IrcServer {
 private:
-	const std::string					_servername;
 	int									_fd;
 	int									_port;
 	std::string							_password;
+	const std::string					_servername;
 	time_t								_startTime;
+
 	std::vector<struct pollfd>			fds;
 	std::map<int, Client*>				_clients;
 	std::map<std::string, Channel *>	_channels;
@@ -103,6 +104,7 @@ public:
 
 	void serverLog(int fd, int log_type, std::string log_color, std::string msg);
 	std::string intToString(int num);
+	static void signalHandler(int signal);
 
 	/* exception */
 	class ServerException : public std::exception {

@@ -1,9 +1,15 @@
 #include "Server.hpp"
 
-static void	signal_handler(int signal) {
-	(void)signal;
-	std::cerr << "SERV_LOG: " << C_ERR << "Server received signal (" << signal << ") - initiating shutdown process." << C_RESET << std::endl;
+void check_leaks() {
+	system("leaks ircserv | grep leaked");
 }
+
+static void signalHandler(int signal) {
+	(void)signal;
+	std::cerr << "SERV_LOG: " << C_ERR << MSG_RECV_SIGNAL << C_RESET;
+	exit(EXIT_FAILURE);
+}
+
 
 int main(int ac, char** av) {
 	if (ac != 3) {
@@ -12,15 +18,15 @@ int main(int ac, char** av) {
 	}
 
 	try {
-		signal(SIGINT, signal_handler);
-		signal(SIGQUIT, signal_handler);
 		IrcServer server(av[1], av[2]);
+		atexit(check_leaks);
+		signal(SIGINT, signalHandler);
+		signal(SIGQUIT, signalHandler);
 		server.init();
 		server.run();
 	} catch (const IrcServer::ServerException &e) {
 		std::cerr << C_ERR << "Error: " << e.what() << C_RESET << std::endl;
 		return 1;
 	}
-
 	return 0;
 }
