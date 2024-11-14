@@ -12,3 +12,119 @@ kick
 -> mode +o user1 후에 kick user2 하면 user2 화면 이상
 
 3명 들어온 뒤 kick으로 내쫒고 마지막에 스스로 /part 하면 터짐
+
+
+
+킥 하고 채널에 재접속할때 접속 잘되는지 확인
+-> 조인 메세지까지 받고 화면에 채널 띄우지만 로그 확인해보면 you're not in channel 뜸
+INPUT[6]: JOIN #ch1
+params [0]#ch1
+OUTPUT[5]: :rani!rchoi@127.0.0.1 JOIN #ch1
+OUTPUT[4]: :rani!rchoi@127.0.0.1 JOIN #ch1
+OUTPUT[6]: :rani!rchoi@127.0.0.1 JOIN #ch1
+OUTPUT[6]: :ircserv 353 rani = #ch1 :@sej dongwook rani
+OUTPUT[6]: :ircserv 366 rani #ch1 :End of /NAMES list
+OUTPUT[6]: :ircserv 331 rani #ch1 :No topic is set
+INPUT[6]: MODE #ch1
+OUTPUT[6]: :ircserv 442 rani #ch1 :You're not on that channel
+INPUT[6]: MODE #ch1
+OUTPUT[6]: :ircserv 442 rani #ch1 :You're not on that channel
+INPUT[6]: WHO #ch1
+INPUT[6]: PING ircserv
+OUTPUT[6]: :ircserv PONG ircserv
+INPUT[6]: PART #ch1
+params[0]: |#ch1|
+OUTPUT[6]: :ircserv 442 rani #ch1 :You're not on that channel
+
+킥하면 킥을 보낸 사용자든, 강퇴 당하는 사람이던, 강퇴를 한/받은 채널에 접근?접속을 못함
+INPUT[5]: KICK #ch2 sej :
+params[0]: |#ch2|
+params[1]: |sej|
+params[2]: |:|
+OUTPUT[5]: :rani!rchoi@127.0.0.1 KICK #ch2 sej :
+OUTPUT[4]: :rani!rchoi@127.0.0.1 KICK #ch2 sej :
+INPUT[4]: MODE #ch1
+INPUT[5]: PRIVMSG #ch2 :hello
+nick in privmsg/isOperatorNickname: rani
+OUTPUT[5]: :ircserv 404 rani #ch2 :Cannot send to channel
+SERV_LOG: new client connected: fd:
+INPUT[6]: PASS 1111
+INPUT[6]: NICK rani
+SERV_LOG: client fd error.
+INPUT[4]: JOIN #ch2
+params [0]#ch2
+OUTPUT[5]: :sej!rchoi@127.0.0.1 JOIN #ch2
+OUTPUT[4]: :sej!rchoi@127.0.0.1 JOIN #ch2
+OUTPUT[4]: :ircserv 353 sej = #ch2 :@rani sej
+OUTPUT[4]: :ircserv 366 sej #ch2 :End of /NAMES list
+OUTPUT[4]: :ircserv 331 sej #ch2 :No topic is set
+INPUT[4]: PING ircserv
+OUTPUT[4]: :ircserv PONG ircserv
+SERV_LOG: new client connected: fd:
+INPUT[6]: PASS 1111
+INPUT[6]: NICK sej
+SERV_LOG: client fd error.
+INPUT[4]: MODE #ch2
+OUTPUT[4]: :ircserv 442 sej #ch2 :You're not on that channel
+INPUT[4]: WHO #ch1
+INPUT[4]: WHO #ch2
+INPUT[5]: PING ircserv
+OUTPUT[5]: :ircserv PONG ircserv
+INPUT[5]: WHO #ch2
+INPUT[5]: PRIVMSG #ch2 :hello
+nick in privmsg/isOperatorNickname: rani
+OUTPUT[5]: :ircserv 404 rani #ch2 :Cannot send to channel
+
+INPUT[4]: KICK #ch2 sej :
+params[0]: |#ch2|
+params[1]: |sej|
+params[2]: |:|
+ch->getParticipant() : @rani
+ch->getParticipant() : sej
+ch->getOperator() : rani
+client->getNickname() : rani
+nick in cmdKick/isOperatorNickname: @rani
+OUTPUT[4]: :rani!rchoi@127.0.0.1 KICK #ch2 sej :
+OUTPUT[5]: :rani!rchoi@127.0.0.1 KICK #ch2 sej :
+ch->getParticipant() : @rani
+client->getNickname() : rani
+nick in cmdKick/isOperatorNickname: rani
+INPUT[4]: PING ircserv
+OUTPUT[4]: :ircserv PONG ircserv
+INPUT[5]: PING ircserv
+OUTPUT[5]: :ircserv PONG ircserv
+INPUT[4]: PRIVMSG #ch2 :hello
+nick in privmsg/isOperatorNickname: rani
+OUTPUT[4]: :ircserv 404 rani #ch2 :Cannot send to channel
+INPUT[5]: MODE #ch1
+INPUT[4]: PING ircserv
+OUTPUT[4]: :ircserv PONG ircserv
+INPUT[4]: MODE #ch2
+OUTPUT[4]: :ircserv 442 rani #ch2 :You're not on that channel
+INPUT[4]: MODE #ch1
+INPUT[5]: PING ircserv
+OUTPUT[5]: :ircserv PONG ircserv
+INPUT[4]: PING ircserv
+OUTPUT[4]: :ircserv PONG ircserv
+INPUT[4]: PRIVMSG #ch2 :hello
+nick in privmsg/isOperatorNickname: rani
+OUTPUT[4]: :ircserv 404 rani #ch2 :Cannot send to channel
+SERV_LOG: new client connected: fd:
+INPUT[6]: PASS 1111
+INPUT[6]: NICK dongwook
+newNick : dongwook
+oldNick :
+INPUT[6]: USER rchoi rchoi localhost :Ran Choi
+
+파트하고 채널에 재접속 할때 접속 잘 되는지 확인
+
+서버가 켜져있는 상태에서 /quit을 하고 바로 irssi로 접속해 /connect를 하는 경우에  getFd() abort 발생
+
+
+왜 ch2에서만 442에 에러가 나는지?
+INPUT[4]: MODE #ch1
+INPUT[5]: MODE #ch2
+OUTPUT[5]: :ircserv 442 sej #ch2 :You're not on that channel
+INPUT[5]: MODE #ch1
+
+

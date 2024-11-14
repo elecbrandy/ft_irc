@@ -49,7 +49,8 @@ void Cmd::cmdPart() {
 
         // 채널은 존재하지만 사용자가 해당 채널에 참여하지 않은 경우
         Channel* ch = chs[chName];
-        if (ch->getParticipant().find(ch->isOperatorNickname(this->client->getNickname())) == ch->getParticipant().end()) {
+        std::string n = ch->isOperatorNickname(this->client->getNickname());
+        if (ch->getParticipant().find(n) == ch->getParticipant().end()) {
             server.castMsg(client_fd, server.makeMsg(PREFIX_SERVER, ERR_NOTONCHANNEL(client->getNickname(), chName)));
             continue ;
         }

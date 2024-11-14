@@ -85,7 +85,17 @@ void Cmd::cmdKick() {
 	std::map<std::string, Channel*>::iterator it = chs.find(chName);
 	Channel* ch = it->second;
 
-	// 명령어를 호출한 클라이언트가 채널에 참여한 클라이언트가 아닌 경우
+	// 명령어를 호출한 클라이언트가 채널에 참여한 클라이언트가 아닌경우
+				for (std::map<std::string, Client*>::iterator it = ch->getParticipant().begin(); it != ch->getParticipant().end(); ++it) {
+					std::cout << "ch->getParticipant() : " << it->first << std::endl;
+				}
+				for (std::map<std::string, Client*>::iterator it = ch->getOperator().begin(); it != ch->getOperator().end(); ++it) {
+					std::cout << "ch->getOperator() : " << it->first << std::endl;
+				}
+				std::cout << "client->getNickname() : " << client->getNickname() << std::endl;
+				std::string nick = ch->isOperatorNickname(client->getNickname());
+				std::cout << "nick in cmdKick/isOperatorNickname: " << nick << std::endl;
+
 	if (ch->getParticipant().find(ch->isOperatorNickname(client->getNickname())) == ch->getParticipant().end())
 		throw Cmd::CmdException(server.makeMsg(PREFIX_SERVER, ERR_NOTONCHANNEL(client->getNickname(), chName)));
 
@@ -106,4 +116,14 @@ void Cmd::cmdKick() {
 	// add : sejkim2 (운영자일 경우 운영자 목록에서도 삭제)
 	if (ch->isOperator(client->getNickname()) == true)
         ch->removeOperator(client);
+
+					for (std::map<std::string, Client*>::iterator it = ch->getParticipant().begin(); it != ch->getParticipant().end(); ++it) {
+					std::cout << "ch->getParticipant() : " << it->first << std::endl;
+				}
+				for (std::map<std::string, Client*>::iterator it = ch->getOperator().begin(); it != ch->getOperator().end(); ++it) {
+					std::cout << "ch->getOperator() : " << it->first << std::endl;
+				}
+				std::cout << "client->getNickname() : " << client->getNickname() << std::endl;
+				nick = ch->isOperatorNickname(client->getNickname());
+				std::cout << "nick in cmdKick/isOperatorNickname: " << nick << std::endl;
 }

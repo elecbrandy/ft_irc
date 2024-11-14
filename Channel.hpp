@@ -42,6 +42,7 @@ class Channel {
 
 		void removeKey();
 		void removeOperator(Client* client);
+		void removeOperatorByNickname(std::string nickname);
 		void removeInvited(std::string nickname);
 		void removeMode(char mode);
 		void removeParticipant(std::string target);
@@ -53,7 +54,7 @@ class Channel {
 		std::string getTopic();
 		const std::set<char>& getMode() const;
 		std::map<std::string, Client*>& getParticipant();
-		std::map<std::string, Client*> getOperator();
+		std::map<std::string, Client*>& getOperator();
 		std::string getParticipantNameStr();
 
 		bool isOperator(std::string nickname) const;
