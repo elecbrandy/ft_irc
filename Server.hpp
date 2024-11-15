@@ -40,7 +40,8 @@
 #define PREFIX_USER(nickname, username, hostname) 	":" + nickname + "!" + username + "@" + hostname
 
 #define TIME_OUT 20
-#define TIME_CHECK_INTERVAL 180
+#define WAIT_FOR_PING_MAX 60
+#define WAIT_FOR_PONG_MAX 20
 
 #define LOG_ERR -1
 #define LOG_SERVER 0
@@ -90,7 +91,8 @@ public:
 	void addClientByNickname(const std::string& nickname, Client* client);
 	std::string makeMsg(const std::string& prefix, const std::string& msg);
 
-	void checkConnection();
+	void sendPingToClient(); // 일정 시간동안 PING을 보내지 않은 클라이언트에게 PING 전송
+	void checkPongFromClient(); // PING을 보낸 클라이언트로부터 PONG을 받지 못한 경우 처리
 	std::string	getPassword();
 	void printGoat();
 	std::string formatDateToString(time_t time);

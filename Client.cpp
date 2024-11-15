@@ -1,9 +1,11 @@
 #include "Client.hpp"
 #include "Server.hpp"
 
+	// _lastPongSent(time(NULL)) {
+	// _lastPingSent(time(NULL)),
 Client::Client(in_addr addr)
 :	_hostname(inet_ntoa(addr)),
-	_LastPingSent(time(NULL)) {
+	_lastPingSent(0), _lastPongReceived(time(NULL)), _pingSent(false) {
 	_registerStatus.pass = false;
 	_registerStatus.nick = false;
 	_registerStatus.user = false;
@@ -35,7 +37,7 @@ void Client::setRealname(const std::string& str) {this->_realname = str;}
 
 void Client::setServername(const std::string& str) {this->_servername = str;}
 
-void Client::updateLastPingSent() {this->_LastPingSent = time(NULL);}
+// void Client::updateLastPingSent() {this->_lastPingSent = time(NULL);}
 
 void Client::setPassStatus(bool status) {this->_registerStatus.pass = status;}
 
@@ -44,6 +46,8 @@ void Client::setNickStatus(bool status) {this->_registerStatus.nick = status;}
 void Client::setUserStatus(bool status) {this->_registerStatus.user = status;}
 
 void Client::setRegisteredStatus(bool status) {this->_registerStatus.registered = status;}
+
+// void Client::updateLastPongSent() {this->_lastPongSent = time(NULL);}
 
 /* getter */
 int	Client::getFd() const {return this->_fd;}
@@ -58,7 +62,7 @@ std::string	Client::getRealname() const {return this->_realname;}
 
 std::string	Client::getServername() const {return this->_servername;}
 
-time_t	Client::getLastPingSent() const {return this->_LastPingSent;}
+// time_t	Client::getLastPingSent() const {return this->_lastPingSent;}
 
 bool Client::getPassStatus() const {return this->_registerStatus.pass;}
 
@@ -69,6 +73,8 @@ bool Client::getUserStatus() const {return this->_registerStatus.user;}
 bool Client::getRegisteredStatus() const {return this->_registerStatus.registered;}
 
 std::string Client::getPrefix() const {return this->_prefix;}
+
+// time_t Client::getLastPongSent() const {return this->_lastPongSent;}
 
 /* other */
 void Client::appendToRecvBuffer(const std::string& str) {
@@ -82,13 +88,6 @@ bool Client::extractMessage(std::string& message) {
 		_recvBuffer.erase(0, pos + 2);
 		return true;
 	}
-	return false;
-}
-
-bool Client::isTimedOut() {
-	time_t now = time(NULL);
-	if (now - this->_LastPingSent > TIME_CHECK_INTERVAL)
-		return true;
 	return false;
 }
 
