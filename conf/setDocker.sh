@@ -18,8 +18,8 @@ docker exec -it irc_container bash -c "apt update && apt install -y inspircd irs
 docker exec -it irc_container bash -c "mkdir -p /var/run/inspircd && chown -R 39:39 /var/run/inspircd"
 
 # inspircd.conf 파일에서 서버 패스워드 및 바인딩 설정
-docker exec -it irc_container bash -c "sed -i '/<connect allow=\"\*\"/a password=\"1234\"' /etc/inspircd/inspircd.conf"
-docker exec -it irc_container bash -c "sed -i 's/<bind address=\"127.0.0.1\"/<bind address=\"0.0.0.0\"/' /etc/inspircd/inspircd.conf"
+docker exec -it irc_container bash -c "sed -i '/<connect allow=\"\*\"/a password=\"1234\"' /conf/inspircd/inspircd.conf"
+docker exec -it irc_container bash -c "sed -i 's/<bind address=\"127.0.0.1\"/<bind address=\"0.0.0.0\"/' /conf/inspircd/inspircd.conf"
 
 # IRC 서버 및 클라이언트 실행 명령어 안내
 RED='\033[0;31m'

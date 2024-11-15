@@ -31,8 +31,8 @@
 #define PORT_MAX_LEN 5
 #define PASSWORD_MAX_LEN 10
 
-#define PATH_GOAT "./etc/goat.txt"
-#define PATH_MOTD "./etc/motd.txt"
+#define PATH_GOAT "./conf/goat.txt"
+#define PATH_MOTD "./conf/motd.txt"
 #define SERVER_NAME "ircserv"
 
 #define CRLF "\r\n"
