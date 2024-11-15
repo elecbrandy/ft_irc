@@ -119,10 +119,11 @@ void Cmd::cmdNick() {
 				}
 
 				// 닉네임 변경 메시지를 채널에 전송
-				server.broadcastMsg(server.makeMsg(":" + oldNick, RPL_NICK(newNick)), ch, client->getFd());
+				// server.broadcastMsg(server.makeMsg(":" + oldNick, RPL_NICK(newNick)), ch, client->getFd());
 			}
 		}
-		server.castMsg(client_fd, server.makeMsg(oldPrefix, RPL_NICK(newNick)));
+		// server.castMsg(client_fd, server.makeMsg(oldPrefix, RPL_NICK(newNick)));
+		server.broadcastMsg(server.makeMsg(":" + oldNick, RPL_NICK(newNick)), NULL, -1);
 	} else
 		this->server.addClientByNickname(this->cmdParams, this->client);
 	client->setNickStatus(true);
