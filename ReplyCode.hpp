@@ -16,7 +16,7 @@
 #define RPL_NOTOPIC(nick, ch)					"331 " + nick + " " + ch + " :No topic is set" 
 
 // 332: 해당 채널의 토픽을 반환
-#define RPL_TOPIC(nick, ch, topic)				"332" + nick + " " + ch + " :" + topic
+#define RPL_TOPIC(nick, ch, topic)				"332" + nick + " " + ch + " " + topic
 
 // 341: 해당 채널에 초대가 전송됨
 #define RPL_INVITING(nick, target, ch)			"341 " + nick + " " + ch + " " + target

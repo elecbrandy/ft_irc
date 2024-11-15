@@ -1,0 +1,276 @@
+
+ ⠠⠴⠶⠾⠿⠿⢶⣦⣦⣦⣄
+ ⢀⣤⣤⣀⠐⣶⣶⣶⣶⣶⣶⡀⢀⣀⣀       
+ ⠉⠛⢿⣿⡆⢹⡿⠻⢿⣿⣿⣷⠈⠿⠛⠁       
+⣀⣾⣿⣿⣠⣾⣷⣦⣼⣿⣿⣿⣧          /* simple irc server */
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣛⠻⢧⣘⡷         █▀▀ ▀▀▀      █ ██ █▀▀
+⣿⣿⣿⣿⣿⣿⣉⠛⠿⣷⣦⣌⠁          █▀▀  █ ▄▄▄▄  █ █▀▄ █▄
+⣿⣿⣿⣿⡿⠋⠀   ⠻⡟⠃          By: ranchoi, sejkim2, dongwook
+========================================================
+
+SERV_LOG: IRC Server INIT!: port: 6667
+SERV_LOG: new client connected: fd: 4
+INPUT[4]: CAP LS 302
+OUTPUT[4]:  CAP * LS :
+INPUT[4]: JOIN :
+OUTPUT[4]: :ircserv 451  :You have not registered
+INPUT[4]: PASS 1111
+INPUT[4]: NICK sejkim2
+INPUT[4]: USER sejkim2 sejkim2 localhost :Sejin Kim
+OUTPUT[4]: :ircserv 001 sejkim2 :Welcome to the Internet Relay Network, sejkim2!
+OUTPUT[4]: :ircserv 002 sejkim2 :Your host is ircserv
+OUTPUT[4]: :ircserv 003 sejkim2 :This server was created 2024-11-15 20:18:00
+OUTPUT[4]: :ircserv 004 sejkim2 :ft_irc, Simple IRC server for 42 cursus project
+OUTPUT[4]: :ircserv 375 sejkim2 :start of MOTD command
+OUTPUT[4]: :ircserv 372 sejkim2 :
+OUTPUT[4]: :ircserv 372 sejkim2 : ⠠⠴⠶⠾⠿⠿⢶⣦⣦⣦⣄
+OUTPUT[4]: :ircserv 372 sejkim2 : ⢀⣤⣤⣀⠐⣶⣶⣶⣶⣶⣶⡀⢀⣀⣀       
+OUTPUT[4]: :ircserv 372 sejkim2 : ⠉⠛⢿⣿⡆⢹⡿⠻⢿⣿⣿⣷⠈⠿⠛⠁       
+OUTPUT[4]: :ircserv 372 sejkim2 :⣀⣾⣿⣿⣠⣾⣷⣦⣼⣿⣿⣿⣧          /* simple irc server */
+OUTPUT[4]: :ircserv 372 sejkim2 :⣿⣿⣿⣿⣿⣿⣿⣿⣿⣛⠻⢧⣘⡷         █▀▀ ▀▀▀      █ ██ █▀▀
+OUTPUT[4]: :ircserv 372 sejkim2 :⣿⣿⣿⣿⣿⣿⣉⠛⠿⣷⣦⣌⠁          █▀▀  █ ▄▄▄▄  █ █▀▄ █▄
+OUTPUT[4]: :ircserv 372 sejkim2 :⣿⣿⣿⣿⡿⠋⠀   ⠻⡟⠃          By: ranchoi, sejkim2, dongwook
+OUTPUT[4]: :ircserv 372 sejkim2 :
+OUTPUT[4]: :ircserv 376 sejkim2 :end of MOTD command
+INPUT[4]: MODE sejkim2 +i
+OUTPUT[4]: :ircserv 403 sejkim2 sejkim2 :No such channel
+INPUT[4]: PING ircserv
+OUTPUT[4]: :ircserv PONG ircserv
+SERV_LOG: new client connected: fd: 5
+INPUT[5]: CAP LS 302
+OUTPUT[5]:  CAP * LS :
+INPUT[5]: JOIN :
+OUTPUT[5]: :ircserv 451  :You have not registered
+INPUT[5]: PASS 1111
+INPUT[5]: NICK sej
+INPUT[5]: USER sejkim2 sejkim2 localhost :Sejin Kim
+OUTPUT[5]: :ircserv 001 sej :Welcome to the Internet Relay Network, sej!
+OUTPUT[5]: :ircserv 002 sej :Your host is ircserv
+OUTPUT[5]: :ircserv 003 sej :This server was created 2024-11-15 20:18:00
+OUTPUT[5]: :ircserv 004 sej :ft_irc, Simple IRC server for 42 cursus project
+OUTPUT[5]: :ircserv 375 sej :start of MOTD command
+OUTPUT[5]: :ircserv 372 sej :
+OUTPUT[5]: :ircserv 372 sej : ⠠⠴⠶⠾⠿⠿⢶⣦⣦⣦⣄
+OUTPUT[5]: :ircserv 372 sej : ⢀⣤⣤⣀⠐⣶⣶⣶⣶⣶⣶⡀⢀⣀⣀       
+OUTPUT[5]: :ircserv 372 sej : ⠉⠛⢿⣿⡆⢹⡿⠻⢿⣿⣿⣷⠈⠿⠛⠁       
+OUTPUT[5]: :ircserv 372 sej :⣀⣾⣿⣿⣠⣾⣷⣦⣼⣿⣿⣿⣧          /* simple irc server */
+OUTPUT[5]: :ircserv 372 sej :⣿⣿⣿⣿⣿⣿⣿⣿⣿⣛⠻⢧⣘⡷         █▀▀ ▀▀▀      █ ██ █▀▀
+OUTPUT[5]: :ircserv 372 sej :⣿⣿⣿⣿⣿⣿⣉⠛⠿⣷⣦⣌⠁          █▀▀  █ ▄▄▄▄  █ █▀▄ █▄
+OUTPUT[5]: :ircserv 372 sej :⣿⣿⣿⣿⡿⠋⠀   ⠻⡟⠃          By: ranchoi, sejkim2, dongwook
+OUTPUT[5]: :ircserv 372 sej :
+OUTPUT[5]: :ircserv 376 sej :end of MOTD command
+INPUT[5]: MODE sej +i
+OUTPUT[5]: :ircserv 403 sej sej :No such channel
+INPUT[5]: PING ircserv
+OUTPUT[5]: :ircserv PONG ircserv
+SERV_LOG: new client connected: fd: 6
+INPUT[6]: CAP LS 302
+OUTPUT[6]:  CAP * LS :
+INPUT[6]: JOIN :
+OUTPUT[6]: :ircserv 451  :You have not registered
+INPUT[6]: PASS 1111
+INPUT[6]: NICK kim
+INPUT[6]: USER sejkim2 sejkim2 localhost :Sejin Kim
+OUTPUT[6]: :ircserv 001 kim :Welcome to the Internet Relay Network, kim!
+OUTPUT[6]: :ircserv 002 kim :Your host is ircserv
+OUTPUT[6]: :ircserv 003 kim :This server was created 2024-11-15 20:18:00
+OUTPUT[6]: :ircserv 004 kim :ft_irc, Simple IRC server for 42 cursus project
+OUTPUT[6]: :ircserv 375 kim :start of MOTD command
+OUTPUT[6]: :ircserv 372 kim :
+OUTPUT[6]: :ircserv 372 kim : ⠠⠴⠶⠾⠿⠿⢶⣦⣦⣦⣄
+OUTPUT[6]: :ircserv 372 kim : ⢀⣤⣤⣀⠐⣶⣶⣶⣶⣶⣶⡀⢀⣀⣀       
+OUTPUT[6]: :ircserv 372 kim : ⠉⠛⢿⣿⡆⢹⡿⠻⢿⣿⣿⣷⠈⠿⠛⠁       
+OUTPUT[6]: :ircserv 372 kim :⣀⣾⣿⣿⣠⣾⣷⣦⣼⣿⣿⣿⣧          /* simple irc server */
+OUTPUT[6]: :ircserv 372 kim :⣿⣿⣿⣿⣿⣿⣿⣿⣿⣛⠻⢧⣘⡷         █▀▀ ▀▀▀      █ ██ █▀▀
+OUTPUT[6]: :ircserv 372 kim :⣿⣿⣿⣿⣿⣿⣉⠛⠿⣷⣦⣌⠁          █▀▀  █ ▄▄▄▄  █ █▀▄ █▄
+OUTPUT[6]: :ircserv 372 kim :⣿⣿⣿⣿⡿⠋⠀   ⠻⡟⠃          By: ranchoi, sejkim2, dongwook
+OUTPUT[6]: :ircserv 372 kim :
+OUTPUT[6]: :ircserv 376 kim :end of MOTD command
+INPUT[6]: MODE kim +i
+OUTPUT[6]: :ircserv 403 kim kim :No such channel
+INPUT[4]: JOIN #ch
+OUTPUT[4]: :sejkim2!sejkim2@127.0.0.1 JOIN #ch
+OUTPUT[4]: :ircserv 353 sejkim2 = #ch :@sejkim2
+OUTPUT[4]: :ircserv 366 sejkim2 #ch :End of /NAMES list
+OUTPUT[4]: :ircserv 331 sejkim2 #ch :No topic is set
+INPUT[4]: MODE #ch
+INPUT[6]: PING ircserv
+OUTPUT[6]: :ircserv PONG ircserv
+INPUT[5]: JOIN #ch
+OUTPUT[4]: :sej!sejkim2@127.0.0.1 JOIN #ch
+OUTPUT[5]: :sej!sejkim2@127.0.0.1 JOIN #ch
+OUTPUT[5]: :ircserv 353 sej = #ch :@sejkim2 sej
+OUTPUT[5]: :ircserv 366 sej #ch :End of /NAMES list
+OUTPUT[5]: :ircserv 331 sej #ch :No topic is set
+INPUT[5]: MODE #ch
+INPUT[6]: JOIN #ch
+OUTPUT[4]: :kim!sejkim2@127.0.0.1 JOIN #ch
+OUTPUT[6]: :kim!sejkim2@127.0.0.1 JOIN #ch
+OUTPUT[5]: :kim!sejkim2@127.0.0.1 JOIN #ch
+OUTPUT[6]: :ircserv 353 kim = #ch :@sejkim2 kim sej
+OUTPUT[6]: :ircserv 366 kim #ch :End of /NAMES list
+OUTPUT[6]: :ircserv 331 kim #ch :No topic is set
+INPUT[6]: MODE #ch
+INPUT[4]: MODE #ch +t
+OUTPUT[4]: :sejkim2!sejkim2@127.0.0.1 MODE #ch :+t
+OUTPUT[6]: :sejkim2!sejkim2@127.0.0.1 MODE #ch :+t
+OUTPUT[5]: :sejkim2!sejkim2@127.0.0.1 MODE #ch :+t
+INPUT[4]: PING ircserv
+OUTPUT[4]: :ircserv PONG ircserv
+INPUT[5]: TOPIC #ch :fd
+OUTPUT[5]: :ircserv 482 sej #ch :You're not channel operator
+INPUT[5]: PING ircserv
+OUTPUT[5]: :ircserv PONG ircserv
+INPUT[6]: PING ircserv
+OUTPUT[6]: :ircserv PONG ircserv
+INPUT[4]: TOPIC #ch :hihi
+OUTPUT[4]: :ircserv 332sejkim2 #ch ::hihi
+OUTPUT[6]: :ircserv 332sejkim2 #ch ::hihi
+OUTPUT[5]: :ircserv 332sejkim2 #ch ::hihi
+INPUT[4]: PING ircserv
+OUTPUT[4]: :ircserv PONG ircserv
+INPUT[4]: MODE #ch
+INPUT[5]: PING ircserv
+OUTPUT[5]: :ircserv PONG ircserv
+INPUT[5]: MODE #ch
+INPUT[6]: PING ircserv
+OUTPUT[6]: :ircserv PONG ircserv
+INPUT[6]: MODE #ch
+INPUT[4]: MODE #ch -t
+OUTPUT[4]: :sejkim2!sejkim2@127.0.0.1 MODE #ch :-t
+OUTPUT[6]: :sejkim2!sejkim2@127.0.0.1 MODE #ch :-t
+OUTPUT[5]: :sejkim2!sejkim2@127.0.0.1 MODE #ch :-t
+INPUT[5]: TOPIC #ch :cool
+OUTPUT[4]: :ircserv 332sej #ch ::cool
+OUTPUT[6]: :ircserv 332sej #ch ::cool
+OUTPUT[5]: :ircserv 332sej #ch ::cool
+INPUT[4]: MODE #ch +o sej
+OUTPUT[5]: :sejkim2!sejkim2@127.0.0.1 MODE #ch +o :sej
+OUTPUT[4]: :sejkim2!sejkim2@127.0.0.1 MODE #ch +o :sej
+OUTPUT[6]: :sejkim2!sejkim2@127.0.0.1 MODE #ch +o :sej
+INPUT[4]: PING ircserv
+OUTPUT[4]: :ircserv PONG ircserv
+INPUT[4]: KICK #ch sejkim2 :
+OUTPUT[5]: :sejkim2!sejkim2@127.0.0.1 KICK #ch sejkim2 :
+OUTPUT[4]: :sejkim2!sejkim2@127.0.0.1 KICK #ch sejkim2 :
+OUTPUT[6]: :sejkim2!sejkim2@127.0.0.1 KICK #ch sejkim2 :
+INPUT[5]: PING ircserv
+OUTPUT[5]: :ircserv PONG ircserv
+INPUT[4]: TOPIC #ch
+OUTPUT[4]: :ircserv 442 sejkim2 #ch :You're not on that channel
+INPUT[6]: PING ircserv
+OUTPUT[6]: :ircserv PONG ircserv
+INPUT[4]: PING ircserv
+OUTPUT[4]: :ircserv PONG ircserv
+INPUT[5]: PING ircserv
+OUTPUT[5]: :ircserv PONG ircserv
+INPUT[5]: WHO #ch
+INPUT[6]: PING ircserv
+OUTPUT[6]: :ircserv PONG ircserv
+INPUT[6]: WHO #ch
+INPUT[5]: TOPIC #ch :adfaf
+OUTPUT[5]: :ircserv 332sej #ch ::adfaf
+OUTPUT[6]: :ircserv 332sej #ch ::adfaf
+INPUT[4]: JOIN #ch
+OUTPUT[5]: :sejkim2!sejkim2@127.0.0.1 JOIN #ch
+OUTPUT[6]: :sejkim2!sejkim2@127.0.0.1 JOIN #ch
+OUTPUT[4]: :sejkim2!sejkim2@127.0.0.1 JOIN #ch
+OUTPUT[4]: :ircserv 353 sejkim2 = #ch :@sej kim sejkim2
+OUTPUT[4]: :ircserv 366 sejkim2 #ch :End of /NAMES list
+OUTPUT[4]: :ircserv 332sejkim2 #ch ::adfaf
+INPUT[4]: MODE #ch
+INPUT[4]: PART #ch
+OUTPUT[5]: :sejkim2!sejkim2@127.0.0.1 PART #ch
+OUTPUT[6]: :sejkim2!sejkim2@127.0.0.1 PART #ch
+OUTPUT[4]: :sejkim2!sejkim2@127.0.0.1 PART #ch
+INPUT[4]: PING ircserv
+OUTPUT[4]: :ircserv PONG ircserv
+INPUT[5]: TOPIC #chdf
+OUTPUT[5]: :ircserv 403 sej #chdf :No such channel
+INPUT[5]: PING ircserv
+OUTPUT[5]: :ircserv PONG ircserv
+INPUT[6]: PING ircserv
+OUTPUT[6]: :ircserv PONG ircserv
+INPUT[4]: PING ircserv
+OUTPUT[4]: :ircserv PONG ircserv
+INPUT[5]: PING ircserv
+OUTPUT[5]: :ircserv PONG ircserv
+INPUT[5]: WHO #ch
+INPUT[6]: PING ircserv
+OUTPUT[6]: :ircserv PONG ircserv
+INPUT[6]: WHO #ch
+INPUT[4]: JOIN #ch
+OUTPUT[5]: :sejkim2!sejkim2@127.0.0.1 JOIN #ch
+OUTPUT[6]: :sejkim2!sejkim2@127.0.0.1 JOIN #ch
+OUTPUT[4]: :sejkim2!sejkim2@127.0.0.1 JOIN #ch
+OUTPUT[4]: :ircserv 353 sejkim2 = #ch :@sej kim sejkim2
+OUTPUT[4]: :ircserv 366 sejkim2 #ch :End of /NAMES list
+OUTPUT[4]: :ircserv 332sejkim2 #ch ::adfaf
+INPUT[4]: MODE #ch
+INPUT[4]: PING ircserv
+OUTPUT[4]: :ircserv PONG ircserv
+INPUT[5]: MODE #ch +okim sejkim2
+OUTPUT[5]: :ircserv 472 m :is unknown mode char to me
+INPUT[5]: PING ircserv
+OUTPUT[5]: :ircserv PONG ircserv
+INPUT[5]: MODE #ch +oo sejkim2 kim
+OUTPUT[6]: :sej!sejkim2@127.0.0.1 MODE #ch +oo sejkim2 :kim
+OUTPUT[5]: :sej!sejkim2@127.0.0.1 MODE #ch +oo sejkim2 :kim
+OUTPUT[4]: :sej!sejkim2@127.0.0.1 MODE #ch +oo sejkim2 :kim
+INPUT[6]: PING ircserv
+OUTPUT[6]: :ircserv PONG ircserv
+INPUT[4]: MODE #ch +i
+OUTPUT[6]: :sejkim2!sejkim2@127.0.0.1 MODE #ch :+i
+OUTPUT[5]: :sejkim2!sejkim2@127.0.0.1 MODE #ch :+i
+OUTPUT[4]: :sejkim2!sejkim2@127.0.0.1 MODE #ch :+i
+INPUT[4]: MODE #ch -i
+OUTPUT[6]: :sejkim2!sejkim2@127.0.0.1 MODE #ch :-i
+OUTPUT[5]: :sejkim2!sejkim2@127.0.0.1 MODE #ch :-i
+OUTPUT[4]: :sejkim2!sejkim2@127.0.0.1 MODE #ch :-i
+INPUT[4]: MODE #ch -o kim
+OUTPUT[5]: :sejkim2!sejkim2@127.0.0.1 MODE #ch -o :kim
+OUTPUT[4]: :sejkim2!sejkim2@127.0.0.1 MODE #ch -o :kim
+OUTPUT[6]: :sejkim2!sejkim2@127.0.0.1 MODE #ch -o :kim
+INPUT[6]: TOPIC #ch :hi
+OUTPUT[5]: :ircserv 332kim #ch ::hi
+OUTPUT[4]: :ircserv 332kim #ch ::hi
+OUTPUT[6]: :ircserv 332kim #ch ::hi
+INPUT[4]: PING ircserv
+OUTPUT[4]: :ircserv PONG ircserv
+INPUT[6]: MODE #ch +t
+OUTPUT[6]: :ircserv 482 kim #ch :You're not channel operator
+INPUT[4]: WHO #ch
+INPUT[5]: PING ircserv
+OUTPUT[5]: :ircserv PONG ircserv
+INPUT[5]: MODE #ch b
+OUTPUT[5]: :ircserv 472 b :is unknown mode char to me
+INPUT[5]: MODE #ch +t
+OUTPUT[5]: :sej!sejkim2@127.0.0.1 MODE #ch :+t
+OUTPUT[4]: :sej!sejkim2@127.0.0.1 MODE #ch :+t
+OUTPUT[6]: :sej!sejkim2@127.0.0.1 MODE #ch :+t
+INPUT[6]: PING ircserv
+OUTPUT[6]: :ircserv PONG ircserv
+INPUT[6]: MODE #ch b
+OUTPUT[6]: :ircserv 482 kim #ch :You're not channel operator
+INPUT[6]: TOPIC #ch :hi
+OUTPUT[6]: :ircserv 482 kim #ch :You're not channel operator
+INPUT[4]: PING ircserv
+OUTPUT[4]: :ircserv PONG ircserv
+INPUT[5]: TOPIC #ch :hello
+OUTPUT[5]: :ircserv 332sej #ch ::hello
+OUTPUT[4]: :ircserv 332sej #ch ::hello
+OUTPUT[6]: :ircserv 332sej #ch ::hello
+INPUT[5]: PING ircserv
+OUTPUT[5]: :ircserv PONG ircserv
+INPUT[6]: PING ircserv
+OUTPUT[6]: :ircserv PONG ircserv
+INPUT[5]: KICK #ch sej :
+OUTPUT[5]: :sej!sejkim2@127.0.0.1 KICK #ch sej :
+OUTPUT[4]: :sej!sejkim2@127.0.0.1 KICK #ch sej :
+OUTPUT[6]: :sej!sejkim2@127.0.0.1 KICK #ch sej :
+INPUT[5]: TOPIC #ch
+ircserv(5120,0x107d37dc0) malloc: can't allocate region
+:*** mach_vm_map(size=17293822569102708736, flags: 100) failed (error code=3)
+ircserv(5120,0x107d37dc0) malloc: *** set a breakpoint in malloc_error_break to debug
+libc++abi.dylib: terminating with uncaught exception of type std::bad_alloc: std::bad_alloc
+zsh: abort      ./ircserv 6667 1111

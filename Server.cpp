@@ -132,7 +132,7 @@ void IrcServer::acceptClient() {
 }
 
 void IrcServer::run() {
-	time_t lastCheckTime = time(NULL);
+	// time_t lastCheckTime = time(NULL);
 
 	while (true) {
 		bool exitFlag= false;
@@ -154,11 +154,11 @@ void IrcServer::run() {
 				}
 			}
 
-			time_t currentTime = time(NULL);
-			if (currentTime - lastCheckTime >= TIME_CHECK_INTERVAL) {
-				checkConnections();
-				lastCheckTime = currentTime;
-			}
+			// time_t currentTime = time(NULL);
+			// if (currentTime - lastCheckTime >= TIME_CHECK_INTERVAL) {
+			// 	checkConnections();
+			// 	lastCheckTime = currentTime;
+			// }
 
 		} catch (const ServerException& e) {
 			serverLog(this->_fd, LOG_ERR, C_ERR, e.what());
