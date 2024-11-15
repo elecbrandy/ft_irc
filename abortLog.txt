@@ -1,0 +1,176 @@
+SERV_LOG: new client connected: fd:
+INPUT[6]: PASS 1111
+INPUT[6]: NICK dongwook
+INPUT[6]: USER root root host.docker.internal :root
+OUTPUT[6]: :ircserv 001 dongwook :Welcome to the Internet Relay Network, dongwook!
+OUTPUT[6]: :ircserv 002 dongwook :Your host is ircserv
+OUTPUT[6]: :ircserv 003 dongwook :This server was created 2024-11-13 22:51:27
+OUTPUT[6]: :ircserv 004 dongwook :ft_irc, Simple IRC server for 42 cursus project
+OUTPUT[6]: :ircserv 375 dongwook :start of MOTD command
+OUTPUT[6]: :ircserv 372 dongwook :
+OUTPUT[6]: :ircserv 372 dongwook : ⠠⠴⠶⠾⠿⠿⢶⣦⣦⣦⣄
+OUTPUT[6]: :ircserv 372 dongwook : ⢀⣤⣤⣀⠐⣶⣶⣶⣶⣶⣶⡀⢀⣀⣀
+OUTPUT[6]: :ircserv 372 dongwook : ⠉⠛⢿⣿⡆⢹⡿⠻⢿⣿⣿⣷⠈⠿⠛⠁
+OUTPUT[6]: :ircserv 372 dongwook :⣀⣾⣿⣿⣠⣾⣷⣦⣼⣿⣿⣿⣧          /* simple irc server */
+OUTPUT[6]: :ircserv 372 dongwook :⣿⣿⣿⣿⣿⣿⣿⣿⣿⣛⠻⢧⣘⡷         █▀▀ ▀▀▀      █ ██ █▀▀
+OUTPUT[6]: :ircserv 372 dongwook :⣿⣿⣿⣿⣿⣿⣉⠛⠿⣷⣦⣌⠁          █▀▀  █ ▄▄▄▄  █ █▀▄ █▄
+OUTPUT[6]: :ircserv 372 dongwook :⣿⣿⣿⣿⡿⠋⠀   ⠻⡟⠃          By: ranchoi, sejkim2, dongwook
+OUTPUT[6]: :ircserv 372 dongwook :
+OUTPUT[6]: :ircserv 376 dongwook :end of MOTD command
+INPUT[6]: MODE dongwook +i
+OUTPUT[6]: :ircserv 403 dongwook dongwook :No such channel
+INPUT[5]: PING ircserv
+OUTPUT[5]: :ircserv PONG ircserv
+INPUT[6]: PING ircserv
+OUTPUT[6]: :ircserv PONG ircserv
+INPUT[4]: JOIN #ch1,#ch2,#ch3
+params [0]#ch1
+params [1]#ch2
+params [2]#ch3
+OUTPUT[4]: :ircserv 475 rani #ch1 :Cannot join channel (+k)
+INPUT[4]: PING ircserv
+OUTPUT[4]: :ircserv PONG ircserv
+INPUT[5]: PING ircserv
+OUTPUT[5]: :ircserv PONG ircserv
+INPUT[6]: PING ircserv
+OUTPUT[6]: :ircserv PONG ircserv
+INPUT[4]: PRIVMSG #ch3 :hello
+=================================================================
+==6819==ERROR: AddressSanitizer: stack-use-after-scope on address 0x7ffedff63bc8 at pc 0x00010fca4caf bp 0x7ffedff62bd0 sp 0x7ffedff62bc8
+READ of size 8 at 0x7ffedff63bc8 thread T0
+    #0 0x10fca4cae in std::__1::__tree<std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, Client*>, std::__1::__map_value_compare<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, Client*>, std::__1::less<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, true>, std::__1::allocator<std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, Client*> > >::__root() const __tree:1085
+    #1 0x10fcb95c5 in std::__1::__tree_const_iterator<std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, Client*>, std::__1::__tree_node<std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, Client*>, void*>*, long> std::__1::__tree<std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, Client*>, std::__1::__map_value_compare<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, Client*>, std::__1::less<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, true>, std::__1::allocator<std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, Client*> > >::find<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) const __tree:2577
+    #2 0x10fca10fd in std::__1::map<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, Client*, std::__1::less<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::allocator<std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, Client*> > >::find(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) const map:1380
+    #3 0x10fca0172 in Channel::isOperator(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >) const Channel.cpp:123
+    #4 0x10fc9feea in Channel::isOperatorNickname(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >) const Channel.cpp:81
+    #5 0x10fd78888 in Cmd::cmdPrivmsg() CmdPrivmsg.cpp:148
+    #6 0x10fcf660a in Cmd::handleClientCmd() Cmd.cpp:50
+    #7 0x10fcc9f50 in IrcServer::handleSocketRead(int) Server.cpp:161
+    #8 0x10fcc9994 in IrcServer::run() Server.cpp:133
+    #9 0x10fcf4206 in main main.cpp:14
+    #10 0x7fff6f194cc8 in start+0x0 (libdyld.dylib:x86_64+0x1acc8)
+
+Address 0x7ffedff63bc8 is located in stack of thread T0 at offset 2792 in frame
+    #0 0x10fd75a3f in Cmd::cmdPrivmsg() CmdPrivmsg.cpp:87
+
+  This frame has 83 object(s):
+    [32, 56) 'ref.tmp' (line 90)
+    [96, 120) 'ref.tmp2' (line 90)
+    [160, 184) 'ref.tmp3' (line 90)
+    [224, 248) 'ref.tmp4' (line 90)
+    [288, 312) 'ref.tmp5' (line 90)
+    [352, 376) 'params' (line 92)
+    [416, 440) 'receivers' (line 94)
+    [480, 504) 'msg' (line 95)
+    [544, 568) 'agg.tmp'
+    [608, 632) 'ref.tmp79' (line 108)
+    [672, 696) 'ref.tmp82' (line 108)
+    [736, 760) 'ref.tmp101' (line 109)
+    [800, 824) 'ref.tmp103' (line 109)
+    [864, 888) 'ref.tmp106' (line 109)
+    [928, 952) 'ref.tmp107' (line 109)
+    [992, 1016) 'ref.tmp108' (line 109)
+    [1056, 1080) 'ref.tmp109' (line 109)
+    [1120, 1144) 'ref.tmp110' (line 109)
+    [1184, 1208) 'ref.tmp171' (line 117)
+    [1248, 1272) 'ref.tmp173' (line 117)
+    [1312, 1336) 'ref.tmp176' (line 117)
+    [1376, 1400) 'ref.tmp177' (line 117)
+    [1440, 1464) 'ref.tmp178' (line 117)
+    [1504, 1528) 'ref.tmp179' (line 117)
+    [1568, 1592) 'ref.tmp180' (line 117)
+    [1632, 1656) 'ref.tmp181' (line 117)
+    [1696, 1720) 'receiverStr' (line 121)
+    [1760, 1784) 'ref.tmp252' (line 123)
+    [1824, 1848) 'ref.tmp253' (line 123)
+    [1888, 1912) 'ref.tmp283' (line 127)
+    [1952, 1976) 'ref.tmp285' (line 127)
+    [2016, 2040) 'ref.tmp288' (line 127)
+    [2080, 2104) 'ref.tmp289' (line 127)
+    [2144, 2168) 'ref.tmp290' (line 127)
+    [2208, 2232) 'ref.tmp291' (line 127)
+    [2272, 2296) 'ref.tmp292' (line 127)
+    [2336, 2360) 'ref.tmp353' (line 132)
+    [2400, 2424) 'ref.tmp355' (line 132)
+    [2464, 2488) 'ref.tmp358' (line 132)
+    [2528, 2552) 'ref.tmp359' (line 132)
+    [2592, 2616) 'ref.tmp360' (line 132)
+    [2656, 2680) 'chs' (line 140)
+    [2720, 2728) 'it' (line 141)
+    [2752, 2760) 'ref.tmp419' (line 144)
+    [2784, 2808) 'ref.tmp432' (line 145) <== Memory access at offset 2792 is inside this variable
+    [2848, 2872) 'ref.tmp434' (line 145)
+    [2912, 2936) 'ref.tmp437' (line 145)
+    [2976, 3000) 'ref.tmp438' (line 145)
+    [3040, 3064) 'ref.tmp439' (line 145)
+    [3104, 3128) 'ref.tmp440' (line 145)
+    [3168, 3192) 'ref.tmp441' (line 145)
+    [3232, 3256) 'nick' (line 148)
+    [3296, 3320) 'agg.tmp496'
+    [3360, 3368) 'ref.tmp504' (line 149)
+    [3392, 3400) 'ref.tmp515' (line 149)
+    [3424, 3448) 'ref.tmp531' (line 150)
+    [3488, 3512) 'ref.tmp533' (line 150)
+    [3552, 3576) 'ref.tmp536' (line 150)
+    [3616, 3640) 'ref.tmp537' (line 150)
+    [3680, 3704) 'ref.tmp538' (line 150)
+    [3744, 3768) 'ref.tmp539' (line 150)
+    [3808, 3832) 'ref.tmp540' (line 150)
+    [3872, 3896) 'ref.tmp610' (line 154)
+    [3936, 3960) 'ref.tmp612' (line 154)
+    [4000, 4024) 'ref.tmp615' (line 154)
+    [4064, 4088) 'ref.tmp616' (line 154)
+    [4128, 4152) 'ref.tmp617' (line 154)
+    [4192, 4216) 'ref.tmp618' (line 154)
+    [4256, 4280) 'ref.tmp619' (line 154)
+    [4320, 4344) 'chs687' (line 161)
+    [4384, 4392) 'ref.tmp693' (line 162)
+    [4416, 4440) 'ref.tmp705' (line 163)
+    [4480, 4504) 'ref.tmp707' (line 163)
+    [4544, 4568) 'ref.tmp711' (line 163)
+    [4608, 4632) 'ref.tmp712' (line 163)
+    [4672, 4696) 'ref.tmp713' (line 163)
+    [4736, 4760) 'ref.tmp714' (line 163)
+    [4800, 4824) 'agg.tmp777'
+    [4864, 4888) 'ref.tmp779' (line 168)
+    [4928, 4952) 'ref.tmp783' (line 168)
+    [4992, 5016) 'ref.tmp784' (line 168)
+    [5056, 5080) 'ref.tmp785' (line 168)
+    [5120, 5144) 'ref.tmp786' (line 168)
+HINT: this may be a false positive if your program uses some custom stack unwind mechanism, swapcontext or vfork
+      (longjmp and C++ exceptions *are* supported)
+SUMMARY: AddressSanitizer: stack-use-after-scope __tree:1085 in std::__1::__tree<std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, Client*>, std::__1::__map_value_compare<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, Client*>, std::__1::less<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, true>, std::__1::allocator<std::__1::__value_type<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, Client*> > >::__root() const
+Shadow bytes around the buggy address:
+  0x1fffdbfec720: f8 f8 f8 f2 f2 f2 f2 f2 f8 f8 f8 f2 f2 f2 f2 f2
+  0x1fffdbfec730: f8 f8 f8 f2 f2 f2 f2 f2 f8 f8 f8 f2 f2 f2 f2 f2
+  0x1fffdbfec740: f8 f8 f8 f2 f2 f2 f2 f2 f8 f8 f8 f2 f2 f2 f2 f2
+  0x1fffdbfec750: f8 f8 f8 f2 f2 f2 f2 f2 f8 f8 f8 f2 f2 f2 f2 f2
+  0x1fffdbfec760: f8 f8 f8 f2 f2 f2 f2 f2 00 00 00 f2 f2 f2 f2 f2
+=>0x1fffdbfec770: 00 f2 f2 f2 f8 f2 f2 f2 f8[f8]f8 f2 f2 f2 f2 f2
+  0x1fffdbfec780: f8 f8 f8 f2 f2 f2 f2 f2 f8 f8 f8 f2 f2 f2 f2 f2
+  0x1fffdbfec790: f8 f8 f8 f2 f2 f2 f2 f2 f8 f8 f8 f2 f2 f2 f2 f2
+  0x1fffdbfec7a0: f8 f8 f8 f2 f2 f2 f2 f2 f8 f8 f8 f2 f2 f2 f2 f2
+  0x1fffdbfec7b0: 00 00 00 f2 f2 f2 f2 f2 00 00 00 f2 f2 f2 f2 f2
+  0x1fffdbfec7c0: f8 f2 f2 f2 f8 f2 f2 f2 f8 f8 f8 f2 f2 f2 f2 f2
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           00
+  Partially addressable: 01 02 03 04 05 06 07
+  Heap left redzone:       fa
+  Freed heap region:       fd
+  Stack left redzone:      f1
+  Stack mid redzone:       f2
+  Stack right redzone:     f3
+  Stack after return:      f5
+  Stack use after scope:   f8
+  Global redzone:          f9
+  Global init order:       f6
+  Poisoned by user:        f7
+  Container overflow:      fc
+  Array cookie:            ac
+  Intra object redzone:    bb
+  ASan internal:           fe
+  Left alloca redzone:     ca
+  Right alloca redzone:    cb
+  Shadow gap:              cc
+==6819==ABORTING
+[1]    6819 abort      ./ircserv 6668 1111

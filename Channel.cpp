@@ -118,8 +118,9 @@ std::string Channel::getParticipantNameStr() {
     return names;
 }
 
+#include <iostream>
 bool Channel::isOperator(std::string nickname) const
-{
+{	
 	if (this->_operator.find(nickname) == this->_operator.end())
 		return false;
 	else
@@ -147,7 +148,7 @@ void Channel::removeInvited(std::string nickname) {
 	_invited.erase(std::remove(_invited.begin(), _invited.end(), nickname), _invited.end());
 }
 
-std::map<std::string, Client*> Channel::getOperator() {return this->_operator;}
+std::map<std::string, Client*>& Channel::getOperator() {return this->_operator;}
 
 unsigned int Channel::getLimit() const {return this->_limit;} 
 

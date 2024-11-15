@@ -36,7 +36,7 @@
 #define SERVER_NAME "ircserv"
 
 #define CRLF "\r\n"
-#define PREFIX_SERVER					":ircserv"
+#define PREFIX_SERVER ":ircserv"
 #define PREFIX_USER(nickname, username, hostname) 	":" + nickname + "!" + username + "@" + hostname
 
 #define TIME_OUT 60
@@ -49,11 +49,12 @@
 
 class IrcServer {
 private:
-	const std::string					_servername;
 	int									_fd;
-	int									port;
-	std::string							password;
+	int									_port;
+	std::string							_password;
+	const std::string					_servername;
 	time_t								_startTime;
+
 	std::vector<struct pollfd>			fds;
 	std::map<int, Client*>				_clients;
 	std::map<std::string, Channel *>	_channels;
@@ -62,7 +63,7 @@ private:
 
 public:
 	IrcServer();
-	IrcServer(int port, const std::string& password);
+	IrcServer(const char *port, const char *password);
 	~IrcServer();
 
 	void	init();
@@ -102,7 +103,8 @@ public:
 	void updateNickNameClientMap(const std::string& oldNick, const std::string& newNick, Client* client);
 
 	void serverLog(int fd, int log_type, std::string log_color, std::string msg);
-	void removePollFds();
+	std::string intToString(int num);
+	static void signalHandler(int signal);
 
 	/* exception */
 	class ServerException : public std::exception {

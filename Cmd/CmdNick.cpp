@@ -77,6 +77,9 @@ void Cmd::cmdNick() {
 	// 0. 변경 전 닉네임을 저장
 	std::string newNick = this->cmdParams;
 	std::string oldNick = client->getNickname();
+	std::string oldPrefix = client->getPrefix();
+	std::cout << "newNick : " << newNick << std::endl;
+	std::cout << "oldNick : " << oldNick << std::endl;
 
 	// 1. 클라이언트의 닉네임 적용/변경
 	client->setNickname(newNick);
@@ -91,29 +94,19 @@ void Cmd::cmdNick() {
 		server.updateNickNameClientMap(oldNick, newNick, client);
 
 		// 3. channel->participant, channel->operator 업데이트
-		std::map<std::string, Channel *>::iterator it = server.getChannels().begin();
-		for (; it != server.getChannels().end(); ++it) {
+		std::map<std::string, Channel *>::iterator it;
+		for (it = server.getChannels().begin(); it != server.getChannels().end(); ++it) {
+							// std::cout << "channel name :" << it->first << std::endl;
 			Channel* ch = it->second;
-			
-			// if (ch->isParticipant(oldNick)) {
-			// 	// 3.1. 채널 참여자 목록 업데이트
-			// 	// 3.2. 채널 운영자 목록 업데이트 (운영자인 경우)
-			// 	if (ch->isOperator(oldNick)) {
-			// 		ch->removeParticipant(oldNick);
-			// 		ch->addParticipant(newNick, client);
-			// 		ch->addOperator(newNick, client);
-			// 	} else {
-			// 		ch->removeParticipant(oldNick);
-			// 		ch->addParticipant(newNick, client);
-			// 	}
-			// 	// 닉네임 변경 메세지 채널 내 전송
-			// 	server.broadcastMsg(server.makeMsg(':' + client->getNickname(), RPL_NICK(newNick)), ch, -1);
-			// }
-
-			// fix : sejkim2 (운영자일 경우 participant 넣을 때 이름에 @ 붙이기) + operator 목록 갱신
+							// std::map<std::string, Client*>::iterator it2 = ch->getParticipant().begin();
+							// for (; it2 != ch->getParticipant().end(); ++it2) {
+							// 	std::cout << "participant name :" << it2->first << std::endl;
+							// }
+							// std::map<std::string, Client*>::iterator it3 = ch->getOperator().begin();
+							// for (; it3 != ch->getOperator().end(); ++it3) {
+							// 	std::cout << "operator name :" << it3->first << std::endl;
+							// }
 			if (ch->isParticipant(ch->isOperatorNickname(oldNick))) {
-				// 3.1. 채널 참여자 목록 업데이트
-				// 3.2. 채널 운영자 목록 업데이트 (운영자인 경우)
 				if (ch->isOperator(oldNick)) {
 					ch->removeParticipant(ch->isOperatorNickname(oldNick));
 					ch->addParticipant("@" + newNick, client);
@@ -124,12 +117,14 @@ void Cmd::cmdNick() {
 					ch->removeParticipant(oldNick);
 					ch->addParticipant(newNick, client);
 				}
-				// 닉네임 변경 메세지 채널 내 전송
-				server.broadcastMsg(server.makeMsg(':' + client->getNickname(), RPL_NICK(newNick)), ch, -1);
+
+				// 닉네임 변경 메시지를 채널에 전송
+				// server.broadcastMsg(server.makeMsg(":" + oldNick, RPL_NICK(newNick)), ch, client->getFd());
 			}
 		}
-	}
-	else
+		// server.castMsg(client_fd, server.makeMsg(oldPrefix, RPL_NICK(newNick)));
+		server.broadcastMsg(server.makeMsg(":" + oldNick, RPL_NICK(newNick)), NULL, -1);
+	} else
 		this->server.addClientByNickname(this->cmdParams, this->client);
 	client->setNickStatus(true);
 }

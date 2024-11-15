@@ -53,7 +53,7 @@ class Channel {
 		std::string getTopic();
 		const std::set<char>& getMode() const;
 		std::map<std::string, Client*>& getParticipant();
-		std::map<std::string, Client*> getOperator();
+		std::map<std::string, Client*>& getOperator();
 		std::string getParticipantNameStr();
 
 		bool isOperator(std::string nickname) const;

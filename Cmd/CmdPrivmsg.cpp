@@ -146,6 +146,7 @@ void Cmd::cmdPrivmsg() {
 
 			//채널에 참여하고 있는지 확인
 			std::string nick = it->second->isOperatorNickname(client->getNickname());
+			std::cout << "nick in privmsg/isOperatorNickname: " << nick << std::endl;
 			if (it->second->getParticipant().find(nick) == it->second->getParticipant().end())
 				throw Cmd::CmdException(server.makeMsg(PREFIX_SERVER, ERR_CANNOTSENDTOCHAN(client->getNickname(), receivers[i])));
 		} else { // 수신자집단이 사용자인 경우
