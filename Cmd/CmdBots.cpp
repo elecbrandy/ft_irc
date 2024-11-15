@@ -5,7 +5,7 @@ void Cmd::cmdBotMe() {
 	server.castMsg(this->client_fd, server.makeMsg(PREFIX_SERVER, "nickname: " + client->getNickname()));
 	server.castMsg(this->client_fd, server.makeMsg(PREFIX_SERVER, "username: " + client->getUsername()));
 	server.castMsg(this->client_fd, server.makeMsg(PREFIX_SERVER, "hostname: " + client->getHostname()));
-	server.castMsg(this->client_fd, server.makeMsg(PREFIX_SERVER, "lastActivityTime: " + server.formatDateToString(client->getLastActivityTime())));
+	server.castMsg(this->client_fd, server.makeMsg(PREFIX_SERVER, "lastPongTime: " + server.formatDateToString(client->getLastPongTime())));
 }
 
 void Cmd::cmdBotTime() {

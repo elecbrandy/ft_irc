@@ -21,7 +21,7 @@ class Client {
 		std::string	_hostname;
 		std::string	_realname;
 		std::string _servername;
-		time_t		_lastActivityTime;
+		time_t		_lastPongTime;
 		t_regitser	_registerStatus;
 		std::string _prefix;
 
@@ -37,7 +37,7 @@ class Client {
 		void		setRealname(const std::string& str);
 		// void		setPassword(const std::string str);
 		void		setServername(const std::string& str);
-		void 		setlastActivityTime();
+		void 		updateLastPongTime();
 		void		setIsRegistered(bool flag);
 		void		setPassStatus(bool status);
 		void 		setNickStatus(bool status);
@@ -52,7 +52,7 @@ class Client {
 		std::string	getRealname() const;
 		std::string	getPassword() const;
 		std::string	getServername() const;
-		time_t		getLastActivityTime() const;
+		time_t		getLastPongTime() const;
 		bool		getPassStatus() const;
 		bool		getNickStatus() const;
 		bool		getUserStatus() const;

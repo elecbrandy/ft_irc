@@ -78,8 +78,6 @@ void Cmd::cmdNick() {
 	std::string newNick = this->cmdParams;
 	std::string oldNick = client->getNickname();
 	std::string oldPrefix = client->getPrefix();
-	std::cout << "newNick : " << newNick << std::endl;
-	std::cout << "oldNick : " << oldNick << std::endl;
 
 	// 1. 클라이언트의 닉네임 적용/변경
 	client->setNickname(newNick);

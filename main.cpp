@@ -1,15 +1,5 @@
 #include "Server.hpp"
 
-void check_leaks() {
-	system("leaks ircserv | grep leaked");
-}
-
-static void signalHandler(int signal) {
-	(void)signal;
-	std::cerr << "SERV_LOG: " << C_ERR << MSG_RECV_SIGNAL << C_RESET;
-	exit(EXIT_FAILURE);
-}
-
 int main(int ac, char** av) {
 	if (ac != 3) {
 		std::cerr << C_ERR << "Error: " << ERR_ARG_COUNT << C_RESET << std::endl;
@@ -18,9 +8,6 @@ int main(int ac, char** av) {
 
 	try {
 		IrcServer server(av[1], av[2]);
-		atexit(check_leaks);
-		signal(SIGINT, signalHandler);
-		signal(SIGQUIT, signalHandler);
 		server.init();
 		server.run();
 	} catch (const IrcServer::ServerException &e) {

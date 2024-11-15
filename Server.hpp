@@ -39,7 +39,7 @@
 #define PREFIX_SERVER ":ircserv"
 #define PREFIX_USER(nickname, username, hostname) 	":" + nickname + "!" + username + "@" + hostname
 
-#define TIME_OUT 60
+#define TIME_OUT 20
 #define TIME_CHECK_INTERVAL 180
 
 #define LOG_ERR -1
@@ -95,8 +95,6 @@ public:
 	void printGoat();
 	std::string formatDateToString(time_t time);
 
-	void modifyPollEvent(int client_fd, short events);
-	void handleSocketWrite(int client_fd);
 	void removeClientFromServer(Client* client);
 
 	void updateClients(Client* client);
@@ -105,6 +103,8 @@ public:
 	void serverLog(int fd, int log_type, std::string log_color, std::string msg);
 	std::string intToString(int num);
 	static void signalHandler(int signal);
+	void sendPing();
+	void checkPong();
 
 	/* exception */
 	class ServerException : public std::exception {

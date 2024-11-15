@@ -132,7 +132,7 @@ void IrcServer::acceptClient() {
 }
 
 void IrcServer::run() {
-	// time_t lastCheckTime = time(NULL);
+	time_t lastCheckTime = time(NULL);
 
 	while (true) {
 		bool exitFlag= false;
@@ -154,6 +154,12 @@ void IrcServer::run() {
 				}
 			}
 
+			time_t currentTime = time(NULL);
+			if (currentTime - lastCheckTime >= TIME_CHECK_INTERVAL) {
+				checkConnections();
+				lastCheckTime = currentTime;
+			}
+
 		} catch (const ServerException& e) {
 			serverLog(this->_fd, LOG_ERR, C_ERR, e.what());
 			if (exitFlag) {
@@ -164,7 +170,7 @@ void IrcServer::run() {
 }
 
 void IrcServer::handleSocketRead(int fd) {
-	char	buffer[BUFFER_SIZE];
+	char	buffer[2000];
 
 	size_t recvLen = recv(fd, buffer, BUFFER_SIZE - 1, 0);
 	if (recvLen <= 0) {
@@ -197,8 +203,6 @@ void IrcServer::castMsg(int client_fd, const std::string msg) {
 			// 소켓의 송신 버퍼가 가득 차있는 경우, send 해야할 데이터를 Client의 _sendBuffer에 임시저장
 			client->appendToSendBuffer(msg);
 
-			// POLLOUT (소켓에 써야하는 플래그) 를 감지하도록 설정. 임시저장한 데이터를 언젠가 소켓 버퍼에 써야하므로
-			modifyPollEvent(client_fd, POLLIN | POLLOUT);
 		} else if (errno == EPIPE || errno == ECONNRESET || errno == ENOTCONN) {
 			// 다른 에러 발생 시 클라이언트 리소스 정리 / 제거 
 			removeClientFromServer(getClient(client_fd));
@@ -211,44 +215,6 @@ void IrcServer::castMsg(int client_fd, const std::string msg) {
 
 	}
 	serverLog(client_fd, LOG_OUTPUT, C_MSG, msg.substr(0, msg.length()));
-}
-
-void IrcServer::modifyPollEvent(int fd, short events) {
-	for (size_t i = 0; i < fds.size(); ++i) {
-		if (fds[i].fd == fd) {
-			fds[i].events = events;
-			break;
-		}
-	}
-}
-
-void IrcServer::handleSocketWrite(int client_fd) {
-	Client * client = getClient(client_fd);
-	if (client) {
-		if (client->hasDataToSend()) {
-			const std::string& buffer = client->getSendBuffer();
-			ssize_t bytesSent = send(client_fd, buffer.c_str(), buffer.size(), 0);
-
-			if (bytesSent == -1) {
-				if (errno == EAGAIN || errno == EWOULDBLOCK) {
-					// 송신 버퍼가 아직 가득 찬 경우, 다음 POLLOUT 이벤트를 기다림
-					return ;
-				} else {
-					// 심각한 에러 발생 시 클라이언트 제거
-					removeClientFromServer(getClient(client_fd));
-				}
-			} else {
-				client->clearSendBuffer(bytesSent);
-				if (!client->hasDataToSend()) {
-					// 모든 데이터가 전송된 경우. 즉 이 시점에서 _sendBuffer가 비어있는경우 POLLOUT 모니터링 해제
-					modifyPollEvent(client_fd, POLLIN);
-				}
-			}
-		} else {
-			// 보낼 데이터가 없으므로 POLLOUT 모니터링 해제
-			modifyPollEvent(client_fd, POLLIN);
-		}
-	}
 }
 
 void IrcServer::broadcastMsg(const std::string& message, Channel* channel, int senderFd) {
@@ -319,15 +285,8 @@ void IrcServer::setChannels(const std::string& channelName, const std::string& k
 }
 
 void IrcServer::checkConnections() {
-	serverLog(this->_fd, LOG_SERVER, C_CHECK, MSG_CHECK_CONNECTION_START);
-
-	for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
-		Client* client = it->second;
-		if (client && client->isConnectionTimedOut(TIME_OUT)) {
-			serverLog(this->_fd, LOG_SERVER, C_MSG, MSG_CONNECTION_TIMEOUT(intToString(it->first)));
-			_fdsToRemove.push_back(it->first);
-		}
-	}
+	sendPing();
+	checkPong();
 }
 
 void IrcServer::printGoat() {
@@ -344,19 +303,19 @@ void IrcServer::printGoat() {
 }
 
 void IrcServer::removeClientFromServer(Client* client) {
-    if (client == NULL) {
-        return;
-    }
+	if (client == NULL) {
+		return;
+	}
 
-    for (std::map<std::string, Channel*>::iterator chs = _channels.begin(); chs != _channels.end(); ++chs) {
-        Channel* ch = chs->second;
-        if (ch->isParticipant(ch->isOperatorNickname(client->getNickname()))) {
-            ch->removeParticipant(ch->isOperatorNickname(client->getNickname()));
-        }
-        if (ch->isOperator(client->getNickname())) {
-            ch->removeOperator(client->getNickname());
-        }
-    }
+	for (std::map<std::string, Channel*>::iterator chs = _channels.begin(); chs != _channels.end(); ++chs) {
+		Channel* ch = chs->second;
+		if (ch->isParticipant(ch->isOperatorNickname(client->getNickname()))) {
+			ch->removeParticipant(ch->isOperatorNickname(client->getNickname()));
+		}
+		if (ch->isOperator(client->getNickname())) {
+			ch->removeOperator(client->getNickname());
+		}
+	}
 
 	_clients.erase(client->getFd());
 	nickNameClientMap.erase(client->getNickname());
@@ -368,7 +327,6 @@ void IrcServer::removeClientFromServer(Client* client) {
 		}
 	}
 
-	// close(client->getFd());
 	delete client;
 }
 
@@ -407,8 +365,37 @@ void IrcServer::serverLog(int fd, int log_type, std::string log_color, std::stri
 }
 
 std::string IrcServer::intToString(int num) {
-    std::stringstream ss;
-    ss << num;
-    return ss.str();
+	std::stringstream ss;
+	ss << num;
+	return ss.str();
+}
+
+void IrcServer::sendPing() {
+	serverLog(this->_fd, LOG_SERVER, C_CHECK, "send Ping");
+
+	for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
+		Client* client = it->second;
+		if (client) {
+			castMsg(it->first, makeMsg(PREFIX_SERVER, std::string("PING") + ' ' + SERVER_NAME));
+		}
+	}
+}
+
+void IrcServer::checkPong() {
+	serverLog(this->_fd, LOG_SERVER, C_CHECK, "check Pong");
+
+	std::vector<int> clientsToRemove;
+
+	for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
+		Client* client = it->second;
+		if (client && time(NULL) - client->getLastPongTime() > TIME_OUT) {
+			clientsToRemove.push_back(it->first);
+		}
+	}
+
+	for (size_t i = 0; i < clientsToRemove.size(); ++i) {
+		int clientFd = clientsToRemove[i];
+		removeClientFromServer(_clients[clientFd]);
+	}
 }
 

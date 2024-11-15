@@ -37,6 +37,7 @@ public:
 	void		cmdUser();
 	void		cmdNick();
 	void		cmdPass();
+	void		cmdPing();
 	void		cmdPong();
 	void		cmdJoin();
 	void		cmdMode();
