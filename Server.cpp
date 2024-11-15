@@ -205,7 +205,7 @@ void IrcServer::castMsg(int client_fd, const std::string msg) {
 
 		} else if (errno == EPIPE || errno == ECONNRESET || errno == ENOTCONN) {
 			// 다른 에러 발생 시 클라이언트 리소스 정리 / 제거 
-			removeClientFromServer(getClient(client_fd));
+			removeClientFromServer(client);
 		}
 	// 송신해야하는 데이터 중 일부만 송신한 경우
 	} else if (bytesSent < static_cast<ssize_t>(msg.length())) {
