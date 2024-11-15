@@ -305,3 +305,6 @@ void Cmd::cmdMode()
 }
 
 // /connect -nocap localhost 6667 1111
+// INPUT[4]: PASS 1111
+// INPUT[4]: NICK sejkim2
+// INPUT[4]: USER sejkim2 sejkim2 localhost :Sejin Kim

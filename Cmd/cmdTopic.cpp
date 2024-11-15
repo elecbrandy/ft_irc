@@ -51,7 +51,12 @@ void Cmd::cmdTopic() {
 
 	std::vector<std::string> params = topicSplit();
 	std::string chName = params[0];
-	std::string topic = params[1];
+	std::string topic;
+
+	if (params.size() == 1)
+		topic = "";
+	else
+		topic = params[1];
 
 	if (chName.empty())
 		throw Cmd::CmdException(server.makeMsg(PREFIX_SERVER, ERR_NEEDMOREPARAMS(client->getNickname(), "TOPIC")));
