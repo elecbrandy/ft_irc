@@ -90,7 +90,7 @@ public:
 	void addClientByNickname(const std::string& nickname, Client* client);
 	std::string makeMsg(const std::string& prefix, const std::string& msg);
 
-	void checkConnections();
+	void checkConnection();
 	std::string	getPassword();
 	void printGoat();
 	std::string formatDateToString(time_t time);

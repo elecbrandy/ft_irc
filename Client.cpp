@@ -3,7 +3,7 @@
 
 Client::Client(in_addr addr)
 :	_hostname(inet_ntoa(addr)),
-	_lastPongTime(time(NULL)) {
+	_LastPingSent(time(NULL)) {
 	_registerStatus.pass = false;
 	_registerStatus.nick = false;
 	_registerStatus.user = false;
@@ -35,7 +35,7 @@ void Client::setRealname(const std::string& str) {this->_realname = str;}
 
 void Client::setServername(const std::string& str) {this->_servername = str;}
 
-void Client::updateLastPongTime() {this->_lastPongTime = time(NULL);}
+void Client::updateLastPingSent() {this->_LastPingSent = time(NULL);}
 
 void Client::setPassStatus(bool status) {this->_registerStatus.pass = status;}
 
@@ -58,7 +58,7 @@ std::string	Client::getRealname() const {return this->_realname;}
 
 std::string	Client::getServername() const {return this->_servername;}
 
-time_t	Client::getLastPongTime() const {return this->_lastPongTime;}
+time_t	Client::getLastPingSent() const {return this->_LastPingSent;}
 
 bool Client::getPassStatus() const {return this->_registerStatus.pass;}
 
@@ -85,9 +85,9 @@ bool Client::extractMessage(std::string& message) {
 	return false;
 }
 
-bool Client::isConnectionTimedOut(time_t timeout) {
+bool Client::isTimedOut() {
 	time_t now = time(NULL);
-	if (now - this->_lastPongTime > timeout)
+	if (now - this->_LastPingSent > TIME_CHECK_INTERVAL)
 		return true;
 	return false;
 }

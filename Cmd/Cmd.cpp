@@ -42,10 +42,10 @@ bool Cmd::handleClientCmd() {
 			cmdPass();
 		else if (cmd == "USER")
 			cmdUser();
-		else if (cmd == "PONG")
-			cmdPong();
 		else if (cmd == "PING")
 			cmdPing();
+		else if (cmd == "PONG")
+			cmdPong();
 		else if (cmd == "JOIN")
 			cmdJoin();
 		else if (cmd == "PART")

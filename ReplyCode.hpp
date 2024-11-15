@@ -187,3 +187,7 @@
 #define ERR_ERRUSERCMD "Error: in Usercmd"
 
 #define RPL_CAP "CAP * LS :"
+
+#define RPL_SENDPINGTOCLI(servername) "PING :" + servername
+
+#define RPL_PING(servername) "PONG :" + servername

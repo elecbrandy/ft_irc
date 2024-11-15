@@ -131,12 +131,44 @@ void IrcServer::acceptClient() {
 	serverLog(this->_fd, LOG_SERVER, C_MSG, MSG_NEW_CONNECTED(intToString(client_fd)));
 }
 
+void IrcServer::checkConnection() {
+    for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end();) {
+        if (_clients.empty()) {
+        return;
+    }
+
+    for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end();) {
+        Client* client = it->second;
+    	time_t now = time(NULL);
+
+        // PING 전송 조건: 마지막 PING 전송 시간 기준으로 TIME_CHECK_INTERVAL 초가 지난 경우
+        if (now - client->getLastPingSent() > TIME_CHECK_INTERVAL) {
+            
+            castMsg(client->getFd(), makeMsg(PREFIX_SERVER, RPL_PING(_servername)));
+            client->updateLastPingReceived(); // 마지막 PING 전송 시간 갱신
+        }
+
+        // PONG 응답 확인 조건: 
+        // 1) 마지막 PING을 보냈고
+        // 2) PONG_TIMEOUT 초 이내에 PONG이 도착하지 않은 경우
+        if (client->getLastPingSent() > 0 && now - client->getLastPingSent() > TIME_PONG_TIMEOUT && client->getLastPingReceived() < client->getLastPingSent()) {
+            removeClient(client);
+            it = _clients.erase(it); // 클라이언트를 맵에서 제거
+            continue;
+        }
+
+        ++it;
+    }
+    }
+}
+
 void IrcServer::run() {
 	time_t lastCheckTime = time(NULL);
 
 	while (true) {
 		bool exitFlag= false;
 		try {
+			//핑 보내는게 위에 있어야함!!!!!!!!!!!!!!
 			if (poll(&fds[0], fds.size(), -1) < 0) {
 				if (errno != EINTR) {
 					exitFlag = true;
@@ -153,12 +185,9 @@ void IrcServer::run() {
 					}
 				}
 			}
-
-			time_t currentTime = time(NULL);
-			if (currentTime - lastCheckTime >= TIME_CHECK_INTERVAL) {
-				checkConnections();
-				lastCheckTime = currentTime;
-			}
+//퐁 받는건 poll 아래에 있어야함
+			if (_clients.size() > 0)
+				checkConnection();
 
 		} catch (const ServerException& e) {
 			serverLog(this->_fd, LOG_ERR, C_ERR, e.what());
@@ -282,11 +311,6 @@ void IrcServer::setChannels(const std::string& channelName, const std::string& k
 		_channels[channelName]->setMode(mode);
 }
 
-void IrcServer::checkConnections() {
-	sendPing();
-	checkPong();
-}
-
 void IrcServer::printGoat() {
 	std::ifstream goatFile(PATH_GOAT);
 	if (goatFile.is_open()) {
@@ -362,6 +386,14 @@ void IrcServer::serverLog(int fd, int log_type, std::string log_color, std::stri
 	}
 }
 
+void IrcServer::checkConnection(Client* client) {
+	if (client->isTimedOut() == true) {
+		time_t now = time(NULL);
+		castMsg(client->getFd(), makeMsg(PREFIX_SERVER, RPL_PING(_servername)));
+
+
+	}
+}
 std::string IrcServer::intToString(int num) {
 	std::stringstream ss;
 	ss << num;
@@ -371,12 +403,7 @@ std::string IrcServer::intToString(int num) {
 void IrcServer::sendPing() {
 	serverLog(this->_fd, LOG_SERVER, C_CHECK, "send Ping");
 
-	for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
-		Client* client = it->second;
-		if (client) {
-			castMsg(it->first, makeMsg(PREFIX_SERVER, std::string("PING") + ' ' + SERVER_NAME));
-		}
-	}
+	castMsg(it->first, makeMsg(PREFIX_SERVER, std::string("PING") + ' ' + SERVER_NAME));
 }
 
 void IrcServer::checkPong() {
@@ -386,7 +413,7 @@ void IrcServer::checkPong() {
 
 	for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
 		Client* client = it->second;
-		if (client && time(NULL) - client->getLastPongTime() > TIME_OUT) {
+		if (client && time(NULL) - client->getLastPingSent() > TIME_OUT) {
 			clientsToRemove.push_back(it->first);
 		}
 	}

@@ -21,7 +21,8 @@ class Client {
 		std::string	_hostname;
 		std::string	_realname;
 		std::string _servername;
-		time_t		_lastPongTime;
+		time_t		_LastPingSent; // 클라이언트가 마지막으로 ping을 보낸시간
+		time_t		_lastPingReceived; // 클라이언트가 서버로부터 마지막으로 ping을 받은 시간 (ping을 보내지 않아서 서버가 ping을 보내는 경우)	
 		t_regitser	_registerStatus;
 		std::string _prefix;
 
@@ -37,7 +38,7 @@ class Client {
 		void		setRealname(const std::string& str);
 		// void		setPassword(const std::string str);
 		void		setServername(const std::string& str);
-		void 		updateLastPongTime();
+		void 		updateLastPingSent();
 		void		setIsRegistered(bool flag);
 		void		setPassStatus(bool status);
 		void 		setNickStatus(bool status);
@@ -52,7 +53,7 @@ class Client {
 		std::string	getRealname() const;
 		std::string	getPassword() const;
 		std::string	getServername() const;
-		time_t		getLastPongTime() const;
+		time_t		getLastPingSent() const;
 		bool		getPassStatus() const;
 		bool		getNickStatus() const;
 		bool		getUserStatus() const;
@@ -61,7 +62,7 @@ class Client {
 
 		void		appendToRecvBuffer(const std::string& str);
 		bool		extractMessage(std::string& message);
-		bool		isConnectionTimedOut(time_t timeout);
+		bool		isTimedOut();
 
 		void		printLog();
 		void		appendToSendBuffer(const std::string& str);
