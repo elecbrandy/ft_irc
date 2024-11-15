@@ -94,16 +94,7 @@ void Cmd::cmdNick() {
 		// 3. channel->participant, channel->operator 업데이트
 		std::map<std::string, Channel *>::iterator it;
 		for (it = server.getChannels().begin(); it != server.getChannels().end(); ++it) {
-							// std::cout << "channel name :" << it->first << std::endl;
 			Channel* ch = it->second;
-							// std::map<std::string, Client*>::iterator it2 = ch->getParticipant().begin();
-							// for (; it2 != ch->getParticipant().end(); ++it2) {
-							// 	std::cout << "participant name :" << it2->first << std::endl;
-							// }
-							// std::map<std::string, Client*>::iterator it3 = ch->getOperator().begin();
-							// for (; it3 != ch->getOperator().end(); ++it3) {
-							// 	std::cout << "operator name :" << it3->first << std::endl;
-							// }
 			if (ch->isParticipant(ch->isOperatorNickname(oldNick))) {
 				if (ch->isOperator(oldNick)) {
 					ch->removeParticipant(ch->isOperatorNickname(oldNick));
@@ -115,12 +106,8 @@ void Cmd::cmdNick() {
 					ch->removeParticipant(oldNick);
 					ch->addParticipant(newNick, client);
 				}
-
-				// 닉네임 변경 메시지를 채널에 전송
-				// server.broadcastMsg(server.makeMsg(":" + oldNick, RPL_NICK(newNick)), ch, client->getFd());
 			}
 		}
-		// server.castMsg(client_fd, server.makeMsg(oldPrefix, RPL_NICK(newNick)));
 		server.broadcastMsg(server.makeMsg(":" + oldNick, RPL_NICK(newNick)), NULL, -1);
 	} else
 		this->server.addClientByNickname(this->cmdParams, this->client);

@@ -23,10 +23,6 @@ void Cmd::cmdPart() {
         
     std::vector<std::string> params = split(',');
 
-    for (size_t i = 0; i < params.size(); i++) {
-        std::cout << "params[" << i << "]: |" << params[i] << "|" << std::endl;
-    }
-    
     if (params.empty())
         throw Cmd::CmdException(server.makeMsg(PREFIX_SERVER, ERR_NEEDMOREPARAMS(client->getNickname(), cmd)));
 

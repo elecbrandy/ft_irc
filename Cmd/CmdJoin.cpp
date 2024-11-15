@@ -77,7 +77,6 @@ void Cmd::cmdJoin() {
 
 	// 채널과 키 분리
 	for (std::vector<std::string>::size_type i = 0; i < joinTokens.size(); ++i) {
-		std::cout << "params [" << i << "]" << joinTokens[i] << std::endl;
 		if (joinTokens[i][0] == '#')
 			channel.push_back(joinTokens[i]);
 		else

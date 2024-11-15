@@ -65,14 +65,9 @@ void Cmd::cmdKick() {
 	std::string target = params[1];
 	std::string comment = "";
 
-	for (size_t i = 0; i < params.size(); i++) {
-		std::cout << "params[" << i << "]: |" << params[i] << "|" << std::endl;
-	}
-
 	if (params.size() == 3)
 		std::string comment = params[2];
 	
-
 	// 채널 이름의 형식이 잘못된 경우
 	if (chName[0] != '#') 
 		throw Cmd::CmdException(server.makeMsg(PREFIX_SERVER, ERR_BADCHANMASK(client->getNickname(), chName)));
@@ -86,16 +81,6 @@ void Cmd::cmdKick() {
 	Channel* ch = it->second;
 
 	// 명령어를 호출한 클라이언트가 채널에 참여한 클라이언트가 아닌경우
-				for (std::map<std::string, Client*>::iterator it = ch->getParticipant().begin(); it != ch->getParticipant().end(); ++it) {
-					std::cout << "ch->getParticipant() : " << it->first << std::endl;
-				}
-				for (std::map<std::string, Client*>::iterator it = ch->getOperator().begin(); it != ch->getOperator().end(); ++it) {
-					std::cout << "ch->getOperator() : " << it->first << std::endl;
-				}
-				std::cout << "client->getNickname() : " << client->getNickname() << std::endl;
-				std::string nick = ch->isOperatorNickname(client->getNickname());
-				std::cout << "nick in cmdKick/isOperatorNickname: " << nick << std::endl;
-
 	if (ch->getParticipant().find(ch->isOperatorNickname(client->getNickname())) == ch->getParticipant().end())
 		throw Cmd::CmdException(server.makeMsg(PREFIX_SERVER, ERR_NOTONCHANNEL(client->getNickname(), chName)));
 
