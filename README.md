@@ -1,5 +1,9 @@
 # ft_irc
 
+``` bash
+while True; do leaks ircserv | grep leaked; sleep 1; done;
+```
+
 ## docker set
 
 1. **docker desktop** 키기
