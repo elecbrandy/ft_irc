@@ -23,7 +23,7 @@ class Client {
 		std::string _servername;
 		time_t		_lastPongTime;
 		t_regitser	_registerStatus;
-		std::string _prefix;
+		std::string	_prefix;
 
 	public:
 		Client(in_addr addr);
@@ -35,7 +35,6 @@ class Client {
 		void		setUsername(const std::string& str);
 		void		setHostname(const std::string& str);
 		void		setRealname(const std::string& str);
-		// void		setPassword(const std::string str);
 		void		setServername(const std::string& str);
 		void 		updateLastPongTime();
 		void		setIsRegistered(bool flag);
@@ -65,7 +64,7 @@ class Client {
 
 		void		printLog();
 		void		appendToSendBuffer(const std::string& str);
-		const std::string& getSendBuffer() const;
+		std::string& getSendBuffer();
 		void		clearSendBuffer(size_t count);
 		bool		hasDataToSend() const;
 };

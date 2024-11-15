@@ -5,6 +5,9 @@ Cmd::Cmd(IrcServer &s, std::string &msg, int client_fd)
 
 Cmd::~Cmd() {}
 
+const char* Cmd::CmdException::what() const throw() {return msg.c_str();}
+std::string Cmd::getCmdParams() const {return this->cmdParams;}
+
 std::string Cmd::extractCmd() {
 	size_t pos = 0;
 
@@ -17,7 +20,6 @@ std::string Cmd::extractCmd() {
 std::string Cmd::extractCmdParams() {
 	size_t startPos = this->cmd.size();
 
-	// 명령어와 파라미터 사이에 공백이 있을 경우를 처리
 	if (msg.size() > startPos && std::isspace(static_cast<unsigned char>(msg[startPos]))) {
 		++startPos;
 	}
@@ -25,7 +27,7 @@ std::string Cmd::extractCmdParams() {
 	if (startPos < msg.size()) {
 		return msg.substr(startPos);
 	} else {
-		return ""; // 파라미터가 없는 경우 빈 문자열 반환
+		return "";
 	}
 }
 
@@ -62,8 +64,6 @@ bool Cmd::handleClientCmd() {
 			cmdTopic();
 		else if (cmd == "QUIT")
 			cmdQuit();
-		else if (cmd == "WHOIS")
-			return true;
 		else
 			return false;
 	} catch (const CmdException& e) {
@@ -76,17 +76,14 @@ bool Cmd::handleClientCmd() {
 	return true;
 }
 
-const char* Cmd::CmdException::what() const throw() {return msg.c_str();}
-std::string Cmd::getCmdParams() const {return this->cmdParams;}
-
 void Cmd::printWelcome() {
-	/* RPL */
+	// RPL
 	server.castMsg(client_fd, server.makeMsg(PREFIX_SERVER, RPL_WELCOME(client->getNickname(), client->getServername())));
 	server.castMsg(client_fd, server.makeMsg(PREFIX_SERVER, RPL_YOURHOST(client->getNickname(), client->getServername())));
 	server.castMsg(client_fd, server.makeMsg(PREFIX_SERVER, RPL_CREATED(client->getNickname(), server.formatDateToString(server.getStartTime()))));
 	server.castMsg(client_fd, server.makeMsg(PREFIX_SERVER, RPL_MYINFO(client->getNickname())));
 	
-	/* MOTD */
+	// MOTD
 	server.castMsg(client_fd, server.makeMsg(PREFIX_SERVER, RPL_MOTDSTART(client->getNickname())));
 	std::ifstream goatFile(PATH_MOTD);
 	if (goatFile.is_open()) {

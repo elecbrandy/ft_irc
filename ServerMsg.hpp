@@ -1,5 +1,5 @@
-#ifndef SERVERCODE_HPP
-#define SERVERCODE_HPP
+#ifndef SERVERMSG_HPP
+#define SERVERMSG_HPP
 
 /* COUT LOG */
 #define MSG_SERVER_INIT(port)			"IRC Server INIT!: port: " + port
@@ -33,6 +33,5 @@
 #define	ERR_ETC					"unknown error occurred."
 #define ERR_RECV				"recv() error."
 #define ERR_OPEN_FILE           "cannot open file."
-
 
 #endif

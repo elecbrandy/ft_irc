@@ -76,14 +76,28 @@ void Client::appendToRecvBuffer(const std::string& str) {
 }
 
 bool Client::extractMessage(std::string& message) {
-	size_t pos = _recvBuffer.find("\r\n");
-	if (pos != std::string::npos) {
-		message = _recvBuffer.substr(0, pos);
-		_recvBuffer.erase(0, pos + 2);
-		return true;
-	}
-	return false;
+    size_t pos = _recvBuffer.find(CRLF);
+
+	/* with CRLF */
+    if (pos != std::string::npos) {
+        size_t messageLen = pos + 2;
+        if (messageLen > BUFFER_SIZE - 1) {
+            _recvBuffer.erase(0, messageLen);
+            return false;
+        } else {
+            message = _recvBuffer.substr(0, pos);
+            _recvBuffer.erase(0, messageLen);
+            return true;
+        }
+	/* without CRLF */
+    } else if (_recvBuffer.length() >= 512) {
+        _recvBuffer.clear();
+        return false;
+    }
+    return false;
 }
+
+
 
 bool Client::isConnectionTimedOut(time_t timeout) {
 	time_t now = time(NULL);
@@ -96,7 +110,7 @@ void Client::appendToSendBuffer(const std::string& data) {
 	this->_sendBuffer += data;
 }
 
-const std::string& Client::getSendBuffer() const {
+std::string& Client::getSendBuffer() {
 	return this->_sendBuffer;
 }
 
