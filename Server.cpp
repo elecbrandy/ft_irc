@@ -3,41 +3,61 @@
 
 IrcServer::IrcServer() {}
 
-IrcServer::IrcServer(int port, const std::string& password)
-:	_servername(SERVER_NAME),
-	port(port),
-	password(password),
-	_startTime(time(NULL)) {}
+IrcServer::IrcServer(const char *port, const char *password)
+: _servername(SERVER_NAME), _startTime(time(NULL)) {
+	/* Check Port number */
+	if (port == NULL || *port == '\0') {
+		throw ServerException(ERR_PORT_NULL);
+	}
+
+	for (int i = 0; port[i] != '\0'; ++i) {
+		if (!std::isdigit(static_cast<unsigned char>(port[i]))) {
+			throw ServerException(ERR_PORT_DIGIT);
+		}
+	}
+
+	int tmpPort = std::atoi(port);
+	if (tmpPort < PORT_MIN || tmpPort > PORT_MAX || std::strlen(port) > PORT_MAX_LEN) {
+		throw ServerException(ERR_PORT_RANGE);
+	}
+	this->_port = tmpPort;
+
+	/* Check Password */
+	if (password == NULL || *password == '\0') {
+		throw ServerException(ERR_PASSWORD_NULL);
+	}
+
+	for (int i = 0; password[i] != '\0'; ++i) {
+		if (!std::isalnum(static_cast<unsigned char>(password[i]))) {
+			throw ServerException(ERR_PASSWORD_ALNUM);
+		}
+	}
+
+	if (std::strlen(password) > PASSWORD_MAX_LEN) {
+		throw ServerException(ERR_PASSWORD_SIZE);
+	}
+	this->_password = std::string(password);
+}
 
 IrcServer::~IrcServer() {
 	/* Close server socket */
-	if (_fd != -1) {
-		close(_fd);
-	}
+	close(this->_fd);
 
 	/* Close & Delete Client resource */
 	for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
-
 		if (it->first != -1) {
 			close(it->first);
 		}
-
 		delete it->second;
 	}
 	_clients.clear();
-
-	/* Close poll struct */
 	fds.clear();
-
-	/* Another Clean up */
 	nickNameClientMap.clear();
-
-	// std::cout << LOG_SERVER_SHUTDOWN << std::endl;
 }
 
 /* getter */
 
-std::string IrcServer::getPassword() {return this->password;}
+std::string IrcServer::getPassword() {return this->_password;}
 
 const std::string IrcServer::getName() const {return this->_servername;}
 
@@ -51,7 +71,6 @@ std::string IrcServer::formatDateToString(time_t time) {
 }
 
 void IrcServer::init() {
-	// ScopedTimer("init");
 	if ((_fd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) == -1) {
 		throw ServerException(ERR_SOCKET_CREATION);
 	}
@@ -59,7 +78,7 @@ void IrcServer::init() {
 	struct sockaddr_in addr;
 	addr.sin_family = AF_INET;
 	addr.sin_addr.s_addr = htonl(INADDR_ANY);
-	addr.sin_port = htons(port);
+	addr.sin_port = htons(_port);
 
 	if (bind(_fd, (struct sockaddr*)&addr, sizeof(addr)) == -1) {
 		throw ServerException(ERR_SOCKET_BIND);
@@ -80,7 +99,7 @@ void IrcServer::init() {
 
 	std::system("clear");
 	printGoat(); // goat
-	serverLog(-1, LOG_SERVER, C_MSG, MSG_SERVER_INIT);
+	serverLog(this->_fd, LOG_SERVER, C_MSG, MSG_SERVER_INIT(intToString(this->_port)));
 }
 
 void IrcServer::acceptClient() {
@@ -109,7 +128,7 @@ void IrcServer::acceptClient() {
 	Client* newClient = new Client(client_addr.sin_addr);
 	newClient->setFd(client_fd);
 	_clients[client_fd] = newClient;
-	serverLog(-1, LOG_SERVER, C_MSG, MSG_NEW_CONNECTED);
+	serverLog(this->_fd, LOG_SERVER, C_MSG, MSG_NEW_CONNECTED(intToString(client_fd)));
 }
 
 void IrcServer::run() {
@@ -136,7 +155,7 @@ void IrcServer::run() {
 			}
 
 		} catch (const ServerException& e) {
-			serverLog(-1, LOG_ERR, C_ERR, e.what());
+			serverLog(this->_fd, LOG_ERR, C_ERR, e.what());
 			if (exitFlag) {
 				exit(EXIT_FAILURE);
 			}
@@ -164,34 +183,6 @@ void IrcServer::handleSocketRead(int fd) {
 	}
 }
 
-// void IrcServer::handleSocketRead(int fd) {
-// 		Client * client = getClient(fd);
-// 		if (client) {
-// 			client->setlastActivityTime();
-// 			char buffer[BUFFER_SIZE];
-// 			int bytes_received = recv(fd, buffer, BUFFER_SIZE - 1, 0);
-
-// 			if (bytes_received < 0) {
-// 				if (errno != EWOULDBLOCK || errno != EAGAIN) {
-// 					removeClientFromServer(client);
-// 					throw ServerException(ERR_RECV);
-// 				}
-// 			} else if (bytes_received == 0) {
-// 				removeClientFromServer(client);
-// 			} else {
-// 				buffer[bytes_received] = '\0';
-// 				client->appendToRecvBuffer(buffer);
-// 				std::string tmp;
-// 				while (getClient(fd) && client->extractMessage(tmp)) {
-// 					Cmd cmdHandler(*this, tmp, fd);
-// 					serverLog(fd, LOG_INPUT, C_MSG, tmp);
-// 					if (!cmdHandler.handleClientCmd())
-// 						return ;
-// 				}
-// 			}
-// 		}
-// }
-
 void IrcServer::castMsg(int client_fd, const std::string msg) {
 	Client* client = getClient(client_fd);
 	if (!client) {
@@ -212,15 +203,12 @@ void IrcServer::castMsg(int client_fd, const std::string msg) {
 			// 다른 에러 발생 시 클라이언트 리소스 정리 / 제거 
 			removeClientFromServer(getClient(client_fd));
 		}
-
 	// 송신해야하는 데이터 중 일부만 송신한 경우
 	} else if (bytesSent < static_cast<ssize_t>(msg.length())) {
 		// 이 경우 또한 임시 저장한 테이터를 언젠가 소켓 버퍼에 써야하므로 남은 데이터를 Client의 _sendbuffer에 임시저장
 		std::string tmp = msg.substr(bytesSent);
 		client->appendToSendBuffer(tmp);
 
-		// 이어서 POLLOUT 이벤트를 모니터링 하도록 설정
-		modifyPollEvent(client_fd, POLLIN | POLLOUT);
 	}
 	serverLog(client_fd, LOG_OUTPUT, C_MSG, msg.substr(0, msg.length()));
 }
@@ -331,12 +319,12 @@ void IrcServer::setChannels(const std::string& channelName, const std::string& k
 }
 
 void IrcServer::checkConnections() {
-	serverLog(-1, LOG_SERVER, C_CHECK, MSG_CHECK_CONNECTION_START);
+	serverLog(this->_fd, LOG_SERVER, C_CHECK, MSG_CHECK_CONNECTION_START);
 
 	for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
 		Client* client = it->second;
 		if (client && client->isConnectionTimedOut(TIME_OUT)) {
-			serverLog(-1, LOG_SERVER, C_MSG, MSG_CONNECTION_TIMEOUT);
+			serverLog(this->_fd, LOG_SERVER, C_MSG, MSG_CONNECTION_TIMEOUT(intToString(it->first)));
 			_fdsToRemove.push_back(it->first);
 		}
 	}
@@ -351,7 +339,7 @@ void IrcServer::printGoat() {
 		}
 		goatFile.close();
 	} else {
-		serverLog(-1, LOG_ERR, C_ERR, ERR_OPEN_FILE);
+		serverLog(this->_fd, LOG_ERR, C_ERR, ERR_OPEN_FILE);
 	}
 }
 
@@ -418,13 +406,9 @@ void IrcServer::serverLog(int fd, int log_type, std::string log_color, std::stri
 	}
 }
 
-void IrcServer::removePollFds() {
-	for (size_t i = 0; i < _fdsToRemove.size(); ++i) {
-		for (std::vector<struct pollfd>::iterator it = fds.begin(); it != fds.end(); ++it) {
-			if (it->fd == _fdsToRemove[i]) {
-				fds.erase(it);
-				break;
-			}
-		}
-	}
+std::string IrcServer::intToString(int num) {
+    std::stringstream ss;
+    ss << num;
+    return ss.str();
 }
+
