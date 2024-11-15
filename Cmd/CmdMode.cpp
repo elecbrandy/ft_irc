@@ -118,13 +118,13 @@ void Cmd::handlePlusFlagOption(std::vector<std::string> modeParse, std::map<std:
 {
     //{i, t, k, o, l} 인가
         std::string _option = modeParse[1].substr(1);
-        std::vector<char> mode_kol;
+        std::vector<char> use_param_mode;
         int flag_i = 0;
         int flag_t = 0;
         for (size_t i = 0; i < _option.length(); i++)
         {
             if (_option[i] == 'o' || _option[i] == 'k' || _option[i] == 'l')
-                mode_kol.push_back(_option[i]);
+                use_param_mode.push_back(_option[i]);
             else if (_option[i] == 'i')
                 flag_i = 1;
             else if (_option[i] == 't')
@@ -133,24 +133,24 @@ void Cmd::handlePlusFlagOption(std::vector<std::string> modeParse, std::map<std:
                 throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_UNKNOWNMODE(std::string(1, _option[i]))));
         }
         //o, k, l은 혼합하여 3개까지 가능
-        if (mode_kol.size() > 3)
+        if (use_param_mode.size() > 3)
             throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_NEEDMOREPARAMS(this->client->getNickname(), this->cmdParams)));
 
         // k, o, l의 개수와 파라미터 개수가 동일한가
         // 3개를 넘지 않는가
         std::vector<std::string> param(modeParse.begin() + 2, modeParse.end());
-        if (param.size() != mode_kol.size() || param.size() > 3)
+        if (param.size() != use_param_mode.size() || param.size() > 3)
             throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_NEEDMOREPARAMS(this->client->getNickname(), this->cmdParams)));
 
         // param validation
         size_t option_index = 0;
         size_t param_index = 0;
-        size_t _size = mode_kol.size();
+        size_t _size = use_param_mode.size();
         while (option_index < _size)
         {
-            if (_option[option_index] == 'o')
+            if (use_param_mode[option_index] == 'o')
                 validationNickName(param[param_index], channel->second, plus_flag);
-            else if (_option[option_index] == 'k')
+            else if (use_param_mode[option_index] == 'k')
                 validationKey(param[param_index], channel->second);
             //(_option[option_index] == 'l')
             else
@@ -169,9 +169,9 @@ void Cmd::handlePlusFlagOption(std::vector<std::string> modeParse, std::map<std:
         param_index = 0;
         while (option_index < _size)
         {
-            if (_option[option_index] == 'o')
+            if (use_param_mode[option_index] == 'o')
                 addChannelOperator(param[param_index], channel->second);
-            else if (_option[option_index] == 'k')
+            else if (use_param_mode[option_index] == 'k')
                 setChannelKey(param[param_index], channel->second);
             //(_option[option_index] == 'l')
             else
@@ -185,7 +185,7 @@ void Cmd::handleMinusFlagOption(std::vector<std::string> modeParse, std::map<std
 {
     //{i, t, k, o, l} 인가
         std::string _option = modeParse[1].substr(1);
-        std::vector<char> mode_kol;
+        std::vector<char> use_param_mode;
         int flag_i = 0;
         int flag_t = 0;
         int flag_l = 0;
@@ -193,7 +193,7 @@ void Cmd::handleMinusFlagOption(std::vector<std::string> modeParse, std::map<std
         for (size_t i = 0; i < _option.length(); i++)
         {
             if (_option[i] == 'o')
-                mode_kol.push_back(_option[i]);
+                use_param_mode.push_back(_option[i]);
             else if (_option[i] == 'i')
                 flag_i = 1;
             else if (_option[i] == 't')
@@ -205,22 +205,22 @@ void Cmd::handleMinusFlagOption(std::vector<std::string> modeParse, std::map<std
             else
                 throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_UNKNOWNMODE(std::string(1, _option[i]))));
         }
-        if (mode_kol.size() > 3)
+        if (use_param_mode.size() > 3)
             throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_NEEDMOREPARAMS(this->client->getNickname(), this->cmdParams)));
 
         // o의 개수와 파라미터 개수가 동일한가
         // 3개를 넘지 않는가
         std::vector<std::string> param(modeParse.begin() + 2, modeParse.end());
-        if (param.size() != mode_kol.size() || param.size() > 3)
+        if (param.size() != use_param_mode.size() || param.size() > 3)
             throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_NEEDMOREPARAMS(this->client->getNickname(), this->cmdParams)));
 
         // param validation
         size_t option_index = 0;
         size_t param_index = 0;
-        size_t _size = mode_kol.size();
+        size_t _size = use_param_mode.size();
         while (option_index < _size)
         {
-            if (_option[option_index] == 'o')
+            if (use_param_mode[option_index] == 'o')
                 validationNickName(param[param_index], channel->second, plus_flag);
             option_index++;
             param_index++;
@@ -240,7 +240,7 @@ void Cmd::handleMinusFlagOption(std::vector<std::string> modeParse, std::map<std
         param_index = 0;
         while (option_index < _size)
         {
-            if (_option[option_index] == 'o')
+            if (use_param_mode[option_index] == 'o')
                 removeChannelOperator(param[param_index], channel->second);
             option_index++;
             param_index++;
@@ -304,3 +304,5 @@ void Cmd::cmdMode()
 }
 
 // /connect -nocap localhost 6667 1111
+// INPUT[4]: MODE #ch +ik pass
+// OUTPUT[4]: :ircserv Error: invalid parameter
