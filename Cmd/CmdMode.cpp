@@ -3,6 +3,7 @@
 /*
     Author : sejkim2
     Description : /MODE
+    /mode [flag][options] [params]
 */
 
 void printParam(std::vector<std::string> param)
@@ -304,5 +305,3 @@ void Cmd::cmdMode()
 }
 
 // /connect -nocap localhost 6667 1111
-// INPUT[4]: MODE #ch +ik pass
-// OUTPUT[4]: :ircserv Error: invalid parameter

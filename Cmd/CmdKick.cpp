@@ -117,4 +117,7 @@ void Cmd::cmdKick() {
 	// fix : sejkim2 (client->getNickname이 아니라 target이 나가아 함)
 	if (ch->isOperator(target) == true)
         ch->removeOperator(target);
+
+	if (ch->getParticipant().empty())
+		server.removeChannel(chName);
 }

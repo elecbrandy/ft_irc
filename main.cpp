@@ -10,7 +10,6 @@ static void signalHandler(int signal) {
 	exit(EXIT_FAILURE);
 }
 
-
 int main(int ac, char** av) {
 	if (ac != 3) {
 		std::cerr << C_ERR << "Error: " << ERR_ARG_COUNT << C_RESET << std::endl;
