@@ -54,7 +54,7 @@ private:
 	const std::string						_servername;
 	time_t									_startTime;
 
-	std::vector<struct pollfd>				fds;
+	std::vector<struct pollfd>				_fds;
 	std::map<int, Client*>					_clients;
 	std::map<std::string, Channel *>		_channels;
 	std::map<std::string, Client*>			nickNameClientMap;
