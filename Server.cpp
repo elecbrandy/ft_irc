@@ -63,12 +63,19 @@ const std::string IrcServer::getName() const {return this->_servername;}
 
 time_t IrcServer::getStartTime() const {return this->_startTime;}
 
+#include <ctime>  // 추가 필요
+
 std::string IrcServer::formatDateToString(time_t time) {
-	struct tm *timeInfo = std::localtime(&time);
-	char buffer[20];
-	std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", timeInfo);
-	return std::string(buffer);
+    struct tm *timeInfo = localtime(&time);  // std:: 제거
+    char buffer[20];
+    strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", timeInfo);  // std:: 제거
+
+    std::ostringstream oss;
+    oss << buffer;
+    return oss.str();
 }
+
+
 
 void IrcServer::init() {
 	
@@ -177,7 +184,7 @@ void IrcServer::run() {
 						handleSocketRead(_fds[i].fd); 
 
 						// Add to remove list if Client Shutdown
-						if (getClient(_fds[i].fd) == nullptr) { 
+						if (getClient(_fds[i].fd) == NULL) { 
 							_fdsToRemove.push_back(_fds[i].fd);
 						}
 					}
@@ -188,7 +195,7 @@ void IrcServer::run() {
 					handleSocketWrite(_fds[i].fd);
 					
 					// Add to remove list if Client Shutdown
-					if (getClient(_fds[i].fd) == nullptr) { 
+					if (getClient(_fds[i].fd) == NULL) { 
 						_fdsToRemove.push_back(_fds[i].fd);
 					}
 				}
@@ -223,7 +230,7 @@ void IrcServer::handleSocketRead(int fd) {
 		removeClientFromServer(getClient(fd));
 		return ;
 	}
-	
+
 	buffer[recvLen] = '\0';
 	client->appendToRecvBuffer(buffer);
 
@@ -423,20 +430,21 @@ void IrcServer::updateNickNameClientMap(const std::string& oldNick, const std::s
 }
 
 void IrcServer::serverLog(int fd, int log_type, std::string log_color, std::string msg) {
-	if (msg.empty() || msg.back() != '\n') {
-		msg += '\n';
-	}
+    if (msg.empty() || msg[msg.size() - 1] != '\n') {
+        msg += '\n';
+    }
 
-	if (log_type == LOG_OUTPUT) {
-		std::cout << "OUTPUT[" << C_KEY << fd << C_RESET << "]: " << log_color << msg << C_RESET;
-	} else if (log_type == LOG_INPUT) {
-		std::cout << "INPUT[" << C_KEY << fd << C_RESET << "]: " << log_color << msg << C_RESET;
-	} else if (log_type == LOG_SERVER) {
-		std::cout << "SERV_LOG: " << log_color << msg << C_RESET;
-	} else if (log_type == LOG_ERR) {
-		std::cerr << "SERV_LOG: " << log_color << msg << C_RESET;
-	}
+    if (log_type == LOG_OUTPUT) {
+        std::cout << "OUTPUT[" << C_KEY << fd << C_RESET << "]: " << log_color << msg << C_RESET;
+    } else if (log_type == LOG_INPUT) {
+        std::cout << "INPUT[" << C_KEY << fd << C_RESET << "]: " << log_color << msg << C_RESET;
+    } else if (log_type == LOG_SERVER) {
+        std::cout << "SERV_LOG: " << log_color << msg << C_RESET;
+    } else if (log_type == LOG_ERR) {
+        std::cerr << "SERV_LOG: " << log_color << msg << C_RESET;
+    }
 }
+
 
 std::string IrcServer::intToString(int num) {
 	std::stringstream ss;

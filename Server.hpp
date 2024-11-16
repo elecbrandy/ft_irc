@@ -1,50 +1,50 @@
 #ifndef SERVER_HPP
 # define SERVER_HPP
 
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <vector>
-#include <map>
-#include <cstring>
-#include <cstdlib>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <poll.h>
-#include <signal.h>
-#include <fcntl.h>
-#include <sstream>
-#include <errno.h>
-#include "Client.hpp"
-#include "Channel.hpp"
-#include "ServerMsg.hpp"
-#include "ReplyCode.hpp"
-#include "Cmd/Cmd.hpp"
+# include <iostream>
+# include <fstream>
+# include <string>
+# include <vector>
+# include <map>
+# include <cstring>
+# include <cstdlib>
+# include <sys/socket.h>
+# include <netinet/in.h>
+# include <arpa/inet.h>
+# include <unistd.h>
+# include <poll.h>
+# include <signal.h>
+# include <fcntl.h>
+# include <sstream>
+# include <errno.h>
+# include "Client.hpp"
+# include "Channel.hpp"
+# include "ServerMsg.hpp"
+# include "ReplyCode.hpp"
+# include "Cmd/Cmd.hpp"
 
-#define MAX_CLIENTS 2
-#define BUFFER_SIZE 513
+# define MAX_CLIENTS 2
+# define BUFFER_SIZE 513
 
-#define PORT_MAX 65535
-#define PORT_MIN 0
-#define PORT_MAX_LEN 5
-#define PASSWORD_MAX_LEN 10
+# define PORT_MAX 65535
+# define PORT_MIN 0
+# define PORT_MAX_LEN 5
+# define PASSWORD_MAX_LEN 10
 
-#define PATH_GOAT "./conf/goat.txt"
-#define PATH_MOTD "./conf/motd.txt"
-#define SERVER_NAME "ircserv"
+# define PATH_GOAT "./conf/goat.txt"
+# define PATH_MOTD "./conf/motd.txt"
+# define SERVER_NAME "ircserv"
 
-#define CRLF "\r\n"
-#define PREFIX_SERVER ":ircserv"
-#define PREFIX_USER(nickname, username, hostname) 	":" + nickname + "!" + username + "@" + hostname
+# define CRLF "\r\n"
+# define PREFIX_SERVER ":ircserv"
+# define PREFIX_USER(nickname, username, hostname) 	":" + nickname + "!" + username + "@" + hostname
 
-#define WAIT_FOR_PING_MAX 250
+# define WAIT_FOR_PING_MAX 250
 
-#define LOG_ERR -1
-#define LOG_SERVER 0
-#define LOG_INPUT 1
-#define LOG_OUTPUT 2
+# define LOG_ERR -1
+# define LOG_SERVER 0
+# define LOG_INPUT 1
+# define LOG_OUTPUT 2
 
 class IrcServer {
 private:

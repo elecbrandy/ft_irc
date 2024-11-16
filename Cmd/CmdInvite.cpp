@@ -21,8 +21,9 @@ RPL_INVITING - 초대를 보내는 사용자에게 초대가 성공적으로 전
 
 void Cmd::cmdInvite() {
     // 명령어를 보낸 클라이언트가 register 되지 않은 경우
-    if (client->getRegisteredStatus() == false)
+    if (client->getRegisteredStatus() == false) {
         throw Cmd::CmdException(server.makeMsg(PREFIX_SERVER, ERR_NOTREGISTERED(client->getNickname())));
+    }
         
     std::vector<std::string> params = split(' ');
     

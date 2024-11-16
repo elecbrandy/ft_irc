@@ -1,12 +1,12 @@
 #ifndef CMD_HPP
 # define CMD_HPP
 
-#include "../Server.hpp"
-#include "../Color.hpp"
+# include "../Server.hpp"
+# include "../Color.hpp"
 
-#define NICK_MAX_LEN 20
-#define USERNAME_MAX_LEN 100
-#define REALNAME_MAX_LEN 100
+# define NICK_MAX_LEN 20
+# define USERNAME_MAX_LEN 100
+# define REALNAME_MAX_LEN 100
 
 class IrcServer;
 class Client;

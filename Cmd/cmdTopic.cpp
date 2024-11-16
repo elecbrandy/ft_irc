@@ -46,8 +46,9 @@ std::vector<std::string> Cmd::topicSplit() {
 
 void Cmd::cmdTopic() {
 	// 명령어를 보낸 클라이언트가 register 되지 않은 경우
-    if (client->getRegisteredStatus() == false)
+    if (client->getRegisteredStatus() == false) {
         throw Cmd::CmdException(server.makeMsg(PREFIX_SERVER, ERR_NOTREGISTERED(client->getNickname())));
+	}
 
 	std::vector<std::string> params = topicSplit();
 	std::string chName = params[0];

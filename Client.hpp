@@ -1,8 +1,8 @@
 #ifndef CLIENT_HPP
-#define CLIENT_HPP
+# define CLIENT_HPP
 
-#include <string>
-#include <arpa/inet.h>
+# include <string>
+# include <arpa/inet.h>
 
 typedef struct s_register {
     bool pass;

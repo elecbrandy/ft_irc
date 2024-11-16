@@ -1,18 +1,18 @@
 #ifndef CHANNEL_HPP
 # define CHANNEL_HPP
 
-#include <set>
-#include <vector>
-#include <map>
-// #include "Server.hpp"
-#include "Client.hpp"
+# include <algorithm>
+# include <set>
+# include <vector>
+# include <map>
+# include "Client.hpp"
 
-#define INVITE_MODE 'i'
-#define TOPIC_MODE 't'
-#define KEY_MODE 'k'
-#define OPERATOR_MODE 'o'
-#define LIMIT_MODE 'l'
-#define DEFAULT_LIMIT 10
+# define INVITE_MODE 'i'
+# define TOPIC_MODE 't'
+# define KEY_MODE 'k'
+# define OPERATOR_MODE 'o'
+# define LIMIT_MODE 'l'
+# define DEFAULT_LIMIT 10
 
 class Channel {
 	private:
