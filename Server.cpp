@@ -347,7 +347,7 @@ void IrcServer::removeClientFromServer(Client* client) {
 	nickNameClientMap.erase(client->getNickname());
 	// removeClientFd(client->getFd());
 	_fdsToRemove.push_back(client->getFd());
-
+	serverLog(this->_fd, LOG_SERVER, C_ERR, MSG_END_CONNECTED(intToString(client->getFd())));
 	delete client;
 }
 
