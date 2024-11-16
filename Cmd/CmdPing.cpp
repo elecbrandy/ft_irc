@@ -1,14 +1,5 @@
 #include "Cmd.hpp"
 
-// void Cmd::cmdPing() {
-// 	// 명령어를 보낸 클라이언트가 register 되지 않은 경우
-//     if (client->getRegisteredStatus() == false)
-//         throw Cmd::CmdException(server.makeMsg(PREFIX_SERVER, ERR_NOTREGISTERED(client->getNickname())));
-//     client->updateLastPingSent();
-// 	server.castMsg(client_fd, server.makeMsg(PREFIX_SERVER, RPL_PING(getCmdParams())));
-// }
-
-
 void Cmd::cmdPing() {
     // 명령어를 보낸 클라이언트가 register 되지 않은 경우
     if (client->getRegisteredStatus() == false)

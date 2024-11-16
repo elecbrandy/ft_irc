@@ -150,6 +150,9 @@ void IrcServer::run() {
 	while (true) {
 		bool exitFlag= false;
 		try {
+			// 타임아웃 또는 입력 이벤트 후 퐁 검사
+			checkPingTimeOut();
+			
 			// poll 호출에 타임아웃 설정 (예: 1초)
 			int timeout_ms = 1000; // 1000ms = 1초
 			if (poll(&fds[0], fds.size(), timeout_ms) < 0) {
@@ -170,8 +173,6 @@ void IrcServer::run() {
 				}
 			}
 
-			// 타임아웃 또는 입력 이벤트 후 퐁 검사
-			checkPingTimeOut();
 
 		} catch (const ServerException& e) {
 			serverLog(this->_fd, LOG_ERR, C_ERR, e.what());

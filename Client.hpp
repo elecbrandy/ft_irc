@@ -23,7 +23,7 @@ class Client {
 		std::string _servername;
 		time_t 		_lastPingSent;     // 마지막으로 서버가 PING을 보낸 시간
 		t_regitser	_registerStatus;
-		std::string _prefix;
+		std::string	_prefix;
 
 	public:
 		Client(in_addr addr);
@@ -63,7 +63,7 @@ class Client {
 
 		void		printLog();
 		void		appendToSendBuffer(const std::string& str);
-		const std::string& getSendBuffer() const;
+		std::string& getSendBuffer();
 		void		clearSendBuffer(size_t count);
 		bool		hasDataToSend() const;
 };
