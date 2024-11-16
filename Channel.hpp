@@ -1,18 +1,18 @@
 #ifndef CHANNEL_HPP
 # define CHANNEL_HPP
 
-#include <set>
-#include <vector>
-#include <map>
-// #include "Server.hpp"
-#include "Client.hpp"
+# include <algorithm>
+# include <set>
+# include <vector>
+# include <map>
+# include "Client.hpp"
 
-#define INVITE_MODE 'i'
-#define TOPIC_MODE 't'
-#define KEY_MODE 'k'
-#define OPERATOR_MODE 'o'
-#define LIMIT_MODE 'l'
-#define DEFAULT_LIMIT 10
+# define INVITE_MODE 'i'
+# define TOPIC_MODE 't'
+# define KEY_MODE 'k'
+# define OPERATOR_MODE 'o'
+# define LIMIT_MODE 'l'
+# define DEFAULT_LIMIT 10
 
 class Channel {
 	private:
@@ -25,7 +25,7 @@ class Channel {
 
 		unsigned int						_limit; //채널 참여자 제한 수
 		std::vector<std::string> _invited; //초대된 사용자 목록
-		std::vector<std::string> _banned; //차단된 사용자 목록
+
 	public:
 		Channel(std::string name);
 		~Channel();
@@ -33,38 +33,36 @@ class Channel {
 		void setKey(std::string key);
 		void setTopic(std::string topic);
 		void setMode(char mode);
-
-		void addParticipantname(std::string participantName);
-		void removeOperator(Client* client);
-		void removeKey();
-		void removeMode(char mode);
-
-		const std::string isOperatorNickname(std::string nickanme) const;
-		void setParticipant(std::string participantName,Client* client);
 		void setLimit(unsigned int limit);
-		void setInvited(std::string nickname);
-		void addOperator(std::string nick, Client* client);
-
-		void setBanned(std::string nickname);
 
 		void addInvited(std::string nickname);
+		void addOperator(std::string nick, Client* client);
+		void addParticipant(std::string participantName,Client* client);
+		void addParticipantname(std::string participantName);
+
+		void removeKey();
+		void removeOperator(std::string nickname);
+		void removeInvited(std::string nickname);
+		void removeMode(char mode);
+		void removeParticipant(std::string target);
+
+		const std::string isOperatorNickname(std::string nickanme) const;
 
 		std::string getName();
 		std::string getKey();
 		std::string getTopic();
 		const std::set<char>& getMode() const;
 		std::map<std::string, Client*>& getParticipant();
-		std::map<std::string, Client*> getOperator();
+		std::map<std::string, Client*>& getOperator();
 		std::string getParticipantNameStr();
 
 		bool isOperator(std::string nickname) const;
 		bool isParticipant(std::string nickname) const;
+		bool isSetKey() const;
 		unsigned int getLimit() const;
 		std::vector<std::string> getInvited();
 		std::vector<std::string> getBanned();
 
-		void removeParticipant(std::string target);
-		void updateInviteList(std::string nickname);
 };
 
 

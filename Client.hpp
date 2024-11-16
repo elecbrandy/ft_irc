@@ -1,8 +1,8 @@
 #ifndef CLIENT_HPP
-#define CLIENT_HPP
+# define CLIENT_HPP
 
-#include <string>
-#include <arpa/inet.h>
+# include <string>
+# include <arpa/inet.h>
 
 typedef struct s_register {
     bool pass;
@@ -20,11 +20,10 @@ class Client {
 		std::string	_username;
 		std::string	_hostname;
 		std::string	_realname;
-		std::string _password;
 		std::string _servername;
-		time_t		_lastActivityTime;
+		time_t 		_lastPingSent;     // 마지막으로 서버가 PING을 보낸 시간
 		t_regitser	_registerStatus;
-		std::string _prefix;
+		std::string	_prefix;
 
 	public:
 		Client(in_addr addr);
@@ -36,9 +35,8 @@ class Client {
 		void		setUsername(const std::string& str);
 		void		setHostname(const std::string& str);
 		void		setRealname(const std::string& str);
-		void		setPassword(const std::string str);
 		void		setServername(const std::string& str);
-		void 		setlastActivityTime();
+		void		updateLastPingSent();
 		void		setIsRegistered(bool flag);
 		void		setPassStatus(bool status);
 		void 		setNickStatus(bool status);
@@ -53,7 +51,7 @@ class Client {
 		std::string	getRealname() const;
 		std::string	getPassword() const;
 		std::string	getServername() const;
-		time_t		getLastActivityTime() const;
+		time_t		getLastPingSent() const;
 		bool		getPassStatus() const;
 		bool		getNickStatus() const;
 		bool		getUserStatus() const;
@@ -62,11 +60,10 @@ class Client {
 
 		void		appendToRecvBuffer(const std::string& str);
 		bool		extractMessage(std::string& message);
-		bool		isConnectionTimedOut(time_t timeout);
 
 		void		printLog();
 		void		appendToSendBuffer(const std::string& str);
-		const std::string& getSendBuffer() const;
+		std::string& getSendBuffer();
 		void		clearSendBuffer(size_t count);
 		bool		hasDataToSend() const;
 };
