@@ -4,6 +4,10 @@
     Author : sejkim2
     Description : /MODE
     /mode [flag][options] [params]
+    
+    flag : [+/-]
+    option : [t/o/l/i/k]
+    params : [o : nickname / l : size / k : password]
 */
 
 void printParam(std::vector<std::string> param)
@@ -72,8 +76,8 @@ void Cmd::addChannelOperator(std::string nickname, Channel* channel)
     channel->removeParticipant(nickname);
     channel->addParticipant(nick, client->second);
 
-    channel->addOperator(nickname, client->second);
     channel->setMode('o');
+    channel->addOperator(nickname, client->second);
 }
 
 // #ch -o user
@@ -87,32 +91,32 @@ void Cmd::removeChannelOperator(std::string nickname, Channel* channel)
     channel->removeParticipant(nick);
     channel->addParticipant(nickname, client->second);
 
-    channel->removeOperator(nickname);
     channel->removeMode('o');
+    channel->removeOperator(nickname);
 }
 
 void Cmd::setChannelKey(std::string key, Channel* channel)
 {
-    channel->setKey(key);
     channel->setMode('k');
+    channel->setKey(key);
 }
 
 void Cmd::removeChannelKey(Channel* channel)
 {
-    channel->removeKey();
     channel->removeMode('k');
+    channel->removeKey();
 }
 
 void Cmd::setChannelUserLimit(std::string _size, Channel* channel)
 {
-    channel->setLimit(atoi(_size.c_str()));
     channel->setMode('l');
+    channel->setLimit(atoi(_size.c_str()));
 }
 
 void Cmd::removeChannelUserLimit(Channel* channel)
 {
-    channel->setLimit(DEFAULT_LIMIT);
     channel->removeMode('l');
+    channel->setLimit(DEFAULT_LIMIT);
 }
 
 void Cmd::handlePlusFlagOption(std::vector<std::string> modeParse, std::map<std::string, Channel*>::iterator channel, int plus_flag)
@@ -202,7 +206,7 @@ void Cmd::handleMinusFlagOption(std::vector<std::string> modeParse, std::map<std
             else if (_option[i] == 'l')
                 flag_l = 1;
             else if (_option[i] == 'k')
-                flag_k = 0;
+                flag_k = 1;
             else
                 throw CmdException(server.makeMsg(PREFIX_SERVER, ERR_UNKNOWNMODE(std::string(1, _option[i]))));
         }
@@ -303,8 +307,3 @@ void Cmd::cmdMode()
     
     server.broadcastMsg(msg, channel->second, -1);
 }
-
-// /connect -nocap localhost 6667 1111
-// INPUT[4]: PASS 1111
-// INPUT[4]: NICK sejkim2
-// INPUT[4]: USER sejkim2 sejkim2 localhost :Sejin Kim
