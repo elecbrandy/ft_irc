@@ -150,7 +150,6 @@ void IrcServer::acceptClient() {
 void IrcServer::run() {
 
 	while (true) {
-		bool exitFlag= false;
 		try {
 			if (poll(&_fds[0], _fds.size(), -1) < 0) {
 				throw ServerException(ERR_POLL);
@@ -192,7 +191,7 @@ void IrcServer::run() {
 
 		} catch (const ServerException& e) {
 			serverLog(this->_fd, LOG_ERR, C_ERR, e.what());
-			if (e.what() == ERR_POLL) {
+			if (std::string(e.what()) == ERR_POLL) {
 				exit(EXIT_FAILURE);
 			}
 		}

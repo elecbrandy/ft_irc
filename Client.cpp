@@ -20,11 +20,11 @@ void Client::setFd(int fd) {this->_fd = fd;}
 
 void Client::setNickname(const std::string& str) {
 	size_t spacePos = str.find(' ');
-    if (spacePos != std::string::npos) {
-        this->_nickname = str.substr(0, spacePos);
-    } else {
-        this->_nickname = str;
-    }
+	if (spacePos != std::string::npos) {
+		this->_nickname = str.substr(0, spacePos);
+	} else {
+		this->_nickname = str;
+	}
 }
 
 void Client::setUsername(const std::string& str) {this->_username = str;}
@@ -75,29 +75,54 @@ void Client::appendToRecvBuffer(const std::string& str) {
 	this->_recvBuffer += str;
 }
 
+// Ver1: 512~ delete
+// bool Client::extractMessage(std::string& message) {
+//     size_t pos = _recvBuffer.find(CRLF);
+
+// 	/* with CRLF */
+//     if (pos != std::string::npos) {
+//         size_t messageLen = pos + 2;
+//         if (messageLen > BUFFER_SIZE - 1) {
+//             _recvBuffer.erase(0, messageLen);
+//             return false;
+//         } else {
+//             message = _recvBuffer.substr(0, pos);
+//             _recvBuffer.erase(0, messageLen);
+//             return true;
+//         }
+// 	/* without CRLF */
+//     } else if (_recvBuffer.length() >= 512) {
+//         _recvBuffer.clear();
+//         return false;
+//     }
+//     return false;
+// }
+
+// Ver2: 512~ extract
 bool Client::extractMessage(std::string& message) {
-    size_t pos = _recvBuffer.find(CRLF);
-
-	/* with CRLF */
-    if (pos != std::string::npos) {
-        size_t messageLen = pos + 2;
-        if (messageLen > BUFFER_SIZE - 1) {
-            _recvBuffer.erase(0, messageLen);
-            return false;
-        } else {
-            message = _recvBuffer.substr(0, pos);
-            _recvBuffer.erase(0, messageLen);
-            return true;
-        }
-	/* without CRLF */
-    } else if (_recvBuffer.length() >= 512) {
-        _recvBuffer.clear();
-        return false;
-    }
-    return false;
+	size_t pos = _recvBuffer.find("\r\n");
+	if (pos != std::string::npos) {
+		size_t messageLength = pos + 2;
+		
+		// Check len 
+		if (messageLength > 512) {
+			// 앞의 510자와 CRLF를 분리
+			message = _recvBuffer.substr(0, 510);
+			_recvBuffer.erase(0, 510); // 앞의 510자를 제거하고 남은 부분은 다음 처리 대상
+		} else {
+			// 정상적인 메시지 처리
+			message = _recvBuffer.substr(0, pos);
+			_recvBuffer.erase(0, pos + 2);
+		}
+		return true;
+	} else if (_recvBuffer.length() >= 512) {
+		// CRLF가 없지만 버퍼가 512자를 초과한 경우
+		message = _recvBuffer.substr(0, 510);
+		_recvBuffer.erase(0, 510);
+		return true;
+	}
+	return false;
 }
-
-
 
 bool Client::isConnectionTimedOut(time_t timeout) {
 	time_t now = time(NULL);
