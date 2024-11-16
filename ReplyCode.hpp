@@ -31,7 +31,7 @@
 #define RPL_MOTDSTART(nick)                     "375 " + nick + " :start of MOTD command"
 
 // 372: MOTD 메세지의 본문
-#define RPL_MOTD(nick, msg)                          "372 " + nick + " :" + msg
+#define RPL_MOTD(nick, msg)                     "372 " + nick + " :" + msg
 
 // 376: MOTD 메세지의 끝을 알림
 #define RPL_ENDOFMOTD(nick)                     "376 " + nick + " :end of MOTD command"
@@ -52,16 +52,10 @@
 #define ERR_NOORIGIN 							"409 " + nick + " "
 
 // 411: 명령에 메시지 대상이 없음
-#define ERR_NORECIPIENT(nick,cmd) 					"411 " + nick + " " + ":No recipient given (" + cmd + ")"
+#define ERR_NORECIPIENT(nick,cmd) 				"411 " + nick + " " + ":No recipient given (" + cmd + ")"
 
 // 412: 보내야 할 메시지가 없음
-#define ERR_NOTEXTTOSEND(nick) 						"412 " + nick + " " ":No text to send"
-
-// 413: 주소가 최상위 도메인이 아님
-// #define ERR_NOTOPLEVEL 							"413 " + nick + " "
-
-// 414: 와일드카드가 최상위 도메인에 사용됨
-// #define ERR_WILDTOPLEVEL 						"414 " + nick + " "
+#define ERR_NOTEXTTOSEND(nick) 					"412 " + nick + " " ":No text to send"
 
 // 421: 알 수 없는 명령을 보냄
 #define ERR_UNKNOWNCOMMAND(nick, cmd)  			"421 " + nick + " " + cmd + " :Unknown command"
@@ -110,15 +104,15 @@
 
 // 462: 클라이언트가 이미 등록된 상태에서 다시 등록 시도
 #define ERR_ALREADYREGISTRED(nick) 				"462 " + nick + " :You may not reregister"
-                        
+						
 // 463: 호스트에 대한 권한이 부족함
 #define ERR_NOPERMFORHOST 						"463 " + nick + " "
 
 // 464: 비밀번호가 틀림
-#define ERR_PASSWDMISMATCH(nick) 						"464 " + nick + " :Password incorrect"
+#define ERR_PASSWDMISMATCH(nick) 				"464 " + nick + " :Password incorrect"
 
 // 467: 채널의 키가 이미 설정되어 있음
-#define ERR_KEYSET(ch)						"467 " + ch + " :Channel key already set"
+#define ERR_KEYSET(ch)							"467 " + ch + " :Channel key already set"
 
 // 471: 채널이 가득 차서 더 이상 사용자가 들어올 수 없음
 #define ERR_CHANNELISFULL(nick, ch) 			"471 " + nick + " " + ch + " :Cannot join channel (+l)"
@@ -154,36 +148,34 @@
 // 502: 사용자가 자신이 아닌 다른 사람의 모드를 변경하려 함
 #define ERR_nickSDONTMATCH 						"502 " + nick + " "
 
-/* Custom */
+/* 
+ * Custom Reply Code
+*/
 
 // PASS 시 Password 오류
-#define ERR_PASS_PASSWORD                       "Error: incorrected PassWord"
+#define ERR_PASS_PASSWORD						"Error: incorrected PassWord"
 
-#define ERR_INVALIDPARAM                        "Error: invalid parameter"
-
-/* 사용자 정의 */
+#define ERR_INVALIDPARAM						"Error: invalid parameter"
 
 // 닉네임 변경 완료시
-#define RPL_NICK( newNick)                 "NICK " + newNick
+#define RPL_NICK(newNick)						"NICK " + newNick
 
 // 채널에 참여 완료시
-#define RPL_JOIN(ch)                            "JOIN " + ch
+#define RPL_JOIN(ch)							"JOIN " + ch
 
 // 채널에서 강퇴 완료시
-#define RPL_KICK(ch, target, comment)           "KICK " + ch + " " + target + " :" + comment
+#define RPL_KICK(ch, target, comment)			"KICK " + ch + " " + target + " :" + comment
 
 // 채널에서 나가기 완료시
-#define RPL_PART(ch)                            "PART " + ch
+#define RPL_PART(ch)							"PART " + ch
 
 // 채널 초대 완료시 초대 당한 사용자에게 보내는 메세지
-#define RPL_INVITE(target, ch)                  "INVITE " + target + " " + ch
+#define RPL_INVITE(target, ch)					"INVITE " + target + " " + ch
 
 // PRIVMSG를 받는 클라이언트한테 보내는 메세지
-#define RPL_PRIVMSG(receiver, msg)              "PRIVMSG " + receiver + " " + msg
+#define RPL_PRIVMSG(receiver, msg)				"PRIVMSG " + receiver + " " + msg
 
-// 417: 메세지가 512자를 넘어가는 경우 (InspIRCd 기준)
-// #define ERR_LINETOOLONG(nick)					"417 " + nick + " :Input Line too long"
+#define ERR_ERRUSERCMD							"Error: in Usercmd"
 
-#define ERR_ERRUSERCMD "Error: in Usercmd"
+#define RPL_PING(servername)					"PONG :" + servername
 
-#define RPL_CAP "CAP * LS :"

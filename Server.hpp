@@ -19,12 +19,12 @@
 #include <errno.h>
 #include "Client.hpp"
 #include "Channel.hpp"
-#include "ServerCode.hpp"
+#include "ServerMsg.hpp"
 #include "ReplyCode.hpp"
 #include "Cmd/Cmd.hpp"
 
 #define MAX_CLIENTS 42
-#define BUFFER_SIZE 512
+#define BUFFER_SIZE 513
 
 #define PORT_MAX 65535
 #define PORT_MIN 0
@@ -39,8 +39,7 @@
 #define PREFIX_SERVER ":ircserv"
 #define PREFIX_USER(nickname, username, hostname) 	":" + nickname + "!" + username + "@" + hostname
 
-#define TIME_OUT 20
-#define TIME_CHECK_INTERVAL 180
+#define WAIT_FOR_PING_MAX 120
 
 #define LOG_ERR -1
 #define LOG_SERVER 0
@@ -49,62 +48,52 @@
 
 class IrcServer {
 private:
-	int									_fd;
-	int									_port;
-	std::string							_password;
-	const std::string					_servername;
-	time_t								_startTime;
+	int										_fd;
+	int										_port;
+	std::string								_password;
+	const std::string						_servername;
+	time_t									_startTime;
 
-	std::vector<struct pollfd>			fds;
-	std::map<int, Client*>				_clients;
-	std::map<std::string, Channel *>	_channels;
-	std::map<std::string, Client*>		nickNameClientMap;
-	std::vector<int>					_fdsToRemove;
+	std::vector<struct pollfd>				_fds;
+	std::map<int, Client*>					_clients;
+	std::map<std::string, Channel *>		_channels;
+	std::map<std::string, Client*>			nickNameClientMap;
+	std::vector<int>						_fdsToRemove;
 
 public:
 	IrcServer();
 	IrcServer(const char *port, const char *password);
 	~IrcServer();
-
-	void	init();
-	void	acceptClient();
-	void	handleSocketRead(int fd);
-	void	handleClientMessage(int fd);
-	void	broadcastMsg(const std::string& message, Channel* channel, int senderFd);
-	void	castMsg(int client_fd, const std::string message);
-	void	run();
 	
-	/* setter & getter */
-	void setChannels(const std::string& channelName, const std::string& key, const char& mode);
+	std::string								getPassword();
+	const std::string						getName() const;
+	time_t									getStartTime() const;
+	Client*									getClient(const std::string& nickname);
+	Client*									getClient(int client_fd);
+	const std::map<std::string, Client*>&	getNickNameClientMap() const;
+	std::map<std::string, Channel*>&		getChannels();
+	void									setChannels(const std::string& channelName, const std::string& key, const char& mode);
 
-	
-	Client* getClient(const std::string& nickname);
-	Client* getClient(int client_fd);
-	const std::string getName() const;
-	time_t getStartTime() const;
-
-	std::map<std::string, Channel*>& getChannels();
-	void removeChannel(const std::string channelName);
-	
-	const std::map<std::string, Client*>& getNickNameClientMap() const;
-	void addClientByNickname(const std::string& nickname, Client* client);
-	std::string makeMsg(const std::string& prefix, const std::string& msg);
-
-	void checkConnections();
-	std::string	getPassword();
-	void printGoat();
-	std::string formatDateToString(time_t time);
-
-	void removeClientFromServer(Client* client);
-
-	void updateClients(Client* client);
-	void updateNickNameClientMap(const std::string& oldNick, const std::string& newNick, Client* client);
-
-	void serverLog(int fd, int log_type, std::string log_color, std::string msg);
-	std::string intToString(int num);
-	static void signalHandler(int signal);
-	void sendPing();
-	void checkPong();
+	void									init();
+	void									acceptClient();
+	void									run();
+	void									handleSocketRead(int fd);
+	void									handleSocketWrite(int fd);
+	void									checkPingTimeOut();
+	std::string								makeMsg(const std::string& prefix, const std::string& msg);
+	void									castMsg(int client_fd, const std::string message);
+	void									broadcastMsg(const std::string& message, Channel* channel, int senderFd);
+	void									removeChannel(const std::string channelName);
+	void									removeClientFd(int client_fd);
+	void									removeClientFromServer(Client* client);
+	void									addClientByNickname(const std::string& nickname, Client* client);
+	void									updateClients(Client* client);
+	void									updateNickNameClientMap(const std::string& oldNick, const std::string& newNick, Client* client);
+	void									enablePollOutEvent(int client_fd);
+	void									serverLog(int fd, int log_type, std::string log_color, std::string msg);
+	std::string								formatDateToString(time_t time);
+	std::string								intToString(int num);
+	void									printGoat();
 
 	/* exception */
 	class ServerException : public std::exception {

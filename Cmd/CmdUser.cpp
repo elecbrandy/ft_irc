@@ -34,7 +34,6 @@
 	서버 간 메시지에서 USER 명령어가 속한 사용자 이름 "testnick"과 함께.
 */
 
-// :testnick USER guest tolmoon tolsun :Ronnie Reagan
 
 void Cmd::checkUsername(const std::string& str) {
 	/* EMPTY check */
