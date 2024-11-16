@@ -3,9 +3,9 @@
 
 /* COUT LOG */
 #define MSG_SERVER_INIT(port)			"IRC Server INIT!: port: " + port
-#define MSG_NEW_CONNECTED(fd)			"new client connected: fd: " + fd
-#define MSG_END_CONNECTED(fd)			"client connection closed: fd: " + fd
-#define MSG_CONNECTION_TIMEOUT(fd)		"client connection timed out: fd: " + fd
+#define MSG_NEW_CONNECTED(fd)			"new client connected [fd: " + fd + "]"
+#define MSG_END_CONNECTED(fd)			"client connection closed [fd: " + fd + "]"
+#define MSG_CONNECTION_TIMEOUT(fd)		"client connection timed out [fd: " + fd + "]"
 #define MSG_CHECK_CONNECTION_START		"checking client connection..."
 #define MSG_RECV_SIGNAL         		"signal received."
 #define MSG_SERVER_SHUTDOWN				"server closed."

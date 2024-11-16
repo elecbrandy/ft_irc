@@ -21,11 +21,7 @@ class Client {
 		std::string	_hostname;
 		std::string	_realname;
 		std::string _servername;
-		// time_t		_lastPingSent; // 클라이언트가 마지막으로 ping을 보낸시간
-		//time_t		_lastPongSent; // 클라이언트가 서버로부터 마지막으로 ping을 받은 시간 (ping을 보내지 않아서 서버가 ping을 보내는 경우)
-			time_t _lastPingSent;     // 마지막으로 서버가 PING을 보낸 시간
-			time_t _lastPongReceived; // 마지막으로 클라이언트가 PONG을 받은 시간
-			bool _pingSent;           // PING이 보내졌는지 여부
+		time_t 		_lastPingSent;     // 마지막으로 서버가 PING을 보낸 시간
 		t_regitser	_registerStatus;
 		std::string _prefix;
 
@@ -39,9 +35,8 @@ class Client {
 		void		setUsername(const std::string& str);
 		void		setHostname(const std::string& str);
 		void		setRealname(const std::string& str);
-		// void		setPassword(const std::string str);
 		void		setServername(const std::string& str);
-		// void 		updateLastPingSent();
+		void		updateLastPingSent();
 		void		setIsRegistered(bool flag);
 		void		setPassStatus(bool status);
 		void 		setNickStatus(bool status);
@@ -56,7 +51,7 @@ class Client {
 		std::string	getRealname() const;
 		std::string	getPassword() const;
 		std::string	getServername() const;
-		// time_t		getLastPingSent() const;
+		time_t		getLastPingSent() const;
 		bool		getPassStatus() const;
 		bool		getNickStatus() const;
 		bool		getUserStatus() const;
@@ -65,34 +60,12 @@ class Client {
 
 		void		appendToRecvBuffer(const std::string& str);
 		bool		extractMessage(std::string& message);
-		bool		isTimedOut();
 
 		void		printLog();
 		void		appendToSendBuffer(const std::string& str);
 		const std::string& getSendBuffer() const;
 		void		clearSendBuffer(size_t count);
 		bool		hasDataToSend() const;
-
-		// void		updateLastPongSent();
-		// time_t		getLastPongSent() const;
-
-
-
-
-		time_t getLastPingSent() const { return _lastPingSent; }
-		time_t getLastPongReceived() const { return _lastPongReceived; }
-
-		void updateLastPingSent() {
-			_lastPingSent = time(NULL);
-			_pingSent = true;
-		}
-
-		void updateLastPongReceived() {
-			_lastPongReceived = time(NULL);
-			_pingSent = false;
-		}
-
-		bool wasPingSent() const { return _pingSent; }
 };
 
 #endif

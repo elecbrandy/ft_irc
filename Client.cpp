@@ -5,7 +5,7 @@
 	// _lastPingSent(time(NULL)),
 Client::Client(in_addr addr)
 :	_hostname(inet_ntoa(addr)),
-	_lastPingSent(0), _lastPongReceived(time(NULL)), _pingSent(false) {
+	_lastPingSent(time(NULL)) {
 	_registerStatus.pass = false;
 	_registerStatus.nick = false;
 	_registerStatus.user = false;
@@ -37,7 +37,7 @@ void Client::setRealname(const std::string& str) {this->_realname = str;}
 
 void Client::setServername(const std::string& str) {this->_servername = str;}
 
-// void Client::updateLastPingSent() {this->_lastPingSent = time(NULL);}
+void Client::updateLastPingSent() {this->_lastPingSent = time(NULL);}
 
 void Client::setPassStatus(bool status) {this->_registerStatus.pass = status;}
 
@@ -47,7 +47,6 @@ void Client::setUserStatus(bool status) {this->_registerStatus.user = status;}
 
 void Client::setRegisteredStatus(bool status) {this->_registerStatus.registered = status;}
 
-// void Client::updateLastPongSent() {this->_lastPongSent = time(NULL);}
 
 /* getter */
 int	Client::getFd() const {return this->_fd;}
@@ -62,7 +61,7 @@ std::string	Client::getRealname() const {return this->_realname;}
 
 std::string	Client::getServername() const {return this->_servername;}
 
-// time_t	Client::getLastPingSent() const {return this->_lastPingSent;}
+time_t	Client::getLastPingSent() const {return this->_lastPingSent;}
 
 bool Client::getPassStatus() const {return this->_registerStatus.pass;}
 

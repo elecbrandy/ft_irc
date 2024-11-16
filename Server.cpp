@@ -131,156 +131,25 @@ void IrcServer::acceptClient() {
 	serverLog(this->_fd, LOG_SERVER, C_MSG, MSG_NEW_CONNECTED(intToString(client_fd)));
 }
 
-// void IrcServer::sendPingToClient() {
-// 	std::cout << "here1" << std::endl;
-// 	if (_clients.empty()) {
-// 	std::cout << "here2" << std::endl;
-// 		return;
-// 	}
+void IrcServer::checkPingTimeOut() {
+	std::vector<int> clientsToRemove;
+	for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); it++) {
+		Client* client = it->second;
+		time_t now = time(NULL);
+		if (now - client->getLastPingSent() > WAIT_FOR_PING_MAX)
+			clientsToRemove.push_back(client->getFd());
+	}
 
-// 	time_t now = time(NULL);
-// 	for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
-// 		Client* client = it->second;
-// 	std::cout << "here3" << std::endl;
-// 		if (now - client->getLastPingSent() > WAIT_FOR_PING_MAX){
-// 	std::cout << "here4" << std::endl;
-// 			castMsg(client->getFd(), makeMsg(PREFIX_SERVER, RPL_PING(_servername)));
-// 			client->updateLastPingSent();
-// 		}
-// 	}
-// }
-
-// void IrcServer::sendPingToClient() {
-//     if (_clients.empty()) {
-//         return;
-//     }
-
-//     time_t now = time(NULL);
-//     for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
-//         Client* client = it->second;
-
-//         // 클라이언트가 마지막으로 PING을 보낸 이후 3분이 지났다면
-//         if (now - client->getLastPingSent() > WAIT_FOR_PING_MAX) {
-//             std::cout << "Sending PING to client: " << client->getFd() << std::endl;
-
-//             // 클라이언트에게 PING 메시지 전송
-//             castMsg(client->getFd(), makeMsg(PREFIX_SERVER, RPL_PING(_servername)));
-
-//             // 클라이언트의 마지막 PING 전송 시간을 갱신
-//             client->updateLastPingSent();
-//         }
-//     }
-// }
-void IrcServer::sendPingToClient() {
-    if (_clients.empty()) {
-        return;
-    }
-
-    time_t now = time(NULL);
-
-    for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
-        Client* client = it->second;
-
-        // 클라이언트에게 PING 전송 조건 확인
-        if (now - client->getLastPingSent() > WAIT_FOR_PING_MAX) {
-            std::cout << "Sending PING to client: " << client->getFd() << std::endl;
-
-            // 클라이언트에게 PING 메시지 전송
-            castMsg(client->getFd(), makeMsg(PREFIX_SERVER, RPL_PING(_servername)));
-
-            // 마지막 PING 전송 시간 갱신
-            client->updateLastPingSent();
-        }
-    }
+	for (std::vector<int>::iterator it = clientsToRemove.begin(); it != clientsToRemove.end(); it++) {
+    	serverLog(this->_fd, LOG_SERVER, C_MSG, MSG_CONNECTION_TIMEOUT(intToString(*it)));
+		removeClientFromServer(_clients[*it]);
+	}
 }
-
-
-// void IrcServer::checkPongFromClient() {
-// 	if (_clients.empty())
-// 		return;
-
-// 	for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); it++) {
-// 		Client* client = it->second;
-// 		time_t now = time(NULL);
-// 		// 두 조건을 둘 다 만족해야 함! 왜냐면 만약 이전에 ping-pong 릴레이가 한번도 실패한 적이 없다면 lastPongSent는 client 객체 생성 시간과 같을 것이기 때문. 그래서 반드시 클라이언트가 마지막으로 ping을 보낸 시간으로부터 WAIT_FOR_PONG_MAX 시간 이상이 지났을때도 동시에 만족해야 퐁을 받지 못했다고 판단할 수 있음.
-// 		if (now - client->getLastPingSent() > WAIT_FOR_PING_MAX && \
-// 			now - client->getLastPongSent() > WAIT_FOR_PONG_MAX) {
-// 			std::cout << client->getNickname() << " is timed out, remove client" << std::endl;
-// 			removeClientFromServer(client);
-// 			continue;
-// 		}
-// 	}
-// }
-
-// void IrcServer::checkPongFromClient() {
-// 	std::vector<int> clientsToRemove;
-// 	for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); it++) {
-// 		Client* client = it->second;
-// 		time_t now = time(NULL);
-// 		if (now - client->getLastPingSent() > WAIT_FOR_PING_MAX && 
-// 			now - client->getLastPongSent() > WAIT_FOR_PONG_MAX)
-// 			clientsToRemove.push_back(client->getFd());
-// 	}
-
-// 	for (std::vector<int>::iterator it = clientsToRemove.begin(); it != clientsToRemove.end(); it++)
-//     	removeClientFromServer(_clients[*it]);
-// }
-
-// void IrcServer::checkPongFromClient() {
-//     if (_clients.empty()) {
-//         return;
-//     }
-
-//     time_t now = time(NULL);
-//     for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end();) {
-//         Client* client = it->second;
-
-//         // 클라이언트가 마지막으로 PONG을 보낸 이후 시간 확인
-//         if (client->wasPingSent()) { // PING이 보내졌는지 확인
-//             if (now - client->getLastPongReceived() > WAIT_FOR_PONG_MAX) { // 30초 경과 확인
-//                 std::cout << "Removing client due to PONG timeout: " << client->getFd() << std::endl;
-
-//                 // 클라이언트를 서버에서 제거
-//                 removeClientFromServer(client);
-//                 it = _clients.erase(it);
-//                 continue;
-//             }
-//         }
-//         ++it;
-//     }
-// }
-
-void IrcServer::checkPongFromClient() {
-    if (_clients.empty()) {
-        return;
-    }
-
-    time_t now = time(NULL);
-
-    for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end();) {
-        Client* client = it->second;
-
-        // 클라이언트가 PONG 응답을 보내지 않았는지 확인
-        if (client->wasPingSent() && now - client->getLastPongReceived() > WAIT_FOR_PONG_MAX) {
-            std::cout << "Removing client due to PONG timeout: " << client->getFd() << std::endl;
-
-            // 클라이언트 정리 및 삭제
-            close(client->getFd());    // 소켓 닫기
-            delete client;             // 메모리 해제
-            it = _clients.erase(it);   // 맵에서 제거 (반복자 갱신)
-        } else {
-            ++it; // 반복자 증가
-        }
-    }
-}
-
 
 void IrcServer::run() {
 	while (true) {
 		bool exitFlag= false;
 		try {
-			sendPingToClient(); // 핑 보내는 부분
-
 			// poll 호출에 타임아웃 설정 (예: 1초)
 			int timeout_ms = 1000; // 1000ms = 1초
 			if (poll(&fds[0], fds.size(), timeout_ms) < 0) {
@@ -302,7 +171,7 @@ void IrcServer::run() {
 			}
 
 			// 타임아웃 또는 입력 이벤트 후 퐁 검사
-			checkPongFromClient();
+			checkPingTimeOut();
 
 		} catch (const ServerException& e) {
 			serverLog(this->_fd, LOG_ERR, C_ERR, e.what());
@@ -439,59 +308,6 @@ void IrcServer::printGoat() {
 	}
 }
 
-// void IrcServer::removeClientFromServer(Client* client) {
-// 	if (client == NULL) {
-// 		return;
-// 	}
-
-// 	// for (std::map<std::string, Channel*>::iterator chs = _channels.begin(); chs != _channels.end(); ++chs) {
-// 	// 	Channel* ch = chs->second;
-// 	// 	if (ch->isParticipant(ch->isOperatorNickname(client->getNickname()))) {
-// 	// 		ch->removeParticipant(ch->isOperatorNickname(client->getNickname()));
-// 	// 	}
-// 	// 	if (ch->isOperator(client->getNickname())) {
-// 	// 		ch->removeOperator(client->getNickname());
-// 	// 	}
-// 	// }
-
-// 	// _clients.erase(client->getFd());
-// 	// nickNameClientMap.erase(client->getNickname());
-
-// 	// for (size_t i = 0; i < fds.size(); i++) {
-// 	// 	if (fds[i].fd == client->getFd()) {
-// 	// 		fds.erase(fds.begin() + i);
-// 	// 		break ;
-// 	// 	}
-// 	// }
-
-// 	// delete client;
-
-// 	// ranchoi : 채널에서 클라이언트 제거
-// 	for (std::map<std::string, Channel*>::iterator chs = _channels.begin(); chs != _channels.end(); ++chs) {
-// 		Channel* ch = chs->second;
-// 		if (ch->isParticipant(client->getNickname())) {
-// 			ch->removeParticipant(client->getNickname());
-// 		}
-// 		if (ch->isOperator(client->getNickname())) {
-// 			ch->removeOperator(client->getNickname());
-// 		}
-// 	}
-
-// 	// _clients 맵에서 클라이언트 제거
-// 	_clients.erase(client->getFd());
-// 	nickNameClientMap.erase(client->getNickname());
-
-// 	// fds 벡터에서 클라이언트 제거
-// 	for (std::vector<pollfd>::iterator it = fds.begin(); it != fds.end(); ++it) {
-// 		if (it->fd == client->getFd()) {
-// 			fds.erase(it);
-// 			break;
-// 		}
-// 	}
-
-// 	delete client;
-// }
-
 void IrcServer::removeClientFromServer(Client* client) {
     if (client == NULL) {
         return;
@@ -523,7 +339,9 @@ void IrcServer::removeClientFromServer(Client* client) {
         }
     }
 
-    // 클라이언트 메모리 해제
+    // // 클라이언트 메모리 해제
+	// serverLog(this->_fd, LOG_SERVER, C_MSG, MSG_CONNECTION_TIMEOUT(intToString(*it)));
+	serverLog (client->getFd(), LOG_SERVER, C_MSG, MSG_END_CONNECTED(intToString(client->getFd())));
     delete client;
 }
 
