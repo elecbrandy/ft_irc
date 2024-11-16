@@ -1,0 +1,12 @@
+# Mac
+.Ds_Store
+
+# VsCode
+.vscode
+
+# etc
+a.out
+*.o
+*.swp
+ircserv
+legacy
