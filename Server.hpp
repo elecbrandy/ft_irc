@@ -23,7 +23,7 @@
 #include "ReplyCode.hpp"
 #include "Cmd/Cmd.hpp"
 
-#define MAX_CLIENTS 42
+#define MAX_CLIENTS 2
 #define BUFFER_SIZE 513
 
 #define PORT_MAX 65535

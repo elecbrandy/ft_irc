@@ -33,5 +33,6 @@
 #define	ERR_ETC					"unknown error occurred."
 #define ERR_RECV				"recv() error."
 #define ERR_OPEN_FILE           "cannot open file."
+#define ERR_BUFFER_SIZE         "buffer size error."
 
 #endif

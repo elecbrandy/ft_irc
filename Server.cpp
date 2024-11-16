@@ -71,6 +71,10 @@ std::string IrcServer::formatDateToString(time_t time) {
 }
 
 void IrcServer::init() {
+	
+	if (BUFFER_SIZE < 4)
+		throw ServerException(ERR_BUFFER_SIZE);
+		
 	if ((_fd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) == -1) {
 		throw ServerException(ERR_SOCKET_CREATION);
 	}
@@ -219,7 +223,7 @@ void IrcServer::handleSocketRead(int fd) {
 		removeClientFromServer(getClient(fd));
 		return ;
 	}
-
+	
 	buffer[recvLen] = '\0';
 	client->appendToRecvBuffer(buffer);
 
