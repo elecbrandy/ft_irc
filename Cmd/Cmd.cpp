@@ -65,10 +65,10 @@ bool Cmd::handleClientCmd() {
 		else
 			return false;
 	} catch (const CmdException& e) {
+		server.castMsg(client_fd, e.what());
 		if (!client->getPassStatus() || !client->getRegisteredStatus()) {
 			server.removeClientFromServer(client);
 		}
-		server.castMsg(client_fd, e.what());
 		return false;
 	}
 	return true;

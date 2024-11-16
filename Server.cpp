@@ -132,20 +132,21 @@ void IrcServer::acceptClient() {
 }
 
 void IrcServer::checkPingTimeOut() {
-	for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); it++) {
+	std::vector<Client*> clientsToRemove;
+	for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
 		Client* client = it->second;
 		time_t now = time(NULL);
-		if (now - client->getLastPingSent() > WAIT_FOR_PING_MAX)
-			_fdsToRemove.push_back(client->getFd());
+		if (now - client->getLastPingSent() > WAIT_FOR_PING_MAX) {
+			clientsToRemove.push_back(client);
+		}
 	}
 
-	// Remove Client fds
-	for (size_t j = 0; j < _fdsToRemove.size(); ++j) {
-		removeClientFd(_fdsToRemove[j]);
+	for (size_t i = 0; i < clientsToRemove.size(); ++i) {
+		Client* client = clientsToRemove[i];
+		serverLog(client->getFd(), LOG_SERVER, C_ERR, "Ping timeout. Disconnecting client " + intToString(client->getFd()));
+		removeClientFromServer(client);
 	}
-	_fdsToRemove.clear();
 }
-
 
 void IrcServer::run() {
 	bool exitFlag = false;
@@ -173,8 +174,8 @@ void IrcServer::run() {
 
 						// Add to remove list if Client Shutdown
 						if (getClient(_fds[i].fd) == nullptr) { 
-                            _fdsToRemove.push_back(_fds[i].fd);
-                        }
+							_fdsToRemove.push_back(_fds[i].fd);
+						}
 					}
 				}
 
@@ -184,16 +185,16 @@ void IrcServer::run() {
 					
 					// Add to remove list if Client Shutdown
 					if (getClient(_fds[i].fd) == nullptr) { 
-                	    _fdsToRemove.push_back(_fds[i].fd);
-                	}
+						_fdsToRemove.push_back(_fds[i].fd);
+					}
 				}
 			}
 
 			// Remove Client fds
 			for (size_t j = 0; j < _fdsToRemove.size(); ++j) {
-                removeClientFd(_fdsToRemove[j]);
-            }
-            _fdsToRemove.clear();
+				removeClientFd(_fdsToRemove[j]);
+			}
+			_fdsToRemove.clear();
 
 		} catch (const ServerException& e) {
 			serverLog(this->_fd, LOG_ERR, C_ERR, e.what());
@@ -387,11 +388,11 @@ void IrcServer::removeClientFromServer(Client* client) {
 		}
 	}
 
-    // 클라이언트를 _clients와 nickNameClientMap에서 제거
-    if (_clients.find(client->getFd()) != _clients.end()) {
-        _clients.erase(client->getFd());
-    }
-    nickNameClientMap.erase(client->getNickname());
+	// 클라이언트를 _clients와 nickNameClientMap에서 제거
+	if (_clients.find(client->getFd()) != _clients.end()) {
+		_clients.erase(client->getFd());
+	}
+	nickNameClientMap.erase(client->getNickname());
 
 	_fdsToRemove.push_back(client->getFd());
 	
@@ -440,19 +441,19 @@ std::string IrcServer::intToString(int num) {
 }
 
 void IrcServer::enablePollOutEvent(int client_fd) {
-    for (size_t i = 0; i < _fds.size(); ++i) {
-        if (_fds[i].fd == client_fd) {
-            _fds[i].events = (_fds[i].events | POLLOUT);
-            break;
-        }
-    }
+	for (size_t i = 0; i < _fds.size(); ++i) {
+		if (_fds[i].fd == client_fd) {
+			_fds[i].events = (_fds[i].events | POLLOUT);
+			break;
+		}
+	}
 }
 
 void IrcServer::removeClientFd(int client_fd) {
-    for (size_t i = 0; i < _fds.size(); ++i) {
-        if (_fds[i].fd == client_fd) {
-            _fds.erase(_fds.begin() + i);
-            break;
-        }
-    }
+	for (size_t i = 0; i < _fds.size(); ++i) {
+		if (_fds[i].fd == client_fd) {
+			_fds.erase(_fds.begin() + i);
+			break;
+		}
+	}
 }

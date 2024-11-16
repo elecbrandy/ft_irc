@@ -39,7 +39,7 @@
 #define PREFIX_SERVER ":ircserv"
 #define PREFIX_USER(nickname, username, hostname) 	":" + nickname + "!" + username + "@" + hostname
 
-#define WAIT_FOR_PING_MAX 120
+#define WAIT_FOR_PING_MAX 250
 
 #define LOG_ERR -1
 #define LOG_SERVER 0
